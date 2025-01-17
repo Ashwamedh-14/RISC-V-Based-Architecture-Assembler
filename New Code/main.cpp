@@ -32,7 +32,6 @@ bool check_comma(int comma_cnt, string hex_code){
 
 // function to get the related hex value of the opcode passed
 string opcode_hex(string opcode){
-    string s;
     if (opcode == "NOP") return "0000000";
     else if (opcode == "AND") return "01";
     else if (opcode == "OR") return "02";
