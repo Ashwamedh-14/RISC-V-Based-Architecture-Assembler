@@ -9,47 +9,47 @@ The assembler is designed to translate assembly instruction into equivalent hexa
 
 Following are the list of abbreviations that will be used:-
 
-<table style="text-align: center;">
+<table>
   <caption><strong>Table of Abbreviations</strong></caption>
   <tr>
-    <th>Abbreviations</th>
-    <th>Refers To</th>
+    <th style="text-align: center;">Abbreviations</th>
+    <th style="text-align: center;">Refers To</th>
   </tr>
   <tr>
-    <td>COA</td>
-    <td>Computer Organisation and Architecture</td>
+    <td style="text-align: center;">COA</td>
+    <td style="text-align: center;">Computer Organisation and Architecture</td>
   </tr>
   <tr>
-    <td>CSE302</td>
-    <td>Refers to COA</td>
+    <td style="text-align: center;">CSE302</td>
+    <td style="text-align: center;">Refers to COA</td>
   </tr>
   <tr>
-    <td>SEAS</td>
-    <td>School of Engineering and Applied Sciences</td>
+    <td style="text-align: center;">SEAS</td>
+    <td style="text-align: center;">School of Engineering and Applied Sciences</td>
   </tr>
   <tr>
-    <td>AU</td>
-    <td>Ahmedabd University</td>
+    <td style="text-align: center;">AU</td>
+    <td style="text-align: center;">Ahmedabd University</td>
   </tr>
   <tr>
-    <td>OP Code</td>
-    <td>OPeration Code</td>
+    <td style="text-align: center;">OP Code</td>
+    <td style="text-align: center;">OPeration Code</td>
   </tr>
   <tr>
-    <td>Hex</td>
-    <td>Hexadecimal</td>
+    <td style="text-align: center;">Hex</td>
+    <td style="text-align: center;">Hexadecimal</td>
   </tr>
   <tr>
-    <td>Reg</td>
-    <td>Registers</td>
+    <td style="text-align: center;">Reg</td>
+    <td style="text-align: center;">Registers</td>
   </tr>
   <tr>
-    <td>DAT</td>
-    <td>Data Line</td>
+    <td style="text-align: center;">DAT</td>
+    <td style="text-align: center;">Data Line</td>
   </tr>
   <tr>
-    <td>PC</td>
-    <td>Program Counter</td>
+    <td style="text-align: center;">PC</td>
+    <td style="text-align: center;">Program Counter</td>
   </tr>
 </table>
 
