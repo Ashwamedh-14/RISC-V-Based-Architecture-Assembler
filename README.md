@@ -9,20 +9,6 @@ The assembler is designed to translate assembly instruction into equivalent hexa
 
 Following are the list of abbreviations that will be used:-
 
-<style>
-    table, th, td{
-        border: 1px solid;
-        border-collapse: collapse;
-        text-align: center;
-    }
-    tr:hover:not(:first-child){
-      background-color: #f5f5f5;
-    }
-    th, td{
-      padding: 5px;
-    }
-</style>
-
 <table>
   <caption><strong>Table of Abbreviations</strong></caption>
   <tr>
