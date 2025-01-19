@@ -9,6 +9,64 @@ The assembler is designed to translate assembly instruction into equivalent hexa
 
 Following are the list of abbreviations that will be used:-
 
+<style>
+    table, th, td{
+        border: 1px solid;
+        border-collapse: collapse;
+        text-align: center;
+    }
+    tr:hover:not(:first-child){
+      background-color: #f5f5f5;
+    }
+    th, td{
+      padding: 5px;
+    }
+</style>
+
+<table>
+  <caption><strong>Table of Abbreviations</strong></caption>
+  <tr>
+    <th>Abbreviations</th>
+    <th>Refers To</th>
+  </tr>
+  <tr>
+    <td>COA</td>
+    <td>Computer Organisation and Architecture</td>
+  </tr>
+  <tr>
+    <td>CSE302</td>
+    <td>Refers to COA</td>
+  </tr>
+  <tr>
+    <td>SEAS</td>
+    <td>School of Engineering and Applied Sciences</td>
+  </tr>
+  <tr>
+    <td>AU</td>
+    <td>Ahmedabd University</td>
+  </tr>
+  <tr>
+    <td>OP Code</td>
+    <td>OPeration Code</td>
+  </tr>
+  <tr>
+    <td>Hex</td>
+    <td>Hexadecimal</td>
+  </tr>
+  <tr>
+    <td>Reg</td>
+    <td>Registers</td>
+  </tr>
+  <tr>
+    <td>DAT</td>
+    <td>Data Line</td>
+  </tr>
+  <tr>
+    <td>PC</td>
+    <td>Program Counter</td>
+  </tr>
+</table>
+
 ## How to Use
 
 ### Pre-installation
