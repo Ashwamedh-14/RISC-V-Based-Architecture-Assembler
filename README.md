@@ -56,7 +56,7 @@ Following are the list of abbreviations that will be used:-
 
 ### Pre-installation
 
-1. Ensure you have a `C++` compiler installed and available on system path
+1. Ensure you have a `C++` compiler installed and available on system path. If not, you can install `C++` from [here](https://sourceforge.net/projects/mingw/).
 2. Ensure you have `Logisim` installed. If not, you can install it from [here](https://sourceforge.net/projects/circuit/#)
    > **Note**  
    > `Logisim` requires `Java 5` or later to run.
