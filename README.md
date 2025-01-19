@@ -9,7 +9,7 @@ The assembler is designed to translate assembly instruction into equivalent hexa
 
 Following are the list of abbreviations that will be used:-
 
-<table>
+<table style="text-align: center;">
   <caption><strong>Table of Abbreviations</strong></caption>
   <tr>
     <th>Abbreviations</th>
