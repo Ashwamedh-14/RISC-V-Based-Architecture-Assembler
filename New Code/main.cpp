@@ -1,17 +1,55 @@
 #include <bits/stdc++.h>
 #include <fstream>
+#include <Sstream>
 
 using namespace std;
 
 static const vector<char> hex_chars = {'0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F'};
+static const map<string,string> op_code = {
+    {"NOP", "0000000"},
+    {"AND", "01"},
+    {"OR", "02"},
+    {"EXOR", "03"},
+    {"ADD", "04"},
+    {"ANDI", "05"},
+    {"ORI", "06"},
+    {"EXORI", "07"},
+    {"ADDI", "08"},
+    {"MOV", "09"},
+    {"MOVI", "0A"},
+    {"LOAD", "0B"},
+    {"STORE", "0C"},
+    {"JMP", "0D"},
+    {"JMPZ", "0E"},
+    {"JMPNZ", "0F"},
+    {"JMPC", "10"},
+    {"JMPNC", "11"},
+    {"PUSH", "12"},
+    {"POP", "13"},
+    {"IN", "14"},
+    {"OUT", "15"},
+    {"LOADI", "16"},
+    {"STOREI", "17"},
+    {"SUB", "18"},
+    {"SHIFTR", "19"},
+    {"SHIFTL", "1A"},
+    {"JMPPCRZ", "1B"},
+    {"JMPPCRNZ", "1C"}
+};
 
-// struct Instruction{
-//     string opcode;
-//     string register1;
-//     string register2;
-//     string register3;
-//     string dataline;
-// };
+struct Instruction{
+    string opcode;
+    vector<string> registers = {"","",""};
+    int reg_num;
+    string dataline;
+};
+
+// Convert alphabets in a string to uppercase
+void toUpper(string &s){
+    for(int i = 0; i < s.size(); i++){
+        if (s[i] >= 97 || s[i] <= 122) s[i] = s[i] - 32;
+    }
+}
 
 // function to remove heading and trailing whitespaces in a line
 string strip(string &s){
@@ -21,94 +59,115 @@ string strip(string &s){
     return (start == string::npos? "" : s.substr(start, last - start + 1));
 }
 
-// function to check appropriate number of commas in a line
-bool check_comma(int comma_cnt, string hex_code){
-    if (hex_code == "00" && comma_cnt) return false;
-    else if ((hex_code >= "01" && hex_code <= "08" || hex_code >= "18" && hex_code <="1A") && comma_cnt != 3) return false;
-    else if ((hex_code >= "09" && hex_code <= "0C" || hex_code >= "14" && hex_code <="17") && comma_cnt != 2) return false;
-    else if ((hex_code >= "0D" && hex_code <= "13" || hex_code >= "1B") && comma_cnt != 1) return false;
-    else return true;
+
+/*
+Function to check whether the values in Instruction are correct
+Meaning of returned values
+0: All good
+1: Invalid Opcode
+2: Invalid Dataline
+3: Invalid Register 1 Reference
+4: Invalid Register 2 Reference
+5: Invalid Regsiter 3 Reference
+6: Register 1 Out of Range
+7: Register 2 Out of Range
+8: Register 3 Out of Range
+*/
+int instr_chk(Instruction &instr){
+
+    // regular expression checks whether the string has valid hex_chars
+    // and checks whether the passed is string either 1 or 2 characters long
+    regex reg_dat("^[0-9A-F]{1,2}$");
+    regex reg_reg("^[0-9]{1,2}");
+    int temp;
+    if (op_code.find(instr.opcode) == op_code.end()) return 1;    // Checks valid opcode
+    for (int i = 0; i < instr.reg_num; i++){
+        if (instr.registers[i].empty()) break;
+        else if (!regex_match(instr.registers[i].substr(1,instr.registers[i].size() - 1), reg_reg)) return i + 3;
+        temp = stoi(instr.registers[i].substr(1, instr.registers[i].size() - 1));
+        if (temp >= 16) return i + 6;
+    }
+    if (!instr.dataline.empty() && !regex_match(instr.dataline, reg_dat)) return 2;
+    return 0;
 }
 
-// function to get the related hex value of the opcode passed
-string opcode_hex(string opcode){
-    if (opcode == "NOP") return "0000000";
-    else if (opcode == "AND") return "01";
-    else if (opcode == "OR") return "02";
-    else if (opcode == "EXOR") return "03";
-    else if (opcode == "ADD") return "04";
-    else if (opcode == "ANDI") return "05";
-    else if (opcode == "ORI") return "06";
-    else if (opcode == "EXORI") return "07";
-    else if (opcode == "ADDI") return "08";
-    else if (opcode == "MOV") return "09";
-    else if (opcode == "MOVI") return "0A";
-    else if (opcode == "LOAD") return "0B";
-    else if (opcode == "STORE") return "0C";
-    else if (opcode == "JMP") return "0D";
-    else if (opcode == "JMPZ") return "0E";
-    else if (opcode == "JMPNZ") return "0F";
-    else if (opcode == "JMPC") return "10";
-    else if (opcode == "JMPNC") return "11";
-    else if (opcode == "PUSH") return "12";
-    else if (opcode == "POP") return "13";
-    else if (opcode == "IN") return "14";
-    else if (opcode == "OUT") return "15";
-    else if (opcode == "LOADI") return "16";
-    else if (opcode == "STOREI") return "17";
-    else if (opcode == "SUB") return "18";
-    else if (opcode == "SHIFTR") return "19";
-    else if (opcode == "SHIFTL") return "1A";
-    else if (opcode == "JMPPCRZ") return "1B";
-    else if (opcode == "JMPPCRNZ") return "1C";
-    else return "";
-}
-
-void parse(int line_num, int comma_cnt, int R_count, string line, ofstream &out_file){
+void parse(int line_num, string line, ofstream &out_file){
+    Instruction instr;
+    stringstream ss(line);
     string temp = "", parsed_code = "";
     int line_idx = 0;
 
-    // This section is to get hex value for the opcode
-    while(line[line_idx] != ',' && line_idx < line.size()){
-        temp += line[line_idx++];
-    }
+    instr.reg_num = 0;
+    instr.dataline = "";
 
-    temp = strip(temp);
-    parsed_code += opcode_hex(temp);
-    if (parsed_code.empty()){
-        out_file << "Invalid OP Code at line number " << line_num << ". OP Code supplied: " << temp << ".\n";
-        out_file << "Kindly check whether there is a typo or some other silly error!";
+    // This section is to get the opcode
+    getline(ss, temp, ',');
+    instr.opcode = strip(temp);
+    line_idx++;
+
+    // This section is to get rest of the Instruction
+    while (getline(ss, temp, ',')){
+        temp = strip(temp);
+        if (temp.empty()){
+            out_file << "Error: Invalid line at line " << line_num << ".\n";
+            out_file << "Passed Value: \"\"";
+            return;
+        }
+
+        if (temp[0] == 'R'){
+            if (temp.size() == 2 || temp.size() == 3){
+                if (instr.reg_num < 3){
+                    instr.registers[instr.reg_num] = temp;
+                    instr.reg_num++;
+                }
+                else{
+                    out_file << "Error: Too many registers at line number " << line_num << ".\n";
+                    return;
+                }
+            }
+            else{
+                out_file << "Error: Invalid Register at line " << line_num << ".";
+                return;
+            }
+        }
+        else if(temp.size() == 2){
+            instr.dataline = temp;
+        }
+        else{
+            out_file << "Error: Invalid Instruction at line number " << line_num << ".\n";
+            out_file << "Passed Value: " << temp;
+            return;
+        }
+        line_idx++;
+    }
+    if (line_idx >= 5){
+        out_file << "Error: Too many instructions at line number: " << line_num << ".\n";
+        out_file << "Number of instructions found: " << line_idx;
         return;
     }
-    else if (!check_comma(comma_cnt, parsed_code.substr(0,2))){
-        out_file << "Error: Invalid number of commas at line " << line_num;
+
+    if (op_code.find(instr.opcode) == op_code.end()){
+        out_file << "Error: Invalid Opcode at line number " << line_num << ".\n";
+        out_file << "Passed Opcode: " << instr.opcode;
         return;
     }
-    else if (parsed_code == "0000000"){
-        out_file << parsed_code;
-        return;
-    }
-    else{
-        out_file << parsed_code;
-    }
-    temp.clear();
 
-    return;
-
-
-    // This section is to get hex value for registers
-    if (parsed_code <= "0C" || parsed_code >= "12" && parsed_code <= "1A"){
-
-    }
-    else{
-        parsed_code += "000";
+    if (instr.opcode == "NOP"){
+        if (instr.reg_num || !instr.dataline.empty()){
+            out_file << "Error: Invalid reference to registers or dataline on line number: " << line_num << ".\n";
+            out_file << "Opcode: " << instr.opcode;
+            return;
+        }
     }
 
 }
 
-int main(){
-    ifstream assembly_code("asmcode.txt");
-    ofstream hexfile("asm2hex.txt");
+int main(int argc, char **argv){
+    string input = "asmcode.txt";
+    string output = "hexcode.txt";
+
+    ifstream assembly_code(input);
+    ofstream hexfile(output);
 
     int line_num = 0;
 
@@ -123,6 +182,7 @@ int main(){
         // Convert assembly code to hex
         // and write to hexfile
         line = strip(line);
+        toUpper(line);
 
         if (!line.size() || (line[0] == ';' && line.size() == 1)) {
             line_num++;
@@ -139,10 +199,10 @@ int main(){
             continue;
         }
 
-        parse(++line_num, count(line.begin(), line.end(), ','), count(line.begin(), line.end(), 'R'), line.substr(0, line.size() - 1), hexfile);
-        hexfile << endl;
-
+        parse(++line_num, line.substr(0, line.size() - 1), hexfile);
+        hexfile << '\n';
     }
+    hexfile << endl;
 
     assembly_code.close();
     hexfile.close();
