@@ -1,6 +1,10 @@
-#include <bits/stdc++.h>
+#include <iostream>
 #include <fstream>
-#include <Sstream>
+#include <sstream>
+#include <vector>
+#include <map>
+#include <regex>
+#include <string>
 
 using namespace std;
 
@@ -47,16 +51,16 @@ struct Instruction{
 // Convert alphabets in a string to uppercase
 void toUpper(string &s){
     for(int i = 0; i < s.size(); i++){
-        if (s[i] >= 97 || s[i] <= 122) s[i] = s[i] - 32;
+        if (s[i] >= 97 && s[i] <= 122) s[i] = s[i] - 32;
     }
 }
 
 // function to remove heading and trailing whitespaces in a line
-string strip(string &s){
-    int i = 0, start, last;
-    start = s.find_first_not_of(" ");
-    last = s.find_last_not_of(" ");
-    return (start == string::npos? "" : s.substr(start, last - start + 1));
+// Function to remove leading and trailing whitespaces from a string
+string strip(const string &s) {
+    size_t start = s.find_first_not_of(" ");
+    size_t end = s.find_last_not_of(" ");
+    return (start == string::npos) ? "" : s.substr(start, end - start + 1);
 }
 
 
@@ -91,78 +95,67 @@ int instr_chk(Instruction &instr){
     return 0;
 }
 
-void parse(int line_num, string line, ofstream &out_file){
+void parse(int line_num, const string &line, ofstream &out_file) {
     Instruction instr;
     stringstream ss(line);
-    string temp = "", parsed_code = "";
+    string temp;
     int line_idx = 0;
 
     instr.reg_num = 0;
     instr.dataline = "";
 
-    // This section is to get the opcode
+    // Get the opcode
     getline(ss, temp, ',');
     instr.opcode = strip(temp);
     line_idx++;
 
-    // This section is to get rest of the Instruction
-    while (getline(ss, temp, ',')){
+    // Get the rest of the instruction
+    while (getline(ss, temp, ',')) {
         temp = strip(temp);
-        if (temp.empty()){
+        if (temp.empty()) {
             out_file << "Error: Invalid line at line " << line_num << ".\n";
-            out_file << "Passed Value: \"\"";
+            out_file << "Passed Value: \"\"\n";
             return;
         }
 
-        if (temp[0] == 'R'){
-            if (temp.size() == 2 || temp.size() == 3){
-                if (instr.reg_num < 3){
+        if (temp[0] == 'R') {
+            if (temp.size() == 2 || temp.size() == 3) {
+                if (instr.reg_num < 3) {
                     instr.registers[instr.reg_num] = temp;
                     instr.reg_num++;
-                }
-                else{
+                } else {
                     out_file << "Error: Too many registers at line number " << line_num << ".\n";
                     return;
                 }
-            }
-            else{
-                out_file << "Error: Invalid Register at line " << line_num << ".";
+            } else {
+                out_file << "Error: Invalid Register at line " << line_num << ".\n";
                 return;
             }
-        }
-        else if(temp.size() == 2){
+        } else if (temp.size() == 2) {
             instr.dataline = temp;
-        }
-        else{
+        } else {
             out_file << "Error: Invalid Instruction at line number " << line_num << ".\n";
-            out_file << "Passed Value: " << temp;
+            out_file << "Passed Value: " << temp << "\n";
             return;
         }
         line_idx++;
     }
-    if (line_idx >= 5){
+    if (line_idx >= 5) {
         out_file << "Error: Too many instructions at line number: " << line_num << ".\n";
-        out_file << "Number of instructions found: " << line_idx;
+        out_file << "Number of instructions found: " << line_idx << "\n";
         return;
     }
 
-    if (op_code.find(instr.opcode) == op_code.end()){
-        out_file << "Error: Invalid Opcode at line number " << line_num << ".\n";
-        out_file << "Passed Opcode: " << instr.opcode;
-        return;
-    }
-
-    if (instr.opcode == "NOP"){
-        if (instr.reg_num || !instr.dataline.empty()){
-            out_file << "Error: Invalid reference to registers or dataline on line number: " << line_num << ".\n";
-            out_file << "Opcode: " << instr.opcode;
-            return;
-        }
-    }
-
+    // Debugging Instruction
+    cout << "Opcode: " << instr.opcode << ",\n";
+    cout << "Register Numbers: " << instr.reg_num << ",\n";
+    cout << "Reg1: " << instr.registers[0] << ",\n";
+    cout << "Reg2: " << instr.registers[1] << ",\n";
+    cout << "Reg3: " << instr.registers[2] << ",\n";
+    cout << "Dataline: " << instr.dataline << "\n\n";
 }
 
-int main(int argc, char **argv){
+int main(){
     string input = "asmcode.txt";
     string output = "hexcode.txt";
 
@@ -172,7 +165,7 @@ int main(int argc, char **argv){
     int line_num = 0;
 
     if (!assembly_code.is_open()){
-        cout << "Error: File asmcode.txt not found" << endl;
+        cout << "Error: File " << input << " not found" << endl;
         return 1;
     }
 
@@ -184,18 +177,23 @@ int main(int argc, char **argv){
         line = strip(line);
         toUpper(line);
 
+        
+
+        // Debug: Print the line being processed
+        cout << "Processing line " << line_num << ": " << line << "\n";
+
         if (!line.size() || (line[0] == ';' && line.size() == 1)) {
             line_num++;
             continue;
         }
 
         else if (line.size() < 4){
-            hexfile << "Error: Invalid line at line " << ++line_num << endl;
+            hexfile << "Error: Invalid line at line " << ++line_num << "\n";
             continue;
         }
         
         else if (line[line.size() - 1] != ';'){
-            hexfile << "Error: Missing semicolon at line " << ++line_num << endl;
+            hexfile << "Error: Missing semicolon at line " << ++line_num << "\n";
             continue;
         }
 
