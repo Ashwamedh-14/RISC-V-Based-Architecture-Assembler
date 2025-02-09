@@ -258,6 +258,8 @@ int main(int argc, char **argv){
 
     string line;
 
+    hexfile << "v2.0 raw\n";
+
     while(getline(assembly_code,line)){
         // Convert assembly code to hex
         // and write to hexfile
