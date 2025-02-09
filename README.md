@@ -57,12 +57,18 @@ Following are the list of abbreviations that will be used:-
 ### Pre-installation
 
 1. Ensure you have a `C++` compiler installed and available on system path. If not, you can install `C++` from [here](https://sourceforge.net/projects/mingw/).
-2. Ensure you have `Logisim` installed. If not, you can install it from [here](https://sourceforge.net/projects/circuit/#)
+2. Ensure you have `Logisim` installed. If not, you can install it from [here](https://sourceforge.net/projects/circuit/#).
    > **Note**
    > It is preferable to use the `GNU C/C++` compiler  
    > `Logisim` requires `Java 5` or later to run.
 
 ### Setting Up
+
+- Install the [**Digital Model of Processor**](./Digital%20Model%20of%20Processor.circ).
+- For **Assembler Executable File**:
+  1. For `Windows x64` Architecture install this [`file`](./New%20Code/Assembler_x64.exe)
+- **Ensure** that the `executable file` is placed in the same folder as your `Assembly Code`.
+- **Ensure** that the name of the `file` in which the `assembly code` is stored is named `asmcode.txt`.
 
 [1]: https://ahduni.edu.in/academics/schools-centres/school-of-engineering-and-applied-science/people-1/mazad-zaveri/
 [2]: https://ahduni.edu.in/academics/schools-centres/school-of-engineering-and-applied-science/
