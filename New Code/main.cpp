@@ -86,14 +86,21 @@ int instr_chk(Instruction &instr){
     regex reg_reg("^[0-9]{1,2}");
     int temp;
     if (op_code.find(instr.opcode) == op_code.end()) return 1;    // Checks valid opcode
-    for (int i = 0; i < instr.reg_num; i++){
-        if (instr.registers[i].empty()) break;
+
+    for (int i = 0; i < 3; i++){                      // Checks valid register
+        if (instr.registers[i].empty()) {
+           instr.registers[i] = '0';
+           continue;
+        }
         else if (!regex_match(instr.registers[i].substr(1,instr.registers[i].size() - 1), reg_reg)) return i + 3;
         temp = stoi(instr.registers[i].substr(1, instr.registers[i].size() - 1));
         if (temp >= 16) return i + 6;
         instr.registers[i] = hex_chars[temp];
     }
+
+    // Checks valid dataline
     if (!instr.dataline.empty() && !regex_match(instr.dataline, reg_dat)) return 2;
+    else if (instr.dataline.empty()) instr.dataline = "00";
     return 0;
 }
 
@@ -207,6 +214,17 @@ void parse(int line_num, const string &line, ofstream &out_file) {
     }
     else cout << "Number of registers valid for the given opcode\n";
 
+    // Verifying whether the dataline is valid for the given opcode
+    if (instr.dataline == "00" && (op_code.at(instr.opcode) >= "05" && op_code.at(instr.opcode) <= "08" || op_code.at(instr.opcode) >= "0A" && op_code.at(instr.opcode) <= "11" || op_code.at(instr.opcode) == "14" || op_code.at(instr.opcode) == "15" || op_code.at(instr.opcode) == "1B" || op_code.at(instr.opcode) == "1C")){
+        out_file << "Error: Missing Dataline for OPCode " << instr.opcode << " at line " << line_num << '.';
+        return;
+    }
+    else if (instr.dataline != "00" && (op_code.at(instr.opcode) >= "00" && op_code.at(instr.opcode) <= "04" || op_code.at(instr.opcode) == "09" || op_code.at(instr.opcode) == "12" || op_code.at(instr.opcode) == "13" || op_code.at(instr.opcode) >= "16" && op_code.at(instr.opcode) <= "1A")){
+        out_file << "Error: Dataline not required for OPCode " << instr.opcode << " at line " << line_num << '.';
+        return;
+    }
+    else cout << "Dataline valid for the given opcode\n";
+
     // Debugging Instruction
     cout << "Opcode: " << instr.opcode << ",\n";
     cout << "Register Numbers: " << instr.reg_num << ",\n";
@@ -214,6 +232,14 @@ void parse(int line_num, const string &line, ofstream &out_file) {
     cout << "Reg2: " << instr.registers[1] << ",\n";
     cout << "Reg3: " << instr.registers[2] << ",\n";
     cout << "Dataline: " << instr.dataline << "\n\n";
+
+    // Construncting the hex code
+    if (instr.opcode == "STORE" || instr.opcode == "PUSH" || instr.opcode == "OUT" || instr.opcode == "STOREI"){
+        out_file << op_code.at(instr.opcode) << instr.registers[2] << instr.registers[0] << instr.registers[1] << instr.dataline;
+    }
+    else{
+        out_file << op_code.at(instr.opcode) << instr.registers[0] << instr.registers[1] << instr.registers[2] << instr.dataline;
+    }
 }
 
 int main(int argc, char **argv){
