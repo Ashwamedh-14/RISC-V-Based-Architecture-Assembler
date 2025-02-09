@@ -90,6 +90,7 @@ int instr_chk(Instruction &instr){
         else if (!regex_match(instr.registers[i].substr(1,instr.registers[i].size() - 1), reg_reg)) return i + 3;
         temp = stoi(instr.registers[i].substr(1, instr.registers[i].size() - 1));
         if (temp >= 16) return i + 6;
+        instr.registers[i] = hex_chars[temp];
     }
     if (!instr.dataline.empty() && !regex_match(instr.dataline, reg_dat)) return 2;
     return 0;
@@ -145,6 +146,8 @@ void parse(int line_num, const string &line, ofstream &out_file) {
         out_file << "Number of instructions found: " << line_idx << "\n";
         return;
     }
+
+    instr_chk(instr);
 
     // Debugging Instruction
     cout << "Opcode: " << instr.opcode << ",\n";
