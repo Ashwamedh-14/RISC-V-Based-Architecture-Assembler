@@ -83,16 +83,16 @@ int instr_chk(Instruction &instr){
     // regular expression checks whether the string has valid hex_chars
     // and checks whether the passed is string either 1 or 2 characters long
     regex reg_dat("^[0-9A-F]{1,2}$");
-    regex reg_reg("^[0-9]{1,2}");
+    regex reg_reg("^R[0-9]{1,2}$");
     int temp;
     if (op_code.find(instr.opcode) == op_code.end()) return 1;    // Checks valid opcode
 
     for (int i = 0; i < 3; i++){                      // Checks valid register
         if (instr.registers[i].empty()) {
-           instr.registers[i] = '0';
+           instr.registers[i] = "0";
            continue;
         }
-        else if (!regex_match(instr.registers[i].substr(1,instr.registers[i].size() - 1), reg_reg)) return i + 3;
+        else if (!regex_match(instr.registers[i], reg_reg)) return i + 3;
         temp = stoi(instr.registers[i].substr(1, instr.registers[i].size() - 1));
         if (temp >= 16) return i + 6;
         instr.registers[i] = hex_chars[temp];
@@ -130,8 +130,7 @@ void parse(int line_num, const string &line, ofstream &out_file) {
         if (temp[0] == 'R') {
             if (temp.size() == 2 || temp.size() == 3) {
                 if (instr.reg_num < 3) {
-                    instr.registers[instr.reg_num] = temp;
-                    instr.reg_num++; 
+                    instr.registers[instr.reg_num++] = temp;
                 } else {
                     out_file << "Error: Too many registers at line number " << line_num << "";
                     return;
@@ -247,15 +246,15 @@ int main(int argc, char **argv){
     string output = "hexcode.txt";
 
     ifstream assembly_code(input);
-    ofstream hexfile(output);
-
+    
     int line_num = 0;
-
+    
     if (!assembly_code.is_open()){
         cout << "Error: File " << input << " not found" << endl;
         return 1;
     }
-
+    
+    ofstream hexfile(output);
     string line;
 
     hexfile << "v2.0 raw\n";
