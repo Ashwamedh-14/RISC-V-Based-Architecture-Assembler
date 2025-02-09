@@ -1,3 +1,5 @@
 .vscode
 *.exe
+!Assembler_x64.exe
 test.*
+*.txt
