@@ -282,27 +282,30 @@ int main(int argc, char **argv){
         // Debug: Print the line being processed
         cout << "Processing line " << line_num << ": " << line << "\n";
 
-        if (!line.size() || (line[0] == ';' && line.size() == 1)) {
+        if (!line.size()){
             line_num++;
             continue;
         }
 
-        else if (line.size() < 4){
-            hexfile << "Error: Invalid line at line " << ++line_num << "\n";
-            continue;
-        }
-
-        else if (count(line.begin(), line.end(), ';') > 1){
-            hexfile << "Error: Too many semicolon on line " << ++line_num << ". Ensure only 1 semi-colon at the end of each line.\n";
-            continue;
-        }
-        
         else if (count(line.begin(), line.end(), ';') == 0){
             hexfile << "Error: Missing semicolon at line " << ++line_num << "\n";
             continue;
         }
 
-        parse(++line_num, line.substr(0, line.find_first_of(';')), hexfile);
+        line = line.substr(0, line.find_first_of(';'));
+
+        if (!line.size()) {
+            line_num++;
+            continue;
+        }
+
+        else if (line.size() < 3){
+            hexfile << "Error: Invalid line at line " << ++line_num << "\n";
+            continue;
+        }
+        
+
+        parse(++line_num, line, hexfile);
         hexfile << '\n';
     }
     hexfile << endl;

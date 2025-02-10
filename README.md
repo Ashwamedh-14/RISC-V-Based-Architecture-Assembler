@@ -73,8 +73,8 @@ Following are the list of abbreviations that have / will be used:-
 
 ### Syntax
 
-- **Each** line will end with a `semi-colon (;)`.
-- **Each** line will have exactly **1** `semi-colon`;
+- **Each** line will end at the **first semi-colon `;`** of the line.
+- **All** characters written after the **first semi-colon** of the line will be treated as a `comment`
 - **All** `DAT` values will be given in `8-bit hex-code` **only**.
 - **All** `Reg` references will be given in `decimal values` **only**.
 - The **valid range** for `Reg` reference is **0-15**.
