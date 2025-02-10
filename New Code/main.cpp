@@ -149,7 +149,7 @@ void parse(int line_num, const string &line, ofstream &out_file) {
         } 
         
         else {
-            out_file << "Error: Invalid Instruction at line number " << line_num << ".\n";
+            out_file << "Error: Invalid Dataline at line number " << line_num << ".\n";
             out_file << "Passed Value: " << temp;
             return;
         }
