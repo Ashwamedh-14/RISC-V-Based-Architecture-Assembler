@@ -66,7 +66,7 @@ Following are the list of abbreviations that have / will be used:-
 
 - Install the [**Digital Model of Processor**](./Digital%20Model%20of%20Processor.circ).
 - For **Assembler Executable File**:
-  1. For `Windows x64` architecture users, install this [`file`](./New%20Code/Assembler_x64.exe)
+  1. For `Windows x64` architecture users, install this [`file`](https://github.com/Ashwamedh-14/RISC-V-Based-Architecture-Assembler/raw/refs/heads/main/New%20Code/Assembler_x64.exe)
   2. For `MacOS` and `Linux` users, install the [`main.cpp`](./New%20Code/main.cpp) file and compile it on your machine to get the `executable file`.
 - **Ensure** that the `executable file` is placed in the same folder as your `Assembly Code`.
 - **Ensure** that the **name** of the `file` in which the `assembly code` is stored is named `asmcode.txt`.
