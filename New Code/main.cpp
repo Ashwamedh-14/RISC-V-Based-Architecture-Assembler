@@ -131,24 +131,31 @@ void parse(int line_num, const string &line, ofstream &out_file) {
             if (temp.size() == 2 || temp.size() == 3) {
                 if (instr.reg_num < 3) {
                     instr.registers[instr.reg_num++] = temp;
-                } else {
+                } 
+                else {
                     out_file << "Error: Too many registers at line number " << line_num << "";
                     return;
                 }
-            } else {
+            } 
+            else {
                 out_file << "Error: Invalid Register at line " << line_num << ".\n";
                 out_file << "Register Passed: " << temp;
                 return;
             }
-        } else if (temp.size() == 2 || temp.size() == 1) {
+        } 
+        
+        else if (temp.size() == 2 || temp.size() == 1) {
             instr.dataline = temp;
-        } else {
+        } 
+        
+        else {
             out_file << "Error: Invalid Instruction at line number " << line_num << ".\n";
             out_file << "Passed Value: " << temp;
             return;
         }
         line_idx++;
     }
+
     if (line_idx >= 5) {
         out_file << "Error: Too many instructions at line number: " << line_num << ".\n";
         out_file << "Number of instructions found: " << line_idx;
@@ -187,6 +194,7 @@ void parse(int line_num, const string &line, ofstream &out_file) {
         case 8:
         out_file << "Error: Register R" << line_idx - 6 << " out of Range at line " << line_num << ".\n";
         out_file << "Register Value: " << instr.registers[line_idx - 6];
+        return;
         break;
     };
 
@@ -289,12 +297,12 @@ int main(int argc, char **argv){
             continue;
         }
         
-        else if (line[line.size() - 1] != ';'){
+        else if (count(line.begin(), line.end(), ';') == 0){
             hexfile << "Error: Missing semicolon at line " << ++line_num << "\n";
             continue;
         }
 
-        parse(++line_num, line.substr(0, line.size() - 1), hexfile);
+        parse(++line_num, line.substr(0, line.find_first_of(';')), hexfile);
         hexfile << '\n';
     }
     hexfile << endl;
