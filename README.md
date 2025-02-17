@@ -52,38 +52,61 @@ Following are the list of abbreviations that have / will be used:-
   </tr>
 </table>
 
-## How to Use
+## Pre-installation
 
-### Pre-installation
+1. Ensure you have a [`C++ Compiler`](https://sourceforge.net/projects/mingw/) installed and available on system path.
+2. Ensure you have [`Logisim`](https://sourceforge.net/projects/circuit/#) installed.  
 
-1. Ensure you have a `C++` compiler installed and available on system path. If not, you can install `C++` from [here](https://sourceforge.net/projects/mingw/).
-2. Ensure you have `Logisim` installed. If not, you can install it from [here](https://sourceforge.net/projects/circuit/#).
-   > **Note**  
-   > It is preferable to use the `GNU C/C++` compiler.  
-   > Ensure you have `C++11` or greater.  
-   > `Logisim` requires `Java 5` or later to run.
+> **Note**  
+> It is preferable to use the `GNU C/C++` compiler.  
+> Ensure you have `C++11` or greater.  
+> `Logisim` requires `Java 5` or later to run.
 
-### Setting Up
+## Setting Up
 
-- Install the [**Digital Model of Processor**](./Digital%20Model%20of%20Processor.circ).
-- For **Assembler Executable File**:
-  1. For `Windows x64` architecture users, install this [`file`](https://github.com/Ashwamedh-14/RISC-V-Based-Architecture-Assembler/raw/refs/heads/main/New%20Code/Assembler_x64.exe)
-  2. For `MacOS` and `Linux` users, install the [`main.cpp`](./New%20Code/main.cpp) file and compile it on your machine to get the `executable file`.
-- **Ensure** that the `executable file` is placed in the same folder as your `Assembly Code`.
-- **Ensure** that the **name** of the `file` in which the `assembly code` is stored is named `asmcode.txt`.
+- Install the [**Digital Model of Processor**](https://github.com/Ashwamedh-14/RISC-V-Based-Architecture-Assembler/raw/refs/heads/main/Digital%20Model%20of%20Processor.circ).
+- For `MacOS` and `Linux` users, install the [`main.cpp`](https://github.com/Ashwamedh-14/RISC-V-Based-Architecture-Assembler/raw/refs/heads/main/New%20Code/main.cpp)
 
-### Syntax
+### Windows
 
-- **Each** line will end at the **first semi-colon `;`** of the line.
-- **All** characters written after the **first semi-colon** of the line will be treated as a `comment`
-- **All** `DAT` values will be given in `8-bit hex-code` **only**.
-- **All** `Reg` references will be given in `decimal values` **only**.
-- The **valid range** for `Reg` reference is **0-15**.
-  > **Note**  
-  > When referencing `registers`, `R1` will be treated the same as `R01`.  
-  > I.E., `R1 <=> R01` and similarly for other decimal values upto 9.  
-  > This is not valid for `R10` onwards.
-- For the `syntax` of each `OP Code`, as well as how to reference `Regs` and use `DAT`, kindly check [**Valid OP Codes.txt**](./Valid%20OP%20Codes.txt)
+For `Windows x64` architecture users, install this file [`Assembler_x64.exe`](https://github.com/Ashwamedh-14/RISC-V-Based-Architecture-Assembler/raw/refs/heads/main/New%20Code/Assembler_x64.exe)
+
+### MacOS and Linux
+
+For `MacOS` and `Linux` user, ensure you have `C++11 Compiler` or greater installed.  
+If you are unsure which version you have, run the following command in your terminal:
+
+``` Bash
+g++ --version
+```
+
+If the above command throws an error, its probably because the `GCC` is not installed on your system, and its most likely using `Clang`. In that case, try the following command:
+
+``` Bash
+clang++ --version
+```
+
+After you have downloaded the file, open the terminal and run the following command:
+
+``` Bash
+cd "Path/to/downloaded/file"
+```
+
+To compile the program run the following command:
+
+```Bash
+# For GCC users
+g++ main.cpp -o Assembler
+
+#For Clang users
+clang++ -std=c++{'Your Version'} main.cpp -o Assembler
+```
+
+> **NOTE**  
+> **Ensure** that the `executable file` is placed in the same folder as your `Assembly Code`.  
+> **Ensure** that the **name** of the `file` in which the `assembly code` is stored is named `asmcode.txt`.
+
+## Syntax
 
 [1]: https://ahduni.edu.in/academics/schools-centres/school-of-engineering-and-applied-science/people-1/mazad-zaveri/
 [2]: https://ahduni.edu.in/academics/schools-centres/school-of-engineering-and-applied-science/
