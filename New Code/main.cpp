@@ -10,6 +10,15 @@ Testing the automation
 #include <regex>
 #include <string>
 
+#define INVALID_OPCODE 1
+#define INVALID_DATALINE 2
+#define REG_W_INVALID_REFERENCE 3
+#define REG_R1_INVALID_REFERENCE 4
+#define REG_R2_INVALID_REFERENCE 5
+#define REG_W_OUT_OF_RANGE 6
+#define REG_R1_OUT_OF_RANGE 7
+#define REG_R2_OUT_OF_RANGE 8
+
 using namespace std;
 
 static const vector<char> hex_chars = {'0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F'};
@@ -88,21 +97,43 @@ int instr_chk(Instruction &instr){
     regex reg_dat("^[0-9A-F]{1,2}$");
     regex reg_reg("^R[0-9]{1,2}$");
     int temp;
-    if (op_code.find(instr.opcode) == op_code.end()) return 1;    // Checks valid opcode
+    if (op_code.find(instr.opcode) == op_code.end()) return INVALID_OPCODE;    // Checks valid opcode
+
+    if (instr.opcode == "STORE" || instr.opcode == "PUSH" || instr.opcode == "OUT"){
+        instr.registers[1] = instr.registers[0];
+        instr.registers[0] = "";
+    }
+    else if( instr.opcode == "STOREI"){
+        instr.registers[2] = instr.registers[1];
+        instr.registers[1] = instr.registers[0];
+        instr.registers[0] = "";
+    }
 
     for (int i = 0; i < 3; i++){                      // Checks valid register
         if (instr.registers[i].empty()) {
            instr.registers[i] = "0";
            continue;
         }
-        else if (!regex_match(instr.registers[i], reg_reg)) return i + 3;
+
+        else if (!regex_match(instr.registers[i], reg_reg)){
+            if (i == 0) return REG_W_INVALID_REFERENCE;
+            else if (i == 1) return REG_R1_INVALID_REFERENCE;
+            else return REG_R2_INVALID_REFERENCE;
+        }
+
         temp = stoi(instr.registers[i].substr(1, instr.registers[i].size() - 1));
-        if (temp >= 16) return i + 6;
+
+        if (temp >= 16){
+            if (i == 0) return REG_W_OUT_OF_RANGE;
+            else if (i == 1) return REG_R1_OUT_OF_RANGE;
+            else return REG_R2_OUT_OF_RANGE;
+        }
         instr.registers[i] = hex_chars[temp];
+
     }
 
     // Checks valid dataline
-    if (!instr.dataline.empty() && !regex_match(instr.dataline, reg_dat)) return 2;
+    if (!instr.dataline.empty() && !regex_match(instr.dataline, reg_dat)) return INVALID_DATALINE;
     else if (instr.dataline.size() == 1) instr.dataline = "0" + instr.dataline;
     return 0;
 }
@@ -169,33 +200,52 @@ void parse(int line_num, const string &line, ofstream &out_file) {
 
     switch(line_idx){
         case 0:
-        cout << "Instruction is correct\n";
         break;
 
-        case 1:
+        case INVALID_OPCODE:
         out_file << "Error: Invalid Opcode at line " << line_num << ".\n";
         out_file << "Opcode: " << instr.opcode;
         return;
         break;
 
-        case 2:
+        case INVALID_DATALINE:
         out_file << "Error: Invalid Dataline at line " << line_num << ".\n";
         out_file << "Dataline: " << instr.dataline;
         return;
         break;
 
-        case 3:
-        case 4:
-        case 5:
-        out_file << "Error: Invalid Register Reference at line " << line_num << ".\n";
-        out_file << "Register Referenced for R" << line_idx - 2 << ": " << instr.registers[line_idx - 3];
+        case REG_W_INVALID_REFERENCE:
+        out_file << "Error: Invalid Register Reference for Rw at line " << line_num << ".\n";
+        out_file << "Register Referenced: " << instr.registers[0];
         return;
         break;
 
-        case 6:
-        case 7:
-        case 8:
-        out_file << "Error: Register R" << line_idx - 6 << " out of Range at line " << line_num << ".\n";
+        case REG_R1_INVALID_REFERENCE:
+        out_file << "Error: Invalid Register Reference for Rx at line " << line_num << ".\n";
+        out_file << "Register Referenced: " << instr.registers[1];
+        return;
+        break;
+
+        case 5:
+        out_file << "Error: Invalid Register Reference for Ry at line " << line_num << ".\n";
+        out_file << "Register Referenced: " << instr.registers[line_idx - 3];
+        return;
+        break;
+
+        case REG_W_OUT_OF_RANGE:
+        out_file << "Error: Register Rw out of Range at line " << line_num << ".\n";
+        out_file << "Register Value: " << instr.registers[0];
+        return;
+        break;
+
+        case REG_R1_OUT_OF_RANGE:
+        out_file << "Error: Register Rx out of Range at line " << line_num << ".\n";
+        out_file << "Register Value: " << instr.registers[1];
+        return;
+        break;
+
+        case REG_R2_OUT_OF_RANGE:
+        out_file << "Error: Register Ry out of Range at line " << line_num << ".\n";
         out_file << "Register Value: " << instr.registers[line_idx - 6];
         return;
         break;
@@ -222,7 +272,6 @@ void parse(int line_num, const string &line, ofstream &out_file) {
         out_file << "Number of Registers Expected: 3, Found: " << instr.reg_num;
         return;
     }
-    else cout << "Number of registers valid for the given opcode\n";
 
     // Verifying whether the dataline is valid for the given opcode
     if (instr.dataline.empty() && (op_code.at(instr.opcode) >= "05" && op_code.at(instr.opcode) <= "08" || op_code.at(instr.opcode) >= "0A" && op_code.at(instr.opcode) <= "11" || op_code.at(instr.opcode) == "14" || op_code.at(instr.opcode) == "15" || op_code.at(instr.opcode) == "1B" || op_code.at(instr.opcode) == "1C")){
@@ -233,27 +282,12 @@ void parse(int line_num, const string &line, ofstream &out_file) {
         out_file << "Error: Dataline not required for OPCode " << instr.opcode << " at line " << line_num << '.';
         return;
     }
-    else cout << "Dataline valid for the given opcode\n";
     
     if (instr.dataline.empty()) instr.dataline = "00";
 
-
-    // Debugging Instruction
-    cout << "Opcode: " << instr.opcode << ",\n";
-    cout << "Register Numbers: " << instr.reg_num << ",\n";
-    cout << "Reg1: " << instr.registers[0] << ",\n";
-    cout << "Reg2: " << instr.registers[1] << ",\n";
-    cout << "Reg3: " << instr.registers[2] << ",\n";
-    cout << "Dataline: " << instr.dataline << "\n\n";
-
-
     // Construncting the hex code
-    if (instr.opcode == "STORE" || instr.opcode == "PUSH" || instr.opcode == "OUT" || instr.opcode == "STOREI"){
-        out_file << op_code.at(instr.opcode) << instr.registers[2] << instr.registers[0] << instr.registers[1] << instr.dataline;
-    }
-    else{
-        out_file << op_code.at(instr.opcode) << instr.registers[0] << instr.registers[1] << instr.registers[2] << instr.dataline;
-    }
+    out_file << op_code.at(instr.opcode) << instr.registers[0] << instr.registers[1] << instr.registers[2] << instr.dataline;
+    return;
 }
 
 int main(int argc, char **argv){
@@ -279,11 +313,6 @@ int main(int argc, char **argv){
         // and write to hexfile
         line = strip(line);
         toUpper(line);
-
-        
-
-        // Debug: Print the line being processed
-        cout << "Processing line " << line_num << ": " << line << "\n";
 
         if (!line.size()){
             line_num++;
