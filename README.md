@@ -65,46 +65,25 @@ Following are the list of abbreviations that have / will be used:-
 ## Setting Up
 
 - Install the [**Digital Model of Processor**](https://github.com/Ashwamedh-14/RISC-V-Based-Architecture-Assembler/raw/refs/heads/main/Digital%20Model%20of%20Processor.circ).
-- For `MacOS` and `Linux` users, install the [`main.cpp`](https://github.com/Ashwamedh-14/RISC-V-Based-Architecture-Assembler/raw/refs/heads/main/New%20Code/main.cpp)
 
-### Windows
+- For `Windows x64` architecture users, install this file, [`Assembler_x64.exe`](https://github.com/Ashwamedh-14/RISC-V-Based-Architecture-Assembler/raw/refs/heads/main/bin/Assembler_x64.exe)  
 
-For `Windows x64` architecture users, install this file [`Assembler_x64.exe`](https://github.com/Ashwamedh-14/RISC-V-Based-Architecture-Assembler/raw/refs/heads/main/New%20Code/Assembler_x64.exe)
+- For `MacOS` users, install this file, [`Assembler_MacOS`](https://github.com/Ashwamedh-14/RISC-V-Based-Architecture-Assembler/raw/refs/heads/main/bin/Assembler_MacOS)  
 
-### MacOS and Linux
+- For `Linux (Ubuntu)` users, install this file, [`Assembler`](https://github.com/Ashwamedh-14/RISC-V-Based-Architecture-Assembler/raw/refs/heads/main/bin/Assembler)
 
-For `MacOS` and `Linux` user, ensure you have `C++11 Compiler` or greater installed.  
-If you are unsure which version you have, run the following command in your terminal:
-
-``` Bash
-g++ --version
-```
-
-If the above command throws an error, its probably because the `GCC` is not installed on your system, and its most likely using `Clang`. In that case, try the following command:
-
-``` Bash
-clang++ --version
-```
-
-After you have downloaded the file, open the terminal and run the following command:
-
-``` Bash
-cd "Path/to/downloaded/file"
-```
-
-To compile the program run the following command:
-
-```Bash
-# For GCC users
-g++ main.cpp -o Assembler
-
-# For Clang users
-clang++ -std=c++11 main.cpp -o Assembler          # Put the latest version of c++ instead of c++11
-```
-
-> **NOTE**  
-> **Ensure** that the `executable file` is placed in the same folder as your `Assembly Code`.  
-> **Ensure** that the **name** of the `file` in which the `assembly code` is stored is named `asmcode.txt`.
+> **NOTE**
+> For `Linux` and `MacOS` users, before being able to run the executable file, run the following commands in the terminal
+>
+> ``` bash
+> # First getting the terminal to the file location
+> cd "Path/to/the/directory/in/which/executable/is/located"
+>
+> # changing permission for the file to make it executable
+> chmod +x filename
+> ```
+>
+> For people using `Linux` distros other than `Ubuntu`, do you really need a step by step guide to obtain the executable file for the [`source code`][4]? Just download the [`source code`][4] and compile it on your system, preferably with `C++17` or greater.  
 
 ## Using
 
@@ -139,3 +118,4 @@ In case the executable file that was compiled does not run upon clicking it, esp
 [1]: https://ahduni.edu.in/academics/schools-centres/school-of-engineering-and-applied-science/people-1/mazad-zaveri/
 [2]: https://ahduni.edu.in/academics/schools-centres/school-of-engineering-and-applied-science/
 [3]: https://ahduni.edu.in/
+[4]: https://github.com/Ashwamedh-14/RISC-V-Based-Architecture-Assembler/raw/refs/heads/main/New%20Code/main.cpp

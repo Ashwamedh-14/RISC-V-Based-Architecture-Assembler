@@ -1,3 +1,7 @@
+/*
+Testing the automation
+*/
+
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -5,7 +9,6 @@
 #include <map>
 #include <regex>
 #include <string>
-#include <getopt.h>
 
 using namespace std;
 

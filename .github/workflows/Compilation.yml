@@ -3,122 +3,133 @@ name: C++ CI
 on:
   push:
     branches: [main]
+    paths:
+      - 'New Code/main.cpp'  # Trigger only when `main.cpp` changes
   pull_request:
     branches: [main]
+    paths:
+      - 'New Code/main.cpp'  # Trigger only when `main.cpp` changes
   release:
     types: [created, published]
 
 jobs:
+  # Build job for Linux
   build-linux:
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout Code
-      uses: actions/checkout@v2
+      - name: Checkout Code
+        uses: actions/checkout@v3
 
-    - name: Compile with g++
-      run: |
-        g++ ./'New Code'/main.cpp -o Assembler
+      - name: Read Version Number
+        run: echo "CURRENT_VERSION=$(cat version.txt)" >> $GITHUB_ENV
 
-    - name: Upload Artifact
-      uses: actions/upload-artifact@v2
-      with:
-        name: Assembler
-        path: Assembler
+      - name: Create bin Directory
+        run: mkdir -p bin/
 
+      - name: Compile with g++
+        run: g++ -static-libstdc++ ./'New Code'/main.cpp -o bin/Assembler
+
+      - name: Ensure Executable Works
+        run: chmod +x bin/Assembler
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Assembler-linux
+          path: bin/Assembler
+
+  # Build job for Windows
   build-windows:
     runs-on: windows-latest
     steps:
-    - name: Checkout Code
-      uses: actions/checkout@v2
+      - name: Checkout Code
+        uses: actions/checkout@v3
 
-    - name: Install MinGW
-      run: |
-        choco install mingw -y
-        setx PATH "C:\Program Files\mingw-w64\bin;%PATH%"
+      - name: Read Version Number
+        run: echo "CURRENT_VERSION=$(Get-Content version.txt)" | Out-File -FilePath $env:GITHUB_ENV -Append
 
-    - name: Compile with g++
-      run: |
-        g++ ./'New Code'/main.cpp -o Assembler_x64
+      - name: Install MinGW
+        run: |
+          choco install mingw -y
+          setx PATH "C:\Program Files\mingw-w64\bin;%PATH%"
 
-    - name: Upload Artifact
-      uses: actions/upload-artifact@v2
-      with:
-        name: Assembler_x64
-        path: Assembler_x64
+      - name: Create bin Directory (if not exists)
+        run: |
+          if (-Not (Test-Path bin)) {
+            mkdir bin
+          }
 
+      - name: Compile with g++
+        run: g++ -static-libstdc++ ./'New Code'/main.cpp -o bin/Assembler_x64.exe
+
+      - name: Ensure Executable Works
+        run: |
+          if (!(Test-Path bin/Assembler_x64.exe)) { exit 1 }
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Assembler-windows
+          path: bin/Assembler_x64.exe
+
+  # Build job for macOS
   build-macos:
     runs-on: macos-latest
     steps:
-    - name: checkout code
-      uses: actions/checkout@v2
+      - name: Checkout Code
+        uses: actions/checkout@v3
 
-    - name: Compile with Clang
-      run: |
-        clang++ -std=c++17 ./'New Code'/main.cpp -o Assembler_MacOS
+      - name: Read Version Number
+        run: echo "CURRENT_VERSION=$(cat version.txt)" >> $GITHUB_ENV
 
-    - name: Upload Artifact
-      uses: actions/upload-artifact@v2
-      with:
-        name: Assembler_MacOS
-        path: Assembler_MacOS
+      - name: Create bin Directory
+        run: mkdir -p bin/
 
-  upload-release-assets:
-    needs: [build-linux, build-windows, build-macos]
+      - name: Compile with clang++
+        run: clang++ -std=c++17 ./'New Code'/main.cpp -o bin/Assembler_MacOS
+
+      - name: Ensure Executable Works
+        run: chmod +x bin/Assembler_MacOS
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Assembler-macos
+          path: bin/Assembler_MacOS
+
+  # Commit the executables to the repository
+  commit-executables:
+    needs: [build-linux, build-windows, build-macos]  # Make sure the build jobs run first
     runs-on: ubuntu-latest
     steps:
-    - name: Download Artifacts
-      uses: actions/download-artifact@v2
-      with:
-        name: Assembler
-        path: ./artifacts/linux
-    - name: Download Artifacts
-      uses: actions/download-artifact@v2
-      with:
-        name: Assembler_x64
-        path: ./artifacts/windows
-    - name: Download Artifacts
-      uses: actions/download-artifact@v2
-      with:
-        name: Assembler_MacOS
-        path: ./artifacts/macos
+      - name: Checkout Code
+        uses: actions/checkout@v3
 
-    - name: Create Release
-      id: create_release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        tag_name: ${{ github.sha }}
-        release_name: Release ${{ github.sha }}
-        draft: false
-        prerelease: false
+      - name: Download Linux Executable
+        uses: actions/download-artifact@v4
+        with:
+          name: Assembler-linux
+          path: bin/
 
-    - name: Upload Release Asset (Linux)
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./artifacts/linux/Assembler
-        asset_name: Assembler
-        asset_content_type: application/octet-stream
+      - name: Download Windows Executable
+        uses: actions/download-artifact@v4
+        with:
+          name: Assembler-windows
+          path: bin/
 
-    - name: Upload Release Asset (Windows)
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./artifacts/windows/Assembler_x64
-        asset_name: Assembler_x64
-        asset_content_type: application/octet-stream
+      - name: Download macOS Executable
+        uses: actions/download-artifact@v4
+        with:
+          name: Assembler-macos
+          path: bin/
 
-    - name: Upload Release Asset (macOS)
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./artifacts/macos/Assembler_MacOS
-        asset_name: Assembler_MacOS
-        asset_content_type: application/octet-stream
+      - name: Read Version Number for Commit
+        run: echo "VERSION=$(cat version.txt)" >> $GITHUB_ENV
+
+      - name: Commit Executables with Version Number
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+          git add bin/  # Add the bin folder with executables
+          git commit -m "Add executables for version $VERSION"
+          git push
