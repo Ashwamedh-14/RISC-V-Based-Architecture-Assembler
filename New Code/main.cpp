@@ -13,11 +13,11 @@ Testing the automation
 #define INVALID_OPCODE 1
 #define INVALID_DATALINE 2
 #define REG_W_INVALID_REFERENCE 3
-#define REG_R1_INVALID_REFERENCE 4
-#define REG_R2_INVALID_REFERENCE 5
+#define REG_RX_INVALID_REFERENCE 4
+#define REG_RY_INVALID_REFERENCE 5
 #define REG_W_OUT_OF_RANGE 6
-#define REG_R1_OUT_OF_RANGE 7
-#define REG_R2_OUT_OF_RANGE 8
+#define REG_RX_OUT_OF_RANGE 7
+#define REG_RY_OUT_OF_RANGE 8
 
 using namespace std;
 
@@ -83,12 +83,12 @@ Meaning of returned values
 0: All good
 1: Invalid Opcode
 2: Invalid Dataline
-3: Invalid Register 1 Reference
-4: Invalid Register 2 Reference
-5: Invalid Regsiter 3 Reference
-6: Register 1 Out of Range
-7: Register 2 Out of Range
-8: Register 3 Out of Range
+3: Invalid Register Rw Reference
+4: Invalid Register Rx Reference
+5: Invalid Regsiter Ry Reference
+6: Register Rw Out of Range
+7: Register Rx Out of Range
+8: Register Ry Out of Range
 */
 int instr_chk(Instruction &instr){
 
@@ -117,16 +117,16 @@ int instr_chk(Instruction &instr){
 
         else if (!regex_match(instr.registers[i], reg_reg)){
             if (i == 0) return REG_W_INVALID_REFERENCE;
-            else if (i == 1) return REG_R1_INVALID_REFERENCE;
-            else return REG_R2_INVALID_REFERENCE;
+            else if (i == 1) return REG_RX_INVALID_REFERENCE;
+            else return REG_RY_INVALID_REFERENCE;
         }
 
         temp = stoi(instr.registers[i].substr(1, instr.registers[i].size() - 1));
 
         if (temp >= 16){
             if (i == 0) return REG_W_OUT_OF_RANGE;
-            else if (i == 1) return REG_R1_OUT_OF_RANGE;
-            else return REG_R2_OUT_OF_RANGE;
+            else if (i == 1) return REG_RX_OUT_OF_RANGE;
+            else return REG_RY_OUT_OF_RANGE;
         }
         instr.registers[i] = hex_chars[temp];
 
@@ -220,13 +220,13 @@ void parse(int line_num, const string &line, ofstream &out_file) {
         return;
         break;
 
-        case REG_R1_INVALID_REFERENCE:
+        case REG_RX_INVALID_REFERENCE:
         out_file << "Error: Invalid Register Reference for Rx at line " << line_num << ".\n";
         out_file << "Register Referenced: " << instr.registers[1];
         return;
         break;
 
-        case 5:
+        case REG_RY_INVALID_REFERENCE:
         out_file << "Error: Invalid Register Reference for Ry at line " << line_num << ".\n";
         out_file << "Register Referenced: " << instr.registers[line_idx - 3];
         return;
@@ -238,13 +238,13 @@ void parse(int line_num, const string &line, ofstream &out_file) {
         return;
         break;
 
-        case REG_R1_OUT_OF_RANGE:
+        case REG_RX_OUT_OF_RANGE:
         out_file << "Error: Register Rx out of Range at line " << line_num << ".\n";
         out_file << "Register Value: " << instr.registers[1];
         return;
         break;
 
-        case REG_R2_OUT_OF_RANGE:
+        case REG_RY_OUT_OF_RANGE:
         out_file << "Error: Register Ry out of Range at line " << line_num << ".\n";
         out_file << "Register Value: " << instr.registers[line_idx - 6];
         return;
