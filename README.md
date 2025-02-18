@@ -59,7 +59,7 @@ Following are the list of abbreviations that have / will be used:-
 
 > **Note**  
 > It is preferable to use the `GNU C/C++` compiler.  
-> Ensure you have `C++11` or greater.  
+> Ensure you have `C++11` or greater (`C++17` is recommended).  
 > `Logisim` requires `Java 5` or later to run.
 
 ## Setting Up
@@ -98,13 +98,41 @@ To compile the program run the following command:
 # For GCC users
 g++ main.cpp -o Assembler
 
-#For Clang users
-clang++ -std=c++{'Your Version'} main.cpp -o Assembler
+# For Clang users
+clang++ -std=c++11 main.cpp -o Assembler          # Put the latest version of c++ instead of c++11
 ```
 
 > **NOTE**  
 > **Ensure** that the `executable file` is placed in the same folder as your `Assembly Code`.  
 > **Ensure** that the **name** of the `file` in which the `assembly code` is stored is named `asmcode.txt`.
+
+## Using
+
+- Write your `assembly` program in a `text file` and name it `asmcode.txt`.
+- Place the executable file in the same folder as `asmcode.txt`.
+- Run the executable file.
+- A text file with the name `hexcode.txt` should be formed.
+- You can upload this file in the ROM of your processor.
+
+### MacOS and Linux Users
+
+In case the executable file that was compiled does not run upon clicking it, especially in the case of `MacOS`, try the following steps:
+
+- Open the `terminal`
+- Type in the following command
+  
+  ``` Bash
+  cd "path/to/your/executable"
+  ```
+
+- Make sure your `asmcode.txt` is in the same `directory`.
+- Run the command below
+
+  ``` Bash
+  ./Assembler
+  ```
+
+- `hexcode.txt` should now be generated.
 
 ## Syntax
 
