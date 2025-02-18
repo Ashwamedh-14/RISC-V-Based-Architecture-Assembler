@@ -43,6 +43,10 @@ Following are the list of abbreviations that have / will be used:-
     <td>Registers</td>
   </tr>
   <tr>
+    <td>MEM</td>
+    <td>Main Memory</td>
+  </tr>
+  <tr>
     <td>DAT</td>
     <td>Data Line</td>
   </tr>
@@ -114,6 +118,58 @@ In case the executable file that was compiled does not run upon clicking it, esp
 - `hexcode.txt` should now be generated.
 
 ## Syntax
+
+Welcome to the syntax of the assembly language, where we will go over some nitpicky stuff while you might be wrting your code.
+
+### Statements
+
+All statements start with a valid `opcode`. This is usually followed by the required `parameters` for that `opcode`. For example, for `opcode` `AND` you might write
+
+``` txt
+AND,R12,R1,R2;
+```
+
+Notice the use of **commas** to seperate the `parameters` of the `opcode`. Use of these commas is **important**, both for successful compilation, as well as for your understanding. For the correct `syntax` and `parameters` for each `opcode`, kindly refer to [**Valid OP Codes**](./Valid%20OP%20Codes.txt)
+
+### Ending a Line
+
+**Each** line ends at the **first** **semicolon** encountered in the line. For example:
+
+``` txt
+AND,R12,R1,R2;
+```
+
+In this case, the line ends after `R2`, which is expected. However, when we write
+
+``` txt
+AND,R12;,R1,R2;
+```
+
+The line ends after `R12`.
+
+### Comments
+
+The **first** **semicolon** of the line demarcates the start of comments for that line. For example:
+
+``` txt
+AND,R12,R1,R2;        This is a comment
+;                     This is also a comment
+                      This is not a comment and will be parsed
+```
+
+### Blank Lines
+
+Blank lines are skipped while parsing
+
+### Points to remember
+
+- **All** `opcodes` are `keywords`.
+- **All** `regs` are referenced by their decimal values. For example:
+  - `R1` is correct
+  - `R10` is correct
+  - `R01` is correct and also equivalent to `R1`
+  - `RA` is incorrect
+- **All** `DAT`, `PORT Address`, `MEM Address` values are passed, parsed and taken as `8-bit hexadecimals`.
 
 [1]: https://ahduni.edu.in/academics/schools-centres/school-of-engineering-and-applied-science/people-1/mazad-zaveri/
 [2]: https://ahduni.edu.in/academics/schools-centres/school-of-engineering-and-applied-science/
