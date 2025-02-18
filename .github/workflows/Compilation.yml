@@ -1,0 +1,124 @@
+name: C++ CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  release:
+    types: [created, published]
+
+jobs:
+  build-linux:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v2
+
+    - name: Compile with g++
+      run: |
+        g++ ./'New Code'/main.cpp -o Assembler
+
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: Assembler
+        path: Assembler
+
+  build-windows:
+    runs-on: windows-latest
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v2
+
+    - name: Install MinGW
+      run: |
+        choco install mingw -y
+        setx PATH "C:\Program Files\mingw-w64\bin;%PATH%"
+
+    - name: Compile with g++
+      run: |
+        g++ ./'New Code'/main.cpp -o Assembler_x64
+
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: Assembler_x64
+        path: Assembler_x64
+
+  build-macos:
+    runs-on: macos-latest
+    steps:
+    - name: checkout code
+      uses: actions/checkout@v2
+
+    - name: Compile with Clang
+      run: |
+        clang++ -std=c++17 ./'New Code'/main.cpp -o Assembler_MacOS
+
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: Assembler_MacOS
+        path: Assembler_MacOS
+
+  upload-release-assets:
+    needs: [build-linux, build-windows, build-macos]
+    runs-on: ubuntu-latest
+    steps:
+    - name: Download Artifacts
+      uses: actions/download-artifact@v2
+      with:
+        name: Assembler
+        path: ./artifacts/linux
+    - name: Download Artifacts
+      uses: actions/download-artifact@v2
+      with:
+        name: Assembler_x64
+        path: ./artifacts/windows
+    - name: Download Artifacts
+      uses: actions/download-artifact@v2
+      with:
+        name: Assembler_MacOS
+        path: ./artifacts/macos
+
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.sha }}
+        release_name: Release ${{ github.sha }}
+        draft: false
+        prerelease: false
+
+    - name: Upload Release Asset (Linux)
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./artifacts/linux/Assembler
+        asset_name: Assembler
+        asset_content_type: application/octet-stream
+
+    - name: Upload Release Asset (Windows)
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./artifacts/windows/Assembler_x64
+        asset_name: Assembler_x64
+        asset_content_type: application/octet-stream
+
+    - name: Upload Release Asset (macOS)
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./artifacts/macos/Assembler_MacOS
+        asset_name: Assembler_MacOS
+        asset_content_type: application/octet-stream
