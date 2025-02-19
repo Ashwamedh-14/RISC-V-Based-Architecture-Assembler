@@ -188,7 +188,7 @@ Blank lines are skipped while parsing
 - Valid `ouput` ports are `F8`, `F9`, `FA` and `FB`.
 - Specifying any other `input` or `output` port will result in a `logic error`.
 - Same as `MEM`, to read / write data to any `I/O` port, you will need to use `regs`.
-- The compiled code is compatible with `x64` architecture **only**.
+- The compiled binaries are compatible with `x64` architecture **only**.
 
 [1]: https://ahduni.edu.in/academics/schools-centres/school-of-engineering-and-applied-science/people-1/mazad-zaveri/
 [2]: https://ahduni.edu.in/academics/schools-centres/school-of-engineering-and-applied-science/
