@@ -119,7 +119,7 @@ In case the executable file that was compiled does not run upon clicking it, esp
 
 ## Syntax
 
-Welcome to the syntax of the assembly language, where we will go over some nitpicky stuff while you might be wrting your code.
+Welcome to the syntax of the assembly language, where we will go over some nitpicky stuff while you might be writing your code.
 
 ### Statements
 
@@ -170,6 +170,25 @@ Blank lines are skipped while parsing
   - `R01` is correct and also equivalent to `R1`
   - `RA` is incorrect
 - **All** `DAT`, `PORT Address`, `MEM Address` values are passed, parsed and taken as `8-bit hexadecimals`.
+
+## Technical Details
+
+- The processor is an `8-bit` processor, i.e., its `regs` are capable of storing `8 bits`, or a `byte`, of data at a time.
+- The processor has a `25-bit` wide `bus`, where:
+  - The first `5 bits` are reserved for `OP Code`.
+  - The next `12 bits` are distributed among 3, `4bit` wide `reg address`. The distribution is:
+    - The first `4 bits` are reserved for `Rw`, i.e., `Register Write`.
+    - The next `4 bits` are reserved for `Rx`, i.e., `Register Read1`.
+    - The last `4 bits` are reserved for `Ry`, i.e., `Register Read2`.
+  - The last `8 bits` is reserved for `DAT`. It carries `immediate data`, `MEM Address`, `Port Address`.
+- The total number of `regs` available are **16**. This means valid `regs` are `R0` - `R15`.
+- The `MEM Address` is taken as `8-bit hexadecimal`. This means valid `MEM Address` are `00` - `FF`.
+- Data can be read from and written to `MEM` only by `regs`.
+- Valid `input` ports are `F1`, `F2`, `F3` and `F4`.
+- Valid `ouput` ports are `F8`, `F9`, `FA` and `FB`.
+- Specifying any other `input` or `output` port will result in a `logic error`.
+- Same as `MEM`, to read / write data to any `I/O` port, you will need to use `regs`.
+- The compiled code is compatible with `x64` architecture **only**.
 
 [1]: https://ahduni.edu.in/academics/schools-centres/school-of-engineering-and-applied-science/people-1/mazad-zaveri/
 [2]: https://ahduni.edu.in/academics/schools-centres/school-of-engineering-and-applied-science/
