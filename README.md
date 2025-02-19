@@ -112,7 +112,11 @@ In case the executable file that was compiled does not run upon clicking it, esp
 - Run the command below
 
   ``` Bash
-  ./Assembler
+  # For MacOS Users
+  ./Assembler_MacOS
+
+  # For Linux (Ubuntu) Users
+  ./Assemnler  
   ```
 
 - `hexcode.txt` should now be generated.
