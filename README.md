@@ -1,5 +1,7 @@
 # RISC-V BASED ARCHITECTURE ASSEMBLER
 
+## About
+
 The assembler is designed to translate assembly instruction into equivalent hexadecimal code for RISC-V based processor as designed in [Digital Model of Processor](./Digital%20Model%20of%20Processor.circ). The full list of Valid OP Codes are given in the text file [Valid OP Codes](./Valid%20OP%20Codes.txt) along with the information that would be required to pass for that OP Code for it to be a valid instruction.
 
 > **NOTE**  
