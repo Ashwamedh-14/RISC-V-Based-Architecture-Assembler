@@ -1,6 +1,6 @@
 /*
 
-Author: Ayush Purohit
+Author: Ashwamedh-14
 Date Started: 17 January 2025
 Software: Assembly to Hex Converter, i.e, Assembler
 Description: 
