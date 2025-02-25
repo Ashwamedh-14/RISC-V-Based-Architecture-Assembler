@@ -1,6 +1,6 @@
 /*
 
-Name: Ayush Purohit
+Author: Ayush Purohit
 Software: Assembly to Hex Converter, i.e, Assembler
 Description: 
 This program converts assembly code to hex code.
