@@ -95,13 +95,15 @@ jobs:
           name: Assembler-macos
           path: bin/Assembler_MacOS
 
-  # Commit the executables to the repository
+  # Commit the executables & version update
   commit-executables:
     needs: [build-linux, build-windows, build-macos]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
+        with:
+          persist-credentials: false  # Prevents using default GitHub token
 
       - name: Download Linux Executable
         uses: actions/download-artifact@v4
@@ -121,8 +123,14 @@ jobs:
           name: Assembler-macos
           path: bin/
 
-      - name: Read Version Number for Commit
-        run: echo "VERSION=$(cat version.txt)" >> $GITHUB_ENV
+      - name: Increment Version Number
+        run: |
+          VERSION=$(cat version.txt)
+          IFS='.' read -r major minor patch <<< "$VERSION"
+          patch=$((patch + 1))
+          NEW_VERSION="$major.$minor.$patch"
+          echo "$NEW_VERSION" > version.txt
+          echo "VERSION_NUMBER=$NEW_VERSION" >> $GITHUB_ENV
 
       - name: Configure Git
         run: |
@@ -132,29 +140,25 @@ jobs:
       - name: Create New Branch
         run: git checkout -b add-executables-${{ github.sha }}
 
-      - name: Commit Executables with Version Number
+      - name: Commit Executables & Version Update
         run: |
-          git add bin/  # Add the bin folder with executables
-          git commit -m "Add executables for version $VERSION"
+          git add bin/ version.txt
+          git commit -m "Added executables for version $VERSION_NUMBER"
           git push https://github.com/${{ github.repository }}.git HEAD:add-executables-${{ github.sha }}
 
-      - name: Create Pull Request and Auto-Merge
+      - name: Create & Auto-Merge Pull Request
         env:
           GH_PAT: ${{ secrets.GH_PAT }}
         run: |
           gh auth login --with-token <<< "$GH_PAT"
-            
-          # Create a pull request and store the URL
-          PR_URL=$(gh pr create --title "Add executables for version $VERSION" \
-                                --body "This pull request adds the executables for version $VERSION" \
+          PR_URL=$(gh pr create --title "Added executables for version $VERSION_NUMBER" \
+                                --body "This PR adds the executables and updates version.txt to $VERSION_NUMBER" \
                                 --head add-executables-${{ github.sha }} \
-                                   --base main)
-            
+                                --base main)
           echo "Pull request created: $PR_URL"
-            
-          # Extract PR number from the URL
+          
+          # Extract PR number from URL
           PR_NUMBER=$(basename "$PR_URL")
-      
-          # Auto-merge the pull request
+
+          # Auto-merge the PR
           gh pr merge "$PR_NUMBER" --merge --admin
-      
