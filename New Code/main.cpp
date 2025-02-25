@@ -250,7 +250,7 @@ void parse(int line_num, const string &line, ofstream &out_file) {
         return;
         break;
     };
-
+    
     // Verifying whether the number of registers is valid for the given opcode
     if (instr.reg_num && (op_code.at(instr.opcode) == "00" || op_code.at(instr.opcode) >= "0D" && op_code.at(instr.opcode) <= "11" || op_code.at(instr.opcode) == "1B" || op_code.at(instr.opcode) == "1C")){
         out_file << "Error: Invalid number of registers for OPCode " << instr.opcode << " at line " << line_num << ".\n";

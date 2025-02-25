@@ -179,6 +179,8 @@ Blank lines are skipped while parsing
 
 ## Technical Details
 
+- The numbering for the assembler starts at 1, i.e., the first line of the input file is numbered 1.
+- The assembler is **case-insensitive**.
 - The processor is an `8-bit` processor, i.e., its `regs` are capable of storing `8 bits`, or a `byte`, of data at a time.
 - The processor has a `25-bit` wide `bus`, where:
   - The first `5 bits` are reserved for `OP Code`.
