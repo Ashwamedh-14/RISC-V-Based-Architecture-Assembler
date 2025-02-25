@@ -138,14 +138,14 @@ jobs:
           git commit -m "Add executables for version $VERSION"
           git push https://github.com/${{ github.repository }}.git HEAD:add-executables-${{ github.sha }}
 
-          - name: Create Pull Request
-          env:
-            GH_PAT: ${{ secrets.GH_PAT }}
-          run: |
-            gh auth login --with-token <<< "$GH_PAT"
-            PR_URL=$(gh pr create --title "Add executables for version $VERSION" --body "This pull request adds the executables for version $VERSION" --head add-executables-${{ github.sha }} --base main --json url -q '.url')
-            echo "Pull request created: $PR_URL"
-      
-            # Auto-merge the PR
-            gh pr merge "$PR_URL" --merge --admin
+      - name: Create Pull Request
+        env:
+          GH_PAT: ${{ secrets.GH_PAT }}
+        run: |
+          gh auth login --with-token <<< "$GH_PAT"
+          PR_URL=$(gh pr create --title "Add executables for version $VERSION" --body "This pull request adds the executables for version $VERSION" --head add-executables-${{ github.sha }} --base main --json url -q '.url')
+          echo "Pull request created: $PR_URL"
+    
+          # Auto-merge the PR
+          gh pr merge "$PR_URL" --merge --admin
       
