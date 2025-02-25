@@ -109,7 +109,7 @@ int instr_chk(Instruction &instr){
         instr.registers[0] = "";
     }
 
-    for (int i = 0; i < 3; i++){                      // Checks valid register
+    for (unsigned short int i = 0; i < 3; i++){                      // Checks valid register
         if (instr.registers[i].empty()) {
            instr.registers[i] = "0";
            continue;
