@@ -1,5 +1,18 @@
 /*
-Testing the automation
+Name: Ayush Purohit
+Software: Assembly to Hex Converter, i.e, Assembler
+Description: 
+This program converts assembly code to hex code.
+The program reads the assembly code from a file named "asmcode.txt" and writes the hex code to a file named "hexcode.txt".
+The assembly code should be written in the following format:
+1. Each line should contain only one instruction.
+2. The instruction should be written in the following format:
+    <OPCODE>, <REGISTER1>, <REGISTER2>, <REGISTER3>, <DATALINE>;
+    where:
+    a. OPCODE: The operation code of the instruction. It should be written in uppercase.
+    b. REGISTER1, REGISTER2, REGISTER3: The registers used in the instruction. The registers should be written in the format "R<register number>". The register number should be written in decimal.
+    c. DATALINE: The data to be used in the instruction. It should be written in hexadecimal.
+3. The instruction should be followed by a semicolon.
 */
 
 #include <iostream>
