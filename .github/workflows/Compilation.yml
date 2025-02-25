@@ -97,7 +97,7 @@ jobs:
 
   # Commit the executables to the repository
   commit-executables:
-    needs: [build-linux, build-windows, build-macos]  # Make sure the build jobs run first
+    needs: [build-linux, build-windows, build-macos]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -124,12 +124,23 @@ jobs:
       - name: Read Version Number for Commit
         run: echo "VERSION=$(cat version.txt)" >> $GITHUB_ENV
 
-      - name: Commit Executables with Version Number
-        env:
-          GH_PAT: ${{ secrets.GH_PAT }}
+      - name: Configure Git
         run: |
           git config --global user.name "github-actions"
           git config --global user.email "github-actions@github.com"
+
+      - name: Create New Branch
+        run: git checkout -b add-executables-${{ github.sha }}
+
+      - name: Commit Executables with Version Number
+        run: |
           git add bin/  # Add the bin folder with executables
-          git commit -m "Added executables for version $VERSION"
-          git push https://$GH_PAT@github.com/${{ github.repository }}.git HEAD:main
+          git commit -m "Add executables for version $VERSION"
+          git push https://github.com/${{ github.repository }}.git HEAD:add-executables-${{ github.sha }}
+
+      - name: Create Pull Request
+        env:
+          GH_PAT: ${{ secrets.GH_PAT }}
+        run: |
+          gh auth login --with-token <<< $GH_PAT
+          gh pr create --title "Add executables for version $VERSION" --body "This pull request adds the executables for version $VERSION" --head add-executables-${{ github.sha }} --base main
