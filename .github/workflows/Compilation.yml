@@ -125,9 +125,11 @@ jobs:
         run: echo "VERSION=$(cat version.txt)" >> $GITHUB_ENV
 
       - name: Commit Executables with Version Number
+        env:
+          GH_PAT: ${{ secrets.GH_PAT }}
         run: |
           git config --global user.name "github-actions"
           git config --global user.email "github-actions@github.com"
           git add bin/  # Add the bin folder with executables
-          git commit -m "Add executables for version $VERSION"
-          git push
+          git commit -m "Added executables for version $VERSION"
+          git push https://$GH_PAT@github.com/${{ github.repository }}.git HEAD:main
