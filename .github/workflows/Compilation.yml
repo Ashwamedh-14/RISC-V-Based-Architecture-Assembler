@@ -102,8 +102,6 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
-        with:
-          persist-credentials: false  # Prevents using default GitHub token
 
       - name: Download Linux Executable
         uses: actions/download-artifact@v4
@@ -141,8 +139,6 @@ jobs:
         run: git checkout -b add-executables-${{ github.sha }}
 
       - name: Commit Executables & Version Update
-        env:
-          GITHUB_TOKEN: ${{ secrets.HITHUB_TOKEN }}
         run: |
           git add bin/ version.txt
           git commit -m "Added executables for version $VERSION_NUMBER"
