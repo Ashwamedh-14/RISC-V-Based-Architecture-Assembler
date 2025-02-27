@@ -141,6 +141,8 @@ jobs:
         run: git checkout -b add-executables-${{ github.sha }}
 
       - name: Commit Executables & Version Update
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           git add bin/ version.txt
           git commit -m "Added executables for version $VERSION_NUMBER"
