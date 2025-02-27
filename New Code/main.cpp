@@ -331,6 +331,7 @@ int main(int argc, char **argv){
 
         if (!line.size()){
             line_num++;
+            hexfile << "NOP\n";
             continue;
         }
 
@@ -343,6 +344,7 @@ int main(int argc, char **argv){
 
         if (!line.size()) {
             line_num++;
+            hexfile << "NOP\n";
             continue;
         }
 
