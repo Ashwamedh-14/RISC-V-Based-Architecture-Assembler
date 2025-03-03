@@ -123,6 +123,34 @@ In case the executable file that was compiled does not run upon clicking it, esp
 
 - `hexcode.txt` should now be generated.
 
+### Command Line Arguements
+
+You can specify the filenames you want the program to take input from and and give out put to. To do this perform the following steps:
+
+- Open the terminal
+- Go to the directory in which your executable file is stored
+  
+  ``` Bash
+  # Go to the directory in which your executable file is stored
+  cd directory/in/which/your/file/is/stored
+  ```
+
+- Run the following command
+
+  ``` Bash
+
+  # For input file
+  ./Assembler inputfilename.txt
+
+  # For both input and output file
+  ./Assembler inputfilename.txt outputfilename.txt
+  
+  ```
+
+- Notice that for specifying an output file, you need to specify an input file. This will be changed in future.
+- Also ensure that the input and output files are `text` files only.
+- If you don't specify the `I/O` files, the `Assembler` will use the default files for `I/O`, i.e., `asmcode.txt` and `hexcode.txt`.
+
 ## Syntax
 
 Welcome to the syntax of the assembly language, where we will go over some nitpicky stuff while you might be writing your code.
