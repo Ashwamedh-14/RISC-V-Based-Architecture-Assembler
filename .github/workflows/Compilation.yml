@@ -150,7 +150,7 @@ jobs:
         run: |
           gh auth login --with-token <<< "$GH_PAT"
           PR_URL=$(gh pr create --title "Added executables for version $VERSION_NUMBER" \
-                                --body "This PR adds the executables and updates version.txt to $VERSION_NUMBER" \
+                                --body "This PR adds the executables and updates version.txt to $NEW_VERSION" \
                                 --head add-executables-${{ github.sha }} \
                                 --base main)
           echo "Pull request created: $PR_URL"
