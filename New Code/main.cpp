@@ -305,19 +305,43 @@ void parse(int line_num, const string &line, ofstream &out_file) {
 }
 
 int main(int argc, char **argv){
-    string input = "asmcode.txt";
-    string output = "hexcode.txt";
+    string input = "asmcode.txt";     // Default input file
+    string output = "hexcode.txt";    // Default output file
+
+    // Check for command line arguements
+    if (argc > 1) input = argv[1];       // If one arguement is passed then it is the input file
+    if (argc > 2) output = argv[2];      // If two arguements are passed then the second arguement is the output file
+
+    // Ensure I/O files have .txt extension
+    if (input.find_last_of('.') == string::npos || input.substr(input.find_last_of('.') +1) != "txt"){
+        cout << "Error: Input file should be a text file" << endl;
+        return 1;
+    }
+    else if (output.find_last_of('.') == string::npos || output.substr(output.find_last_of('.') +1) != "txt"){
+        cout << "Error: Output file should be a text file" << endl;
+        return 1;
+    }
 
     ifstream assembly_code(input);
     
     int line_num = 0;
     
+    // Checking whether we are able to open the input file
     if (!assembly_code.is_open()){
-        cout << "Error: File " << input << " not found" << endl;
+        cout << "Error: File " << input << " was not found, or we were unable to open it.\n";
+        cout << "Check whether you have the file in the same directory, as well as the permission to read it" << endl;
         return 1;
     }
     
     ofstream hexfile(output);
+
+    // Checking whether we are able to open the output file
+    if (!hexfile.is_open()){
+        cout << "Error: File " << output << " was not found, or we were unable to open it.\n";
+        cout << "Check whether you have the file in the same directory, as well as the permission to write to it" << endl;
+        return 1;
+    }
+    
     string line;
 
     hexfile << "v2.0 raw\n";
