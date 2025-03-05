@@ -72,7 +72,7 @@ Following are the list of abbreviations that have / will be used:-
 
 - Install the [**Digital Model of Processor**](https://github.com/Ashwamedh-14/RISC-V-Based-Architecture-Assembler/raw/refs/heads/main/Digital%20Model%20of%20Processor.circ).
 
-- For `Windows x64` architecture users, install [`Assembler_x64.exe`](https://github.com/Ashwamedh-14/RISC-V-Based-Architecture-Assembler/raw/refs/heads/main/bin/Assembler_x64.exe)  
+- For `Windows x64` users, install [`Assembler_x64.exe`](https://github.com/Ashwamedh-14/RISC-V-Based-Architecture-Assembler/raw/refs/heads/main/bin/Assembler_x64.exe)  
 
 - For `MacOS` users, install [`Assembler_MacOS`](https://github.com/Ashwamedh-14/RISC-V-Based-Architecture-Assembler/raw/refs/heads/main/bin/Assembler_MacOS)  
 
