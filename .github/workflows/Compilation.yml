@@ -121,14 +121,9 @@ jobs:
           name: Assembler-macos
           path: bin/
 
-      - name: Increment Version Number
+      - name: Get Version Number
         run: |
           VERSION=$(cat version.txt)
-          IFS='.' read -r major minor patch <<< "$VERSION"
-          patch=$((patch + 1))
-          NEW_VERSION="$major.$minor.$patch"
-          echo "$NEW_VERSION" > version.txt
-          echo "VERSION_NUMBER=$NEW_VERSION" >> $GITHUB_ENV
 
       - name: Configure Git
         run: |
@@ -140,7 +135,7 @@ jobs:
 
       - name: Commit Executables & Version Update
         run: |
-          git add bin/ version.txt
+          git add bin/
           git commit -m "Added executables for version $VERSION_NUMBER"
           git push https://github.com/${{ github.repository }}.git HEAD:add-executables-${{ github.sha }}
 

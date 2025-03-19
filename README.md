@@ -89,6 +89,8 @@ Following are the list of abbreviations that have / will be used:-
 > chmod +x filename
 > ```
 >
+> `MacOS` users might also face the issue of the OS flagging it as a virus, the first time they run it. They will manually have to allow the program to be run.
+>
 > For people using `Linux` distros other than `Ubuntu`, do you really need a step by step guide to obtain the executable file for the [`source code`][4]? Just download the [`source code`][4] and compile it on your system, preferably with `C++17` or greater.  
 
 ## Using
@@ -101,7 +103,7 @@ Following are the list of abbreviations that have / will be used:-
 
 ### MacOS and Linux Users
 
-In case the executable file that was compiled does not run upon clicking it, especially in the case of `MacOS`, try the following steps:
+In case the executable file does not run upon clicking it, especially in the case of `MacOS`, try the following steps:
 
 - Open the `terminal`
 - Type in the following command
@@ -193,7 +195,7 @@ AND,R12,R1,R2;        This is a comment
 
 ### Blank Lines
 
-Blank lines are skipped while parsing
+Blank lines are replaced with `0000000`, i.e. `NOP`, in `hecode.txt`
 
 ### Points to remember
 
