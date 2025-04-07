@@ -23,6 +23,7 @@ The assembly code should be written in the following format:
 #include <map>
 #include <regex>
 #include <string>
+#include <stdio.h>
 
 #define INVALID_OPCODE 1
 #define INVALID_DATALINE 2
@@ -177,7 +178,7 @@ int main(int argc, char **argv){
         parse(++line_num, line, hexfile);
         hexfile << '\n';
     }
-    hexfile << endl;
+    hexfile << flush;
 
     assembly_code.close();
     hexfile.close();
@@ -204,11 +205,10 @@ int main(int argc, char **argv){
     string hex_line;
 
     getline(hexfile_read, hex_line); // Read the first line and skip it
-
     while (getline(hexfile_read, hex_line)){
-        for(int i = 0; i < 7; i++){
-            if (!i) binaryfile << hex_line[i];
-            else binaryfile << hex_map.at(hex_line[i]);
+        binaryfile << hex_line[0];
+        for(int i = 1; i < 7; i++){
+            binaryfile << hex_map.at(hex_line[i]);
         }
         binaryfile << '\n';
     }
