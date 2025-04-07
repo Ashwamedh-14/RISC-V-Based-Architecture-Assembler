@@ -36,6 +36,24 @@ The assembly code should be written in the following format:
 using namespace std;
 
 static const vector<char> hex_chars = {'0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F'};
+static const map<char, string> hex_map = {
+    {'0', "0000"},
+    {'1', "0001"},
+    {'2', "0010"},
+    {'3', "0011"},
+    {'4', "0100"},
+    {'5', "0101"},
+    {'6', "0110"},
+    {'7', "0111"},
+    {'8', "1000"},
+    {'9', "1001"},
+    {'A', "1010"},
+    {'B', "1011"},
+    {'C', "1100"},
+    {'D', "1101"},
+    {'E', "1110"},
+    {'F', "1111"}
+};
 static const map<string,string> op_code = {
     {"NOP", "00"},
     {"AND", "01"},
@@ -74,6 +92,134 @@ struct Instruction{
     int reg_num;
     string dataline;
 };
+
+// Function prototypes
+
+
+void toUpper(string &s);                        // Convert alphabets in a string to uppercase
+string strip(const string &s);                  // Function to remove leading and trailing whitespaces from a string                                      
+int instr_chk(Instruction &instr);              // Function to check whether the values in Instruction are correct
+void parse(int line_num, const string &line, ofstream &out_file);   // Function to parse the instruction and check for errors
+
+int main(int argc, char **argv){
+    string input = "asmcode.txt";     // Default input file
+    string output = "hexcode.txt";    // Default output file
+
+    // Check for command line arguements
+    if (argc > 1) input = argv[1];       // If one arguement is passed then it is the input file
+    if (argc > 2) output = argv[2];      // If two arguements are passed then the second arguement is the output file
+
+    // Ensure I/O files have .txt extension
+    if (input.find_last_of('.') == string::npos || input.substr(input.find_last_of('.') +1) != "txt"){
+        cout << "Error: Input file should be a text file" << endl;
+        return 1;
+    }
+    else if (output.find_last_of('.') == string::npos || output.substr(output.find_last_of('.') +1) != "txt"){
+        cout << "Error: Output file should be a text file" << endl;
+        return 1;
+    }
+
+    ifstream assembly_code(input);
+    
+    int line_num = 0;
+    
+    // Checking whether we are able to open the input file
+    if (!assembly_code.is_open()){
+        cout << "Error: File " << input << " was not found, or we were unable to open it.\n";
+        cout << "Check whether you have the file in the same directory, as well as the permission to read it" << endl;
+        return 1;
+    }
+    
+    ofstream hexfile(output);
+
+    // Checking whether we are able to open the output file
+    if (!hexfile.is_open()){
+        cout << "Error: File " << output << " was not found, or we were unable to open it.\n";
+        cout << "Check whether you have the file in the same directory, as well as the permission to write to it" << endl;
+        return 1;
+    }
+    
+    string line;
+
+    hexfile << "v2.0 raw\n";
+
+    while(getline(assembly_code,line)){
+        // Convert assembly code to hex
+        // and write to hexfile
+        line = strip(line);
+        toUpper(line);
+        
+        if (!line.size()){
+            line_num++;
+            hexfile << "0000000\n";
+            continue;
+        }
+
+        else if (count(line.begin(), line.end(), ';') == 0){
+            hexfile << "Error: Missing semicolon at line " << ++line_num << "\n";
+            continue;
+        }
+
+        line = line.substr(0, line.find_first_of(';'));
+
+        if (!line.size()) {
+            line_num++;
+            hexfile << "0000000\n";
+            continue;
+        }
+
+        else if (line.size() < 3){
+            hexfile << "Error: Invalid line at line " << ++line_num << "\n";
+            continue;
+        }
+        
+
+        parse(++line_num, line, hexfile);
+        hexfile << '\n';
+    }
+    hexfile << endl;
+
+    assembly_code.close();
+    hexfile.close();
+
+    // Converting the hexcode to binary code and storing it in bin.txt
+    ifstream hexfile_read(output);
+
+    // Checking whether we are able to open the input file
+    if (!hexfile_read.is_open()){
+        cout << "Error: File " << output << " was not found, or we were unable to open it.\n";
+        cout << "Check whether you have the file in the same directory, as well as the permission to read it" << endl;
+        return 1;
+    }
+
+    ofstream binaryfile("bin.txt");
+    
+    // Checking whether we are able to open the output file
+    if (!binaryfile.is_open()){
+        cout << "Error: File " << output << " was not found, or we were unable to open it.\n";
+        cout << "Check whether you have the file in the same directory, as well as the permission to write to it" << endl;
+        return 1;
+    }
+    
+    string hex_line;
+
+    getline(hexfile_read, hex_line); // Read the first line and skip it
+
+    while (getline(hexfile_read, hex_line)){
+        for(int i = 0; i < 7; i++){
+            if (!i) binaryfile << hex_line[i];
+            else binaryfile << hex_map.at(hex_line[i]);
+        }
+        binaryfile << '\n';
+    }
+    binaryfile << flush;
+
+    hexfile_read.close();
+    binaryfile.close();
+    
+    return 0;
+}
+
 
 // Convert alphabets in a string to uppercase
 void toUpper(string &s){
@@ -302,88 +448,4 @@ void parse(int line_num, const string &line, ofstream &out_file) {
     // Construncting the hex code
     out_file << op_code.at(instr.opcode) << instr.registers[0] << instr.registers[1] << instr.registers[2] << instr.dataline;
     return;
-}
-
-int main(int argc, char **argv){
-    string input = "asmcode.txt";     // Default input file
-    string output = "hexcode.txt";    // Default output file
-
-    // Check for command line arguements
-    if (argc > 1) input = argv[1];       // If one arguement is passed then it is the input file
-    if (argc > 2) output = argv[2];      // If two arguements are passed then the second arguement is the output file
-
-    // Ensure I/O files have .txt extension
-    if (input.find_last_of('.') == string::npos || input.substr(input.find_last_of('.') +1) != "txt"){
-        cout << "Error: Input file should be a text file" << endl;
-        return 1;
-    }
-    else if (output.find_last_of('.') == string::npos || output.substr(output.find_last_of('.') +1) != "txt"){
-        cout << "Error: Output file should be a text file" << endl;
-        return 1;
-    }
-
-    ifstream assembly_code(input);
-    
-    int line_num = 0;
-    
-    // Checking whether we are able to open the input file
-    if (!assembly_code.is_open()){
-        cout << "Error: File " << input << " was not found, or we were unable to open it.\n";
-        cout << "Check whether you have the file in the same directory, as well as the permission to read it" << endl;
-        return 1;
-    }
-    
-    ofstream hexfile(output);
-
-    // Checking whether we are able to open the output file
-    if (!hexfile.is_open()){
-        cout << "Error: File " << output << " was not found, or we were unable to open it.\n";
-        cout << "Check whether you have the file in the same directory, as well as the permission to write to it" << endl;
-        return 1;
-    }
-    
-    string line;
-
-    hexfile << "v2.0 raw\n";
-
-    while(getline(assembly_code,line)){
-        // Convert assembly code to hex
-        // and write to hexfile
-        line = strip(line);
-        toUpper(line);
-
-        if (!line.size()){
-            line_num++;
-            hexfile << "0000000\n";
-            continue;
-        }
-
-        else if (count(line.begin(), line.end(), ';') == 0){
-            hexfile << "Error: Missing semicolon at line " << ++line_num << "\n";
-            continue;
-        }
-
-        line = line.substr(0, line.find_first_of(';'));
-
-        if (!line.size()) {
-            line_num++;
-            hexfile << "0000000\n";
-            continue;
-        }
-
-        else if (line.size() < 3){
-            hexfile << "Error: Invalid line at line " << ++line_num << "\n";
-            continue;
-        }
-        
-
-        parse(++line_num, line, hexfile);
-        hexfile << '\n';
-    }
-    hexfile << endl;
-
-    assembly_code.close();
-    hexfile.close();
-
-    return 0;
 }
