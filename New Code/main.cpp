@@ -36,6 +36,7 @@ The assembly code should be written in the following format:
 
 using namespace std;
 
+bool ERR = false;             // Error flag
 static const vector<char> hex_chars = {'0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F'};
 static const map<char, string> hex_map = {
     {'0', "0000"},
@@ -158,6 +159,7 @@ int main(int argc, char **argv){
 
         else if (count(line.begin(), line.end(), ';') == 0){
             hexfile << "Error: Missing semicolon at line " << ++line_num << "\n";
+            ERR = true;
             continue;
         }
 
@@ -171,6 +173,7 @@ int main(int argc, char **argv){
 
         else if (line.size() < 3){
             hexfile << "Error: Invalid line at line " << ++line_num << "\n";
+            ERR = true;
             continue;
         }
         
@@ -182,6 +185,12 @@ int main(int argc, char **argv){
 
     assembly_code.close();
     hexfile.close();
+
+    if (ERR){
+        cout << "Error: Errors were found in the assembly code. Check the output file for more details." << endl;
+        cout << "Error: Failed to generate binary code.\n";
+        return 1;
+    }
 
     // Converting the hexcode to binary code and storing it in bin.txt
     ifstream hexfile_read(output);
@@ -318,6 +327,7 @@ void parse(int line_num, const string &line, ofstream &out_file) {
         if (temp.empty()) {
             out_file << "Error: Invalid line at line " << line_num << ".\n";
             out_file << "Passed Value: \"\".";
+            ERR = true;
             return;
         }
 
@@ -328,12 +338,14 @@ void parse(int line_num, const string &line, ofstream &out_file) {
                 } 
                 else {
                     out_file << "Error: Too many registers at line number " << line_num << "";
+                    ERR = true;
                     return;
                 }
             } 
             else {
                 out_file << "Error: Invalid Register at line " << line_num << ".\n";
                 out_file << "Register Passed: " << temp;
+                ERR = true;
                 return;
             }
         } 
@@ -345,6 +357,7 @@ void parse(int line_num, const string &line, ofstream &out_file) {
         else {
             out_file << "Error: Invalid Dataline at line number " << line_num << ".\n";
             out_file << "Passed Value: " << temp;
+            ERR = true;
             return;
         }
         line_idx++;
@@ -353,6 +366,7 @@ void parse(int line_num, const string &line, ofstream &out_file) {
     if (line_idx >= 5) {
         out_file << "Error: Too many instructions at line number: " << line_num << ".\n";
         out_file << "Number of instructions found: " << line_idx;
+        ERR = true;
         return;
     }
 
@@ -365,48 +379,56 @@ void parse(int line_num, const string &line, ofstream &out_file) {
         case INVALID_OPCODE:
         out_file << "Error: Invalid Opcode at line " << line_num << ".\n";
         out_file << "Opcode: " << instr.opcode;
+        ERR = true;
         return;
         break;
 
         case INVALID_DATALINE:
         out_file << "Error: Invalid Dataline at line " << line_num << ".\n";
         out_file << "Dataline: " << instr.dataline;
+        ERR = true;
         return;
         break;
 
         case REG_W_INVALID_REFERENCE:
         out_file << "Error: Invalid Register Reference for Rw at line " << line_num << ".\n";
         out_file << "Register Referenced: " << instr.registers[0];
+        ERR = true;
         return;
         break;
 
         case REG_RX_INVALID_REFERENCE:
         out_file << "Error: Invalid Register Reference for Rx at line " << line_num << ".\n";
         out_file << "Register Referenced: " << instr.registers[1];
+        ERR = true;
         return;
         break;
 
         case REG_RY_INVALID_REFERENCE:
         out_file << "Error: Invalid Register Reference for Ry at line " << line_num << ".\n";
         out_file << "Register Referenced: " << instr.registers[line_idx - 3];
+        ERR = true;
         return;
         break;
 
         case REG_W_OUT_OF_RANGE:
         out_file << "Error: Register Rw out of Range at line " << line_num << ".\n";
         out_file << "Register Value: " << instr.registers[0];
+        ERR = true;
         return;
         break;
 
         case REG_RX_OUT_OF_RANGE:
         out_file << "Error: Register Rx out of Range at line " << line_num << ".\n";
         out_file << "Register Value: " << instr.registers[1];
+        ERR = true;
         return;
         break;
 
         case REG_RY_OUT_OF_RANGE:
         out_file << "Error: Register Ry out of Range at line " << line_num << ".\n";
         out_file << "Register Value: " << instr.registers[line_idx - 6];
+        ERR = true;
         return;
         break;
     };
@@ -415,31 +437,37 @@ void parse(int line_num, const string &line, ofstream &out_file) {
     if (instr.reg_num && (op_code.at(instr.opcode) == "00" || op_code.at(instr.opcode) >= "0D" && op_code.at(instr.opcode) <= "11" || op_code.at(instr.opcode) == "1B" || op_code.at(instr.opcode) == "1C")){
         out_file << "Error: Invalid number of registers for OPCode " << instr.opcode << " at line " << line_num << ".\n";
         out_file << "Number of Registers Expected: 0, Found: " << instr.reg_num;
+        ERR = true;
         return;
     }
     else if (instr.reg_num != 1 && (op_code.at(instr.opcode) >= "0A" && op_code.at(instr.opcode) <= "0C" || op_code.at(instr.opcode) >= "12" && op_code.at(instr.opcode) <= "15")){
         out_file << "Error: Invalid number of registers for OPCode " << instr.opcode << " at line " << line_num << ".\n";
         out_file << "Number of Registers Expected: 1, Found: " << instr.reg_num;
+        ERR = true;
         return;
     }
     else if (instr.reg_num != 2 && (op_code.at(instr.opcode) >= "05" && op_code.at(instr.opcode) <= "09" || op_code.at(instr.opcode) == "16" || op_code.at(instr.opcode) == "17")){
         out_file << "Error: Invalid number of registers for OPCode " << instr.opcode << " at line " << line_num << ".\n";
         out_file << "Number of Registers Expected: 2, Found: " << instr.reg_num;
+        ERR = true;
         return;
     }
     else if (instr.reg_num != 3 && (op_code.at(instr.opcode) >= "01" && op_code.at(instr.opcode) <= "04" || op_code.at(instr.opcode) >= "18" && op_code.at(instr.opcode) <= "1A")){
         out_file << "Error: Invalid number of registers for OPCode " << instr.opcode << " at line " << line_num << ".\n";
         out_file << "Number of Registers Expected: 3, Found: " << instr.reg_num;
+        ERR = true;
         return;
     }
 
     // Verifying whether the dataline is valid for the given opcode
     if (instr.dataline.empty() && (op_code.at(instr.opcode) >= "05" && op_code.at(instr.opcode) <= "08" || op_code.at(instr.opcode) >= "0A" && op_code.at(instr.opcode) <= "11" || op_code.at(instr.opcode) == "14" || op_code.at(instr.opcode) == "15" || op_code.at(instr.opcode) == "1B" || op_code.at(instr.opcode) == "1C")){
         out_file << "Error: Missing Dataline for OPCode " << instr.opcode << " at line " << line_num << '.';
+        ERR = true;
         return;
     }
     else if (!instr.dataline.empty() && (op_code.at(instr.opcode) >= "00" && op_code.at(instr.opcode) <= "04" || op_code.at(instr.opcode) == "09" || op_code.at(instr.opcode) == "12" || op_code.at(instr.opcode) == "13" || op_code.at(instr.opcode) >= "16" && op_code.at(instr.opcode) <= "1A")){
         out_file << "Error: Dataline not required for OPCode " << instr.opcode << " at line " << line_num << '.';
+        ERR = true;
         return;
     }
     
