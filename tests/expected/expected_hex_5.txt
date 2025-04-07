@@ -1,0 +1,23 @@
+v2.0 raw
+Error: Missing semicolon at line 1
+Error: Invalid number of registers for OPCode MOVI at line 2.
+Number of Registers Expected: 1, Found: 0
+0A30002
+14A00F2
+01FA200
+0F00003
+14400F1
+0544003
+18F4300
+Error: Invalid Opcode at line 10.
+Opcode: JMPNCZR
+0144200
+15040F8
+15020F9
+14A00F2
+Error: Invalid Opcode at line 15.
+Opcode: ANT
+0E0000D
+15010F9
+0D00003
+Error: Missing semicolon at line 19
