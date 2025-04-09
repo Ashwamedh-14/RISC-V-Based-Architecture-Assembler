@@ -187,8 +187,8 @@ int main(int argc, char **argv){
     hexfile.close();
 
     if (ERR){
-        cout << "Error: Errors were found in the assembly code. Check the output file for more details." << endl;
-        cout << "Error: Failed to generate binary code.\n";
+        cout << "Error: Errors were found in the assembly code. Check the output file for more details." << '\n';
+        cout << "Error: Failed to generate binary code." << endl;
         return 1;
     }
 
