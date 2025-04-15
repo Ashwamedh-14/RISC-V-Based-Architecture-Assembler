@@ -40,7 +40,7 @@ jobs:
               id: cache-mingw
               uses: actions/cache@v3
               with:
-                path: C:\'Program Files'\mingw-w64\bin
+                path: "C:\\Program Files\\mingw-w64"
                 key: ${{ runner.os }}-mingw-cache-v1
                 restore-keys: |
                   ${{ runner.os }}-mingw-cache-
