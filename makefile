@@ -31,7 +31,7 @@ test: setup
 		output_hex="$(OUTPUT_DIR)/output_hex_$$test_case.txt"; \
 		output_bin="$(OUTPUT_DIR)/output_bin_$$test_case.txt"; \
 		echo "Running test 🧪 $$test_case:"; \
-		./$(OUT) $$input $$output_hex $$output_bin; \
+		./$(OUT) $$input $$output_hex $$output_bin || echo "❌ Could not compile"; \
 		echo "Comparing output with expected results..."; \
 		if cmp -s $$output_hex $$expected_hex; then \
 			echo "✅ Hex output matches expected results for test $$test_case"; \
