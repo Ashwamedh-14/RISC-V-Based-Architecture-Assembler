@@ -11,10 +11,16 @@ all: test
 
 .PHONY: all build test clean
 
-build:
+dependencies:
+	@echo "Downloading Dependencies..."
+	sudo apt-get install -y dos2unix
+	@echo "Dependencies installed."
+
+build: dependencies
+	@echo "Building the project..."
 	$(CXX) -std=c++17 -o $(OUT) $(SRC)
 	@echo "Build complete ✅. Executable: $(OUT)"
-	ls -l | grep '$(OUT)'
+	ls -l
 
 setup: build
 	@echo "Setting all files in Directories to Unix Standard, if saved in Windows Standard"
@@ -32,7 +38,7 @@ test: setup
 		output_hex="$(OUTPUT_DIR)/output_hex_$$test_case.txt"; \
 		output_bin="$(OUTPUT_DIR)/output_bin_$$test_case.txt"; \
 		echo "Running test 🧪 $$test_case:"; \
-		./$(OUT) $$input $$output_hex $$output_bin || echo "❌ Could not compile"; \
+		./$(OUT) $$input $$output_hex $$output_bin || echo "❌ Could not compile."; \
 		echo "Comparing output with expected results..."; \
 		if cmp -s $$output_hex $$expected_hex; then \
 			echo "✅ Hex output matches expected results for test $$test_case"; \
