@@ -1,10 +1,12 @@
 CXX := g++
 SRC := New\ Code/main.cpp
 OUT := Assembler
-TEST_INPUT := tests/input.txt
-TEST_OUTPUT_HEX := tests/output_hex.txt
-TEST_EXPECTED_HEX := tests/expected_hex.txt
-TEST_OUTPUT_BIN := tests/output_bin.txt
+INPUT_DIR := ./tests/input
+OUTPUT_DIR := ./tests/output
+EXPECTED_DIR := ./tests/expected
+
+INPUT_FILES := $(notdir $(wildcard tests/input/*.txt))
+TEST_CASES := $(basename $(INPUT_FILES))
 
 all: test
 
@@ -14,27 +16,48 @@ build:
 	$(CXX) -std=c++17 -o $(OUT) $(SRC)
 	@echo "Build complete ✅. Executable: $(OUT)"
 
-execute: build
-	@echo "Executing $(OUT) with test input..."
-	@./$(OUT) $(TEST_INPUT) $(TEST_OUTPUT_HEX) $(TEST_OUTPUT_BIN)
-	@echo "Execution complete. Output files generated."
-
-test: execute
+test: build
 	@echo "Running tests..."
-	@echo "Input:"
-	@cat $(TEST_INPUT)
-	@echo "Output of Hexadecimal:"
-	@cat $(TEST_OUTPUT_HEX)
-	@echo "Expected:"
-	@cat $(TEST_EXPECTED_HEX)
-	@echo "Comparing output..."
-	@if cmp -s $(TEST_OUTPUT_HEX) $(TEST_EXPECTED_HEX); then \
-		echo "Test for Hexadecimal passed! ✅"; \
+	$(eval FAILED=false)
+	@$(foreach test_case,$(TEST_CASES), \
+		$(eval input=$(INPUT_DIR)/input_$(test_case).txt) \
+		$(eval expected_hex=$(EXPECTED_DIR)/expected_hex_$(test_case).txt) \
+		$(eval expected_bin=$(EXPECTED_DIR)/expected_bin_$(test_case).txt) \
+		$(eval output_hex=$(OUTPUT_DIR)/output_hex_$(test_case).txt) \
+		$(eval output_bin=$(OUTPUT_DIR)/output_bin_$(test_case).txt) \
+		@echo "Running test 🧪 $(test_case):"; \
+		@-./$(OUT) $(input) $(output_hex) $(output_bin) || echo "❌ Execution failed for test $(test_case)"; \
+		@echo "Comparing output with expected results..."; \
+		@if cmp -s $(output_hex) $(expected_hex); then \
+			echo "✅ Hex output matches expected results for test $(test_case)"; \
+		else \
+			echo "❌ Hex output does not match expected results for test $(test_case)"; \
+			git diff --no-index --color $(output_hex) $(expected_hex); \
+			FAILED=true; \
+		fi; \
+		@if [ -f $(expected_bin) ]; then \
+			if cmp -s $(output_bin) $(expected_bin); then \
+				echo "✅ Binary output matches expected results for test $(test_case)"; \
+			else \
+				echo "❌ Binary output does not match expected results for test $(test_case)"; \
+				git diff --no-index --color $(output_bin) $(expected_bin); \
+				FAILED=true; \
+			fi; \
+		else \
+			echo "⚠️ No expected binary output for test $(test_case)"; \
+		fi; \
+		@echo "Test $(test_case) completed.\n"; \
+	)
+
+	@echo "All tests completed."
+
+	@if [ "$(FAILED)" = "true" ]; then \
+	    exit 1; \
 	else \
-		echo "Test for Hexadecimal failed! ❌"; \
-		git diff --no-index --color $(TEST_OUTPUT_HEX) $(TEST_EXPECTED_HEX) || true; \
-		exit 1; \
-	fi
+	    echo "✅ All tests passed successfully!"; \
+	fi;
+
+
 
 clean:
 	rm -f $(OUT) $(TEST_OUTPUT_HEX)
