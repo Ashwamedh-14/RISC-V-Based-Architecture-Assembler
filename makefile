@@ -21,7 +21,7 @@ setup: build
 	dos2unix $(EXPECTED_DIR)/*.txt
 	@echo "Done"
 
-test: build
+test: setup
 	@echo "Running tests..."
 	@FAILED=false; \
 	for test_case in $(TEST_CASES); do \
@@ -31,7 +31,7 @@ test: build
 		output_hex="$(OUTPUT_DIR)/output_hex_$$test_case.txt"; \
 		output_bin="$(OUTPUT_DIR)/output_bin_$$test_case.txt"; \
 		echo "Running test 🧪 $$test_case:"; \
-		./$(OUT) $$input $$output_hex $$output_bin || echo "❌ Execution failed for test $$test_case"; \
+		./$(OUT) $$input $$output_hex $$output_bin; \
 		echo "Comparing output with expected results..."; \
 		if cmp -s $$output_hex $$expected_hex; then \
 			echo "✅ Hex output matches expected results for test $$test_case"; \
