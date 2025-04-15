@@ -5,10 +5,12 @@ on:
     branches: [main]
     paths:
        - 'New Code/main.cpp'  # Trigger only when `main.cpp` changes
+       - 'makefile'
   pull_request:
     branches: [main]
     paths:
        - 'New Code/main.cpp'  # Trigger only when `main.cpp` changes
+       - 'makefile'
 
 jobs:
     

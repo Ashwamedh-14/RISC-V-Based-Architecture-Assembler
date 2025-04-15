@@ -73,3 +73,4 @@ clean:
 	rm -f $(OUT)
 	rm -f $(OUTPUT_DIR)/*.txt
 	@echo "Cleaned up. Removed executable and test output."
+	@echo "Testing"
