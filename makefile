@@ -5,12 +5,11 @@ INPUT_DIR := ./tests/input
 OUTPUT_DIR := ./tests/output
 EXPECTED_DIR := ./tests/expected
 
-INPUT_FILES := $(notdir $(wildcard tests/input/*.txt))
-TEST_CASES := $(basename $(INPUT_FILES))
+TEST_CASES := 1 2 3 4 5
 
 all: test
 
-.PHONY: all build execute test clean
+.PHONY: all build test clean
 
 build:
 	$(CXX) -std=c++17 -o $(OUT) $(SRC)
