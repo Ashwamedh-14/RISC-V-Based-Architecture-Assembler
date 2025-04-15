@@ -14,6 +14,7 @@ all: test
 build:
 	$(CXX) -std=c++17 -o $(OUT) $(SRC)
 	@echo "Build complete ✅. Executable: $(OUT)"
+	ls -l | grep '$(OUT)'
 
 setup: build
 	@echo "Setting all files in Directories to Unix Standard, if saved in Windows Standard"
