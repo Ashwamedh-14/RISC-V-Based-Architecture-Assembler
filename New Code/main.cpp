@@ -98,26 +98,33 @@ struct Instruction{
 // Function prototypes
 
 
-void toUpper(string &s);                        // Convert alphabets in a string to uppercase
-string strip(const string &s);                  // Function to remove leading and trailing whitespaces from a string                                      
-int instr_chk(Instruction &instr);              // Function to check whether the values in Instruction are correct
+void usage(void);
+void toUpper(string &s);      // Convert alphabets in a string to uppercase
+string strip(const string &s);     // Function to remove leading and trailing whitespaces from a string                                      
+int instr_chk(Instruction &instr);   // Function to check whether the values in Instruction are correct
 void parse(int line_num, const string &line, ofstream &out_file);   // Function to parse the instruction and check for errors
 
 int main(int argc, char **argv){
     string input = "asmcode.txt";     // Default input file
     string output = "hexcode.txt";    // Default output file
+    string binary = "bin.txt";
 
     // Check for command line arguements
     if (argc > 1) input = argv[1];       // If one arguement is passed then it is the input file
     if (argc > 2) output = argv[2];      // If two arguements are passed then the second arguement is the output file
+    if (argc > 3) binary = argv[3];     // If three arguements are passed then the third arguement is the binary file
 
     // Ensure I/O files have .txt extension
     if (input.find_last_of('.') == string::npos || input.substr(input.find_last_of('.') +1) != "txt"){
-        cout << "Error: Input file should be a text file" << endl;
+        usage();
         return 1;
     }
     else if (output.find_last_of('.') == string::npos || output.substr(output.find_last_of('.') +1) != "txt"){
-        cout << "Error: Output file should be a text file" << endl;
+        usage();
+        return 1;
+    }
+    else if (binary.find_last_of('.') == string::npos || binary.substr(binary.find_last_of('.') +1) != "txt"){
+        usage();
         return 1;
     }
 
@@ -202,7 +209,7 @@ int main(int argc, char **argv){
         return 1;
     }
 
-    ofstream binaryfile("bin.txt");
+    ofstream binaryfile(binary);
     
     // Checking whether we are able to open the output file
     if (!binaryfile.is_open()){
@@ -476,4 +483,12 @@ void parse(int line_num, const string &line, ofstream &out_file) {
     // Construncting the hex code
     out_file << op_code.at(instr.opcode) << instr.registers[0] << instr.registers[1] << instr.registers[2] << instr.dataline;
     return;
+}
+
+void usage(void){
+    cout << "Usage: ./Assembler <input_file>.txt <output_file>.txt <binary_file>.txt" << '\n';
+    cout << "Default input file: asmcode.txt" << '\n';
+    cout << "Default output file: hexcode.txt" << '\n';
+    cout << "Default binary file: bin.txt" << '\n';
+    cout << "Input, Output, and Binary file should be a text file" << endl;
 }
