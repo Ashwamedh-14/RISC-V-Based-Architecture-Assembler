@@ -1,8 +1,8 @@
 CXX := g++
 SRC := New\ Code/main.cpp
 OUT := Assembler
-INPUT_DIR := ./tests/input
-OUTPUT_DIR := ./tests/output
+INPUT_DIR := ./tests/inputs
+OUTPUT_DIR := ./tests/outputs
 EXPECTED_DIR := ./tests/expected
 
 TEST_CASES := 1 2 3 4 5
