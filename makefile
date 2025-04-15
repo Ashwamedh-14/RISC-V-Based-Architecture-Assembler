@@ -27,6 +27,14 @@ setup: build
 	dos2unix $(INPUT_DIR)/*.txt
 	dos2unix $(EXPECTED_DIR)/*.txt
 	@echo "Done"
+	@echo "Checking is the output directory exists..."
+	@if [ ! -d "$(OUTPUT_DIR)" ]; then \
+		echo "Output directory does not exist. Creating..."; \
+		mkdir -p $(OUTPUT_DIR); \
+		echo "Output directory created."; \
+	else \
+		echo "Output directory already exists."; \
+	fi
 
 test: setup
 	@echo "Running tests..."
@@ -78,6 +86,5 @@ test: setup
 
 clean:
 	rm -f $(OUT)
-	rm -f $(OUTPUT_DIR)/*.txt
-	@echo "Cleaned up. Removed executable and test output."
-	@echo "Testing"
+	rm -rf $(OUTPUT_DIR)
+	@echo "Cleaned up. Removed executable and test output directory."
