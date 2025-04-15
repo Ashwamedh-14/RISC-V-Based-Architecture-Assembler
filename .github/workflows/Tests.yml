@@ -1,0 +1,32 @@
+name: Tests
+
+on:
+  push:
+    branches: [main]
+    paths:
+       - 'New Code/main.cpp'  # Trigger only when `main.cpp` changes
+  pull_request:
+    branches: [main]
+    paths:
+       - 'New Code/main.cpp'  # Trigger only when `main.cpp` changes
+
+jobs:
+    
+    build-and-test:
+      runs-on: ubuntu-latest
+      steps:
+        - name: Checkout Code
+          uses: actions/checkout@v3
+      
+        - name: Update Environment
+          run: sudo apt-get update && sudo apt-get install -y g++ make git
+
+        - name: Test
+          run: make test
+
+        - name: Clean
+          if: always() # Always run this step, even if the previous steps fail
+          run: make clean
+
+        
+

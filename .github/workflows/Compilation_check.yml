@@ -1,0 +1,70 @@
+name: Check Whether Compilable or Not
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'New Code/main.cpp'  # Trigger only when `main.cpp` changes
+
+jobs:
+
+    # Build Check for Linux
+    build-linux:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout Code
+              uses: actions/checkout@v3
+
+            - name: Update System
+              run: sudo apt-get update && sudo apt-get upgrade -y
+
+            - name: Build Essential Packages
+              run: sudo apt-get install -y build-essential
+
+            - name: Simple Compile with g++
+              run: g++ -static-libstdc++ ./'New Code'/main.cpp -o Assembler
+        
+            - name: Ensure Executable Works
+              run: chmod +x Assembler
+
+    build-windows:
+        runs-on: windows-latest
+        steps:
+            - name: Checkout Code
+              uses: actions/checkout@v3
+
+            - name: Update System
+              run: choco upgrade all -y
+
+            - name: Use cache MinGW
+              id: cache-mingw
+              uses: actions/cache@v3
+              with:
+                path: "C:\\Program Files\\mingw-w64"
+                key: ${{ runner.os }}-mingw-cache-v1
+                restore-keys: |
+                  ${{ runner.os }}-mingw-cache-
+                    
+            - name: Install MinGW (If Not Cached)
+              if: steps.cache-mingw.outputs.cache-hit != 'true'
+              run: choco install mingw -y
+            
+            - name: Add MinGW to PATH
+              run: |
+                echo "Adding MinGW to PATH"
+                echo "C:\\Program Files\\mingw-w64\\bin" >> $env:GITHUB_PATH
+                
+            - name: Simple Compile with g++
+              run: g++ -static-libstdc++ ./'New Code'/main.cpp Assembler.exe
+
+    build-macos:
+        runs-on: macos-latest
+        steps:
+            - name: Checkout Code
+              uses: actions/checkout@v3
+
+            - name: Simple Compile with clang++
+              run: clang++ -std=c++17 ./'New Code'/main.cpp -o Assembler
+
+            - name: Ensure Executable Works
+              run: chmod +x Assembler
