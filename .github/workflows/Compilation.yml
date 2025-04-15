@@ -54,6 +54,15 @@ jobs:
       - name: Install MinGW (If Not Cached)
         if: steps.cache-mingw.outputs.cache-hit != 'true'
         run: choco install mingw -y
+
+      - name: Checking where MinGW is installed
+        run: |
+          echo "🔍 Checking where gcc is installed..."
+          where gcc
+          echo "🔍 Checking where g++ is installed..."
+          where g++
+          echo "🔍 Verifying g++ version..."
+          g++ --version
       
       - name: Add MinGW to PATH
         run: |
