@@ -42,10 +42,23 @@ jobs:
       - name: Read Version Number
         run: echo "CURRENT_VERSION=$(Get-Content version.txt)" | Out-File -FilePath $env:GITHUB_ENV -Append
 
-      - name: Install MinGW
+      - name: Use cache MinGW
+        id: cache-mingw
+        uses: actions/cache@v3
+        with:
+          path: "C:\\Program Files\\mingw-w64\\bin"
+          key: ${{ runner.os }}-mingw-cache-v1
+          restore-keys: |
+            ${{ runner.os }}-mingw-cache-
+              
+      - name: Install MinGW (If Not Cached)
+        if: steps.cache-mingw.outputs.cache-hit != 'true'
+        run: choco install mingw -y
+      
+      - name: Add MinGW to PATH
         run: |
-          choco install mingw -y
-          setx PATH "C:\Program Files\mingw-w64\bin;%PATH%"
+          echo "Adding MinGW to PATH"
+          echo "C:\\Program Files\\mingw-w64\\bin" >> $env:GITHUB_PATH
 
       - name: Create bin Directory (if not exists)
         run: |
