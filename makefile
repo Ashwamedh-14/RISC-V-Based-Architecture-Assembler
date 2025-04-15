@@ -60,5 +60,6 @@ test: build
 
 
 clean:
-	rm -f $(OUT) $(TEST_OUTPUT_HEX)
+	rm -f $(OUT)
+	rm -f $(OUTPUT_DIR)/*.txt
 	@echo "Cleaned up. Removed executable and test output."
