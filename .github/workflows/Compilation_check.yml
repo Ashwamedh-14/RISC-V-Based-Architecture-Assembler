@@ -15,9 +15,6 @@ jobs:
             - name: Checkout Code
               uses: actions/checkout@v3
 
-            - name: Update System
-              run: sudo apt-get update && sudo apt-get upgrade -y
-
             - name: Build Essential Packages
               run: sudo apt-get install -y build-essential
 
@@ -32,9 +29,6 @@ jobs:
         steps:
             - name: Checkout Code
               uses: actions/checkout@v3
-
-            - name: Update System
-              run: choco upgrade all -y
 
             - name: Use cache MinGW
               id: cache-mingw
