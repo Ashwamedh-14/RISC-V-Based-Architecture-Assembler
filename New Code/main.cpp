@@ -196,7 +196,7 @@ int main(int argc, char **argv){
     if (ERR){
         cout << "Error: Errors were found in the assembly code. Check the output file for more details." << '\n';
         cout << "Error: Failed to generate binary code." << endl;
-        return 1;
+        return 9;
     }
 
     // Converting the hexcode to binary code and storing it in bin.txt
