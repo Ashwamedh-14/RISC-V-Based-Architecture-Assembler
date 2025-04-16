@@ -59,8 +59,10 @@ jobs:
         run: |
           echo "🔍 Checking where gcc is installed..."
           where gcc
+          Get-Command gcc
           echo "🔍 Checking where g++ is installed..."
           where g++
+          Get-Command g++
           echo "🔍 Verifying g++ version..."
           g++ --version
       
