@@ -13,7 +13,7 @@ all: test
 
 dependencies:
 	@echo "Downloading Dependencies..."
-	sudo apt-get install -y dos2unix
+	sudo apt-get install -y git dos2unix
 	@echo "Dependencies installed."
 
 build: dependencies
