@@ -13,7 +13,7 @@ The assembly code should be written in the following format:
     a. OPCODE: The operation code of the instruction. It should be written in uppercase.
     b. REGISTER1, REGISTER2, REGISTER3: The registers used in the instruction. The registers should be written in the format "R<register number>". The register number should be written in decimal.
     c. DATALINE: The data to be used in the instruction. It should be written in hexadecimal. Can be PORT or MEM Address too
-3. The instruction should be followed by a semicolon. Debugging
+3. The instruction should be followed by a semicolon.
 */
 
 #include <iostream>
