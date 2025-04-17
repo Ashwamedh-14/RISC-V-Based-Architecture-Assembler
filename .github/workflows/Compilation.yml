@@ -54,17 +54,6 @@ jobs:
       - name: Install MinGW (If Not Cached)
         if: steps.cache-mingw.outputs.cache-hit != 'true'
         run: choco install mingw -y
-
-      - name: Checking where MinGW is installed
-        run: |
-          echo "🔍 Checking where gcc is installed..."
-          where gcc
-          Get-Command gcc
-          echo "🔍 Checking where g++ is installed..."
-          where g++
-          Get-Command g++
-          echo "🔍 Verifying g++ version..."
-          g++ --version
       
       - name: Add MinGW to PATH
         run: |
@@ -156,7 +145,7 @@ jobs:
       - name: Commit Executables & Version Update
         run: |
           git add bin/
-          git commit -m "Added executables for version $VERSION_NUMBER"
+          git commit -m "Added executables for version $VERSION"
           git push https://github.com/${{ github.repository }}.git HEAD:add-executables-${{ github.sha }}
 
       - name: Create & Auto-Merge Pull Request
@@ -164,8 +153,8 @@ jobs:
           GH_PAT: ${{ secrets.GH_PAT }}
         run: |
           gh auth login --with-token <<< "$GH_PAT"
-          PR_URL=$(gh pr create --title "Added executables for version $VERSION_NUMBER" \
-                                --body "This PR adds the executables and updates version.txt to $NEW_VERSION" \
+          PR_URL=$(gh pr create --title "Added executables for version $VERSION" \
+                                --body "This PR adds the executables for version $VERSION" \
                                 --head add-executables-${{ github.sha }} \
                                 --base main)
           echo "Pull request created: $PR_URL"
