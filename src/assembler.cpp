@@ -272,25 +272,25 @@ void parse(int line_num, const string &line, ofstream &out_file) {
     };
     
     // Verifying whether the number of registers is valid for the given opcode
-    if (instr.reg_num && (op_code.at(instr.opcode) == "00" || op_code.at(instr.opcode) >= "0D" && op_code.at(instr.opcode) <= "11" || op_code.at(instr.opcode) == "1B" || op_code.at(instr.opcode) == "1C")){
+    if (instr.reg_num && (op_code.at(instr.opcode) == "00" || (op_code.at(instr.opcode) >= "0D" && op_code.at(instr.opcode) <= "11") || op_code.at(instr.opcode) == "1B" || op_code.at(instr.opcode) == "1C")){
         out_file << "Error: Invalid number of registers for OPCode " << instr.opcode << " at line " << line_num << ".\n";
         out_file << "Number of Registers Expected: 0, Found: " << instr.reg_num;
         ERR = true;
         return;
     }
-    else if (instr.reg_num != 1 && (op_code.at(instr.opcode) >= "0A" && op_code.at(instr.opcode) <= "0C" || op_code.at(instr.opcode) >= "12" && op_code.at(instr.opcode) <= "15")){
+    else if (instr.reg_num != 1 && ((op_code.at(instr.opcode) >= "0A" && op_code.at(instr.opcode) <= "0C") || (op_code.at(instr.opcode) >= "12" && op_code.at(instr.opcode) <= "15"))){
         out_file << "Error: Invalid number of registers for OPCode " << instr.opcode << " at line " << line_num << ".\n";
         out_file << "Number of Registers Expected: 1, Found: " << instr.reg_num;
         ERR = true;
         return;
     }
-    else if (instr.reg_num != 2 && (op_code.at(instr.opcode) >= "05" && op_code.at(instr.opcode) <= "09" || op_code.at(instr.opcode) == "16" || op_code.at(instr.opcode) == "17")){
+    else if (instr.reg_num != 2 && ((op_code.at(instr.opcode) >= "05" && op_code.at(instr.opcode) <= "09") || op_code.at(instr.opcode) == "16" || op_code.at(instr.opcode) == "17")){
         out_file << "Error: Invalid number of registers for OPCode " << instr.opcode << " at line " << line_num << ".\n";
         out_file << "Number of Registers Expected: 2, Found: " << instr.reg_num;
         ERR = true;
         return;
     }
-    else if (instr.reg_num != 3 && (op_code.at(instr.opcode) >= "01" && op_code.at(instr.opcode) <= "04" || op_code.at(instr.opcode) >= "18" && op_code.at(instr.opcode) <= "1A")){
+    else if (instr.reg_num != 3 && ((op_code.at(instr.opcode) >= "01" && op_code.at(instr.opcode) <= "04") || (op_code.at(instr.opcode) >= "18" && op_code.at(instr.opcode) <= "1A"))){
         out_file << "Error: Invalid number of registers for OPCode " << instr.opcode << " at line " << line_num << ".\n";
         out_file << "Number of Registers Expected: 3, Found: " << instr.reg_num;
         ERR = true;
@@ -298,12 +298,12 @@ void parse(int line_num, const string &line, ofstream &out_file) {
     }
 
     // Verifying whether the dataline is valid for the given opcode
-    if (instr.dataline.empty() && (op_code.at(instr.opcode) >= "05" && op_code.at(instr.opcode) <= "08" || op_code.at(instr.opcode) >= "0A" && op_code.at(instr.opcode) <= "11" || op_code.at(instr.opcode) == "14" || op_code.at(instr.opcode) == "15" || op_code.at(instr.opcode) == "1B" || op_code.at(instr.opcode) == "1C")){
+    if (instr.dataline.empty() && ((op_code.at(instr.opcode) >= "05" && op_code.at(instr.opcode) <= "08") || (op_code.at(instr.opcode) >= "0A" && op_code.at(instr.opcode) <= "11") || op_code.at(instr.opcode) == "14" || op_code.at(instr.opcode) == "15" || op_code.at(instr.opcode) == "1B" || op_code.at(instr.opcode) == "1C")){
         out_file << "Error: Missing Dataline for OPCode " << instr.opcode << " at line " << line_num << '.';
         ERR = true;
         return;
     }
-    else if (!instr.dataline.empty() && (op_code.at(instr.opcode) >= "00" && op_code.at(instr.opcode) <= "04" || op_code.at(instr.opcode) == "09" || op_code.at(instr.opcode) == "12" || op_code.at(instr.opcode) == "13" || op_code.at(instr.opcode) >= "16" && op_code.at(instr.opcode) <= "1A")){
+    else if (!instr.dataline.empty() && ((op_code.at(instr.opcode) >= "00" && op_code.at(instr.opcode) <= "04") || op_code.at(instr.opcode) == "09" || op_code.at(instr.opcode) == "12" || op_code.at(instr.opcode) == "13" || (op_code.at(instr.opcode) >= "16" && op_code.at(instr.opcode) <= "1A"))){
         out_file << "Error: Dataline not required for OPCode " << instr.opcode << " at line " << line_num << '.';
         ERR = true;
         return;

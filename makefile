@@ -1,41 +1,55 @@
+# Compiler and Flags
 CXX := g++
-SRC := New\ Code/main.cpp
-OUT := Assembler
+CXXFLAGS := -std=c++17 -Wall -Wextra -Iinclude
+
+# Directories
+SRC_DIR := src
+INC_DIR := include
+OBJ_DIR := obj
+BIN_DIR := bin
+
+# Directories for Tests
 INPUT_DIR := ./tests/inputs
-OUTPUT_DIR := ./tests/outputs
 EXPECTED_DIR := ./tests/expected
+OUTPUT_DIR := ./tests/outputs
 
-TEST_CASES := 1 2 3 4 5
+# Source and Object Files
+SOURCEs := $(wildcard $(SRC_DIR)/*.cpp)
+OBJECTS := $(patsubst $(SRC_DIR)/%.cpp, $(OBJ_DIR)/%.o, $(SOURCEs))
 
-all: test
+# Final Executable
+target := $(BIN_DIR)/Assembler
 
-.PHONY: all build test clean
+.PHONY: setup all clean
 
-dependencies:
-	@echo "Downloading Dependencies..."
-	sudo apt-get install -y git dos2unix
-	@echo "Dependencies installed."
+all: $(target)
 
-build: dependencies
-	@echo "Building the project..."
-	$(CXX) -std=c++17 -o $(OUT) $(SRC)
-	@echo "Build complete ✅. Executable: $(OUT)"
+setup:
+	@echo "Setting up the environment"
+	@echo "Updating and Upgrading the Environment"
+	@sudo apt update && sudo apt upgrade -y
+	@echo "Installing required packages"
+	@sudo apt install -y g++ git
 
-setup: build
-	@echo "Setting all files in Directories to Unix Standard, if saved in Windows Standard"
-	dos2unix $(INPUT_DIR)/*.txt
-	dos2unix $(EXPECTED_DIR)/*.txt
-	@echo "Done"
-	@echo "Checking is the output directory exists..."
-	@if [ ! -d "$(OUTPUT_DIR)" ]; then \
-		echo "Output directory does not exist. Creating..."; \
-		mkdir -p $(OUTPUT_DIR); \
-		echo "Output directory created."; \
-	else \
-		echo "Output directory already exists."; \
-	fi
+# Create obj and bin folders if they don't exist
+$(OBJ_DIR):
+	@mkdir -p $(OBJ_DIR)
 
-test: setup
+$(BIN_DIR):
+	@mkdir -p $(BIN_DIR)
+
+$(OUTPUT_DIR):
+	@mkdir -p $(OUTPUT_DIR)
+
+# Rule to compile each .cpp file into .o file
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp | $(OBJ_DIR)
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+# Rule to link obj files into final binary
+$(target): $(OBJECTS) | $(BIN_DIR)
+	$(CXX) $(CXXFLAGS) $(OBJECTS) -o $(target)
+
+test: $(target) $(OUTPUT_DIR)
 	@echo "Running tests..."
 	@FAILED=false; \
 	for test_case in $(TEST_CASES); do \
@@ -45,7 +59,7 @@ test: setup
 		output_hex="$(OUTPUT_DIR)/output_hex_$$test_case.txt"; \
 		output_bin="$(OUTPUT_DIR)/output_bin_$$test_case.txt"; \
 		echo "Running test 🧪 $$test_case:"; \
-		./$(OUT) $$input $$output_hex $$output_bin || { \
+		./$(target) $$input $$output_hex $$output_bin || { \
 			status=$$?; \
 			if [ $$status -eq 9 ] && [ ! -f $$expected_bin ]; then \
 				echo "✅ Test $$test_case passed (no expected binary output)."; \
@@ -85,6 +99,5 @@ test: setup
 
 
 clean:
-	rm -f $(OUT)
 	rm -rf $(OUTPUT_DIR)
 	@echo "Cleaned up. Removed executable and test output directory."
