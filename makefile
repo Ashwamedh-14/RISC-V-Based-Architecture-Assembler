@@ -13,6 +13,9 @@ INPUT_DIR := ./tests/inputs
 EXPECTED_DIR := ./tests/expected
 OUTPUT_DIR := ./tests/outputs
 
+# Defining Testcases
+TEST_CASES := 1 2 3 4 5
+
 # Source and Object Files
 SOURCEs := $(wildcard $(SRC_DIR)/*.cpp)
 OBJECTS := $(patsubst $(SRC_DIR)/%.cpp, $(OBJ_DIR)/%.o, $(SOURCEs))
@@ -29,7 +32,7 @@ setup:
 	@echo "Updating and Upgrading the Environment"
 	@sudo apt update && sudo apt upgrade -y
 	@echo "Installing required packages"
-	@sudo apt install -y g++ git
+	@sudo apt install -y g++ git dos2unix
 
 # Create obj and bin folders if they don't exist
 $(OBJ_DIR):
@@ -60,6 +63,7 @@ test: $(target) $(OUTPUT_DIR)
 		expected_bin="$(EXPECTED_DIR)/expected_bin_$$test_case.txt"; \
 		output_hex="$(OUTPUT_DIR)/output_hex_$$test_case.txt"; \
 		output_bin="$(OUTPUT_DIR)/output_bin_$$test_case.txt"; \
+		dos2unix $$input $$expected_hex $$expected_bin 2>/dev/null || true; \
 		echo "Running test 🧪 $$test_case:"; \
 		./$(target) $$input $$output_hex $$output_bin || { \
 			status=$$?; \
@@ -103,3 +107,7 @@ test: $(target) $(OUTPUT_DIR)
 clean:
 	rm -rf $(OUTPUT_DIR)
 	@echo "Cleaned up. Removed executable and test output directory."
+
+clean_hard:
+	rm -rf $(OBJ_DIR) $(BIN_DIR) $(OUTPUT_DIR)
+	@echo "Cleaned up. Removed all object files, executable, and test output directory."
