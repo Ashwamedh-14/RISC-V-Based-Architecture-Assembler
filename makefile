@@ -49,6 +49,8 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp | $(OBJ_DIR)
 $(target): $(OBJECTS) | $(BIN_DIR)
 	$(CXX) $(CXXFLAGS) $(OBJECTS) -o $(target)
 
+
+# Rule to run tests
 test: $(target) $(OUTPUT_DIR)
 	@echo "Running tests..."
 	@FAILED=false; \
