@@ -21,7 +21,7 @@ jobs:
         run: mkdir -p bin/
 
       - name: Compile with g++
-        run: g++ -static-libstdc++ ./'New Code'/main.cpp -o bin/Assembler
+        run: g++ -static-libstdc++ ./src/main.cpp -o bin/Assembler
 
       - name: Ensure Executable Works
         run: chmod +x bin/Assembler
@@ -67,7 +67,7 @@ jobs:
           }
 
       - name: Compile with g++
-        run: g++ -static-libstdc++ ./'New Code'/main.cpp -o bin/Assembler_x64.exe
+        run: g++ -static-libstdc++ ./src/main.cpp -o bin/Assembler_x64.exe
 
       - name: Ensure Executable Works
         run: |
@@ -93,7 +93,7 @@ jobs:
         run: mkdir -p bin/
 
       - name: Compile with clang++
-        run: clang++ -std=c++17 ./'New Code'/main.cpp -o bin/Assembler_MacOS
+        run: clang++ -std=c++17 ./src/main.cpp -o bin/Assembler_MacOS
 
       - name: Ensure Executable Works
         run: chmod +x bin/Assembler_MacOS
