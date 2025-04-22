@@ -1,28 +1,9 @@
-/*
-Author: Ashwamedh-14
-Date Started: 17 January 2025
-Software: Assembly to Hex Converter, i.e, Assembler
-Description: 
-This program converts assembly code to hex code.
-The program reads the assembly code from a file named "asmcode.txt" and writes the hex code to a file named "hexcode.txt".
-The assembly code should be written in the following format:
-1. Each line should contain only one instruction.
-2. The instruction should be written in the following format:
-    <OPCODE>, <REGISTER1>, <REGISTER2>, <REGISTER3>, <DATALINE>;
-    where:
-    a. OPCODE: The operation code of the instruction. It should be written in uppercase.
-    b. REGISTER1, REGISTER2, REGISTER3: The registers used in the instruction. The registers should be written in the format "R<register number>". The register number should be written in decimal.
-    c. DATALINE: The data to be used in the instruction. It should be written in hexadecimal. Can be PORT or MEM Address too
-3. The instruction should be followed by a semicolon.
-*/
-
+#include "assembler.h"
 #include <iostream>
-#include <fstream>
-#include <sstream>
-#include <vector>
-#include <map>
 #include <regex>
-#include <string>
+#include <map>
+#include <sstream>
+#include <algorithm>
 
 #define INVALID_OPCODE 1
 #define INVALID_DATALINE 2
@@ -35,26 +16,17 @@ The assembly code should be written in the following format:
 
 using namespace std;
 
-bool ERR = false;             // Error flag
+bool ERR = 0;
+
 static const vector<char> hex_chars = {'0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F'};
-static const map<char, string> hex_map = {
-    {'0', "0000"},
-    {'1', "0001"},
-    {'2', "0010"},
-    {'3', "0011"},
-    {'4', "0100"},
-    {'5', "0101"},
-    {'6', "0110"},
-    {'7', "0111"},
-    {'8', "1000"},
-    {'9', "1001"},
-    {'A', "1010"},
-    {'B', "1011"},
-    {'C', "1100"},
-    {'D', "1101"},
-    {'E', "1110"},
-    {'F', "1111"}
+
+static const map<char, string> hex_to_bin_map = {
+    {'0', "0000"}, {'1', "0001"}, {'2', "0010"}, {'3', "0011"},
+    {'4', "0100"}, {'5', "0101"}, {'6', "0110"}, {'7', "0111"},
+    {'8', "1000"}, {'9', "1001"}, {'A', "1010"}, {'B', "1011"},
+    {'C', "1100"}, {'D', "1101"}, {'E', "1110"}, {'F', "1111"}
 };
+
 static const map<string,string> op_code = {
     {"NOP", "00"},
     {"AND", "01"},
@@ -87,170 +59,30 @@ static const map<string,string> op_code = {
     {"JMPPCRNZ", "1C"}
 };
 
-struct Instruction{
-    string opcode;
-    vector<string> registers = {"","",""};
-    int reg_num;
-    string dataline;
-};
-
-// Function prototypes
-
-
-void usage(void);
-void toUpper(string &s);      // Convert alphabets in a string to uppercase
-string strip(const string &s);     // Function to remove leading and trailing whitespaces from a string                                      
-int instr_chk(Instruction &instr);   // Function to check whether the values in Instruction are correct
-void parse(int line_num, const string &line, ofstream &out_file);   // Function to parse the instruction and check for errors
-
-int main(int argc, char **argv){
-    string input = "asmcode.txt";     // Default input file
-    string output = "hexcode.txt";    // Default output file
-    string binary = "bin.txt";
-
-    // Check for command line arguements
-    if (argc > 1) input = argv[1];       // If one arguement is passed then it is the input file
-    if (argc > 2) output = argv[2];      // If two arguements are passed then the second arguement is the output file
-    if (argc > 3) binary = argv[3];     // If three arguements are passed then the third arguement is the binary file
-
-    // Ensure I/O files have .txt extension
-    if (input.find_last_of('.') == string::npos || input.substr(input.find_last_of('.') +1) != "txt"){
-        usage();
-        return 1;
-    }
-    else if (output.find_last_of('.') == string::npos || output.substr(output.find_last_of('.') +1) != "txt"){
-        usage();
-        return 1;
-    }
-    else if (binary.find_last_of('.') == string::npos || binary.substr(binary.find_last_of('.') +1) != "txt"){
-        usage();
-        return 1;
-    }
-
-    ifstream assembly_code(input);
-    
-    int line_num = 0;
-    
-    // Checking whether we are able to open the input file
-    if (!assembly_code.is_open()){
-        cout << "Error: File " << input << " was not found, or we were unable to open it.\n";
-        cout << "Check whether you have the file in the same directory, as well as the permission to read it" << endl;
-        return 1;
-    }
-    
-    ofstream hexfile(output);
-
-    // Checking whether we are able to open the output file
-    if (!hexfile.is_open()){
-        cout << "Error: File " << output << " was not found, or we were unable to open it.\n";
-        cout << "Check whether you have the file in the same directory, as well as the permission to write to it" << endl;
-        return 1;
-    }
-    
-    string line;
-
-    hexfile << "v2.0 raw\n";
-
-    while(getline(assembly_code,line)){
-        // Convert assembly code to hex
-        // and write to hexfile
-        line = strip(line);
-        toUpper(line);
-        
-        if (!line.size()){
-            line_num++;
-            hexfile << "0000000\n";
-            continue;
-        }
-
-        else if (count(line.begin(), line.end(), ';') == 0){
-            hexfile << "Error: Missing semicolon at line " << ++line_num << "\n";
-            ERR = true;
-            continue;
-        }
-
-        line = line.substr(0, line.find_first_of(';'));
-
-        if (!line.size()) {
-            line_num++;
-            hexfile << "0000000\n";
-            continue;
-        }
-
-        else if (line.size() < 3){
-            hexfile << "Error: Invalid line at line " << ++line_num << "\n";
-            ERR = true;
-            continue;
-        }
-        
-
-        parse(++line_num, line, hexfile);
-        hexfile << '\n';
-    }
-    hexfile << flush;
-
-    assembly_code.close();
-    hexfile.close();
-
-    if (ERR){
-        cout << "Error: Errors were found in the assembly code. Check the output file for more details." << '\n';
-        cout << "Error: Failed to generate binary code." << endl;
-        return 9;
-    }
-
-    // Converting the hexcode to binary code and storing it in bin.txt
-    ifstream hexfile_read(output);
-
-    // Checking whether we are able to open the input file
-    if (!hexfile_read.is_open()){
-        cout << "Error: File " << output << " was not found, or we were unable to open it.\n";
-        cout << "Check whether you have the file in the same directory, as well as the permission to read it" << endl;
-        return 1;
-    }
-
-    ofstream binaryfile(binary);
-    
-    // Checking whether we are able to open the output file
-    if (!binaryfile.is_open()){
-        cout << "Error: File " << output << " was not found, or we were unable to open it.\n";
-        cout << "Check whether you have the file in the same directory, as well as the permission to write to it" << endl;
-        return 1;
-    }
-    
-    string hex_line;
-
-    getline(hexfile_read, hex_line); // Read the first line and skip it
-    while (getline(hexfile_read, hex_line)){
-        binaryfile << hex_line[0];
-        for(int i = 1; i < 7; i++){
-            binaryfile << hex_map.at(hex_line[i]);
-        }
-        binaryfile << '\n';
-    }
-    binaryfile << flush;
-
-    hexfile_read.close();
-    binaryfile.close();
-    
-    return 0;
+// function to print use of command line arguement.
+void usage(void) {
+    cout << "Usage: ./Assembler <input_file>.txt <output_file>.txt <binary_file>.txt\n";
+    cout << "Default input file: asmcode.txt\n";
+    cout << "Default output file: hexcode.txt\n";
+    cout << "Default binary file: bin.txt\n";
+    cout << "Input, Output, and Binary files should be .txt files\n";
 }
 
-
-// Convert alphabets in a string to uppercase
+// Function to convert lowercase letters to uppercase
 void toUpper(string &s){
-    for(int i = 0; i < s.size(); i++){
-        if (s[i] >= 97 && s[i] <= 122) s[i] = s[i] - 32;
+    for (char &c : s) {
+        if (c >= 'a' && c <= 'z'){
+            c = c - 32; // Convert to uppercase
+        }
     }
 }
 
-// function to remove heading and trailing whitespaces in a line
 // Function to remove leading and trailing whitespaces from a string
 string strip(const string &s) {
     size_t start = s.find_first_not_of(" ");
     size_t end = s.find_last_not_of(" ");
     return (start == string::npos) ? "" : s.substr(start, end - start + 1);
 }
-
 
 /*
 Function to check whether the values in Instruction are correct
@@ -440,25 +272,25 @@ void parse(int line_num, const string &line, ofstream &out_file) {
     };
     
     // Verifying whether the number of registers is valid for the given opcode
-    if (instr.reg_num && (op_code.at(instr.opcode) == "00" || op_code.at(instr.opcode) >= "0D" && op_code.at(instr.opcode) <= "11" || op_code.at(instr.opcode) == "1B" || op_code.at(instr.opcode) == "1C")){
+    if (instr.reg_num && (op_code.at(instr.opcode) == "00" || (op_code.at(instr.opcode) >= "0D" && op_code.at(instr.opcode) <= "11") || op_code.at(instr.opcode) == "1B" || op_code.at(instr.opcode) == "1C")){
         out_file << "Error: Invalid number of registers for OPCode " << instr.opcode << " at line " << line_num << ".\n";
         out_file << "Number of Registers Expected: 0, Found: " << instr.reg_num;
         ERR = true;
         return;
     }
-    else if (instr.reg_num != 1 && (op_code.at(instr.opcode) >= "0A" && op_code.at(instr.opcode) <= "0C" || op_code.at(instr.opcode) >= "12" && op_code.at(instr.opcode) <= "15")){
+    else if (instr.reg_num != 1 && ((op_code.at(instr.opcode) >= "0A" && op_code.at(instr.opcode) <= "0C") || (op_code.at(instr.opcode) >= "12" && op_code.at(instr.opcode) <= "15"))){
         out_file << "Error: Invalid number of registers for OPCode " << instr.opcode << " at line " << line_num << ".\n";
         out_file << "Number of Registers Expected: 1, Found: " << instr.reg_num;
         ERR = true;
         return;
     }
-    else if (instr.reg_num != 2 && (op_code.at(instr.opcode) >= "05" && op_code.at(instr.opcode) <= "09" || op_code.at(instr.opcode) == "16" || op_code.at(instr.opcode) == "17")){
+    else if (instr.reg_num != 2 && ((op_code.at(instr.opcode) >= "05" && op_code.at(instr.opcode) <= "09") || op_code.at(instr.opcode) == "16" || op_code.at(instr.opcode) == "17")){
         out_file << "Error: Invalid number of registers for OPCode " << instr.opcode << " at line " << line_num << ".\n";
         out_file << "Number of Registers Expected: 2, Found: " << instr.reg_num;
         ERR = true;
         return;
     }
-    else if (instr.reg_num != 3 && (op_code.at(instr.opcode) >= "01" && op_code.at(instr.opcode) <= "04" || op_code.at(instr.opcode) >= "18" && op_code.at(instr.opcode) <= "1A")){
+    else if (instr.reg_num != 3 && ((op_code.at(instr.opcode) >= "01" && op_code.at(instr.opcode) <= "04") || (op_code.at(instr.opcode) >= "18" && op_code.at(instr.opcode) <= "1A"))){
         out_file << "Error: Invalid number of registers for OPCode " << instr.opcode << " at line " << line_num << ".\n";
         out_file << "Number of Registers Expected: 3, Found: " << instr.reg_num;
         ERR = true;
@@ -466,12 +298,12 @@ void parse(int line_num, const string &line, ofstream &out_file) {
     }
 
     // Verifying whether the dataline is valid for the given opcode
-    if (instr.dataline.empty() && (op_code.at(instr.opcode) >= "05" && op_code.at(instr.opcode) <= "08" || op_code.at(instr.opcode) >= "0A" && op_code.at(instr.opcode) <= "11" || op_code.at(instr.opcode) == "14" || op_code.at(instr.opcode) == "15" || op_code.at(instr.opcode) == "1B" || op_code.at(instr.opcode) == "1C")){
+    if (instr.dataline.empty() && ((op_code.at(instr.opcode) >= "05" && op_code.at(instr.opcode) <= "08") || (op_code.at(instr.opcode) >= "0A" && op_code.at(instr.opcode) <= "11") || op_code.at(instr.opcode) == "14" || op_code.at(instr.opcode) == "15" || op_code.at(instr.opcode) == "1B" || op_code.at(instr.opcode) == "1C")){
         out_file << "Error: Missing Dataline for OPCode " << instr.opcode << " at line " << line_num << '.';
         ERR = true;
         return;
     }
-    else if (!instr.dataline.empty() && (op_code.at(instr.opcode) >= "00" && op_code.at(instr.opcode) <= "04" || op_code.at(instr.opcode) == "09" || op_code.at(instr.opcode) == "12" || op_code.at(instr.opcode) == "13" || op_code.at(instr.opcode) >= "16" && op_code.at(instr.opcode) <= "1A")){
+    else if (!instr.dataline.empty() && ((op_code.at(instr.opcode) >= "00" && op_code.at(instr.opcode) <= "04") || op_code.at(instr.opcode) == "09" || op_code.at(instr.opcode) == "12" || op_code.at(instr.opcode) == "13" || (op_code.at(instr.opcode) >= "16" && op_code.at(instr.opcode) <= "1A"))){
         out_file << "Error: Dataline not required for OPCode " << instr.opcode << " at line " << line_num << '.';
         ERR = true;
         return;
@@ -484,10 +316,10 @@ void parse(int line_num, const string &line, ofstream &out_file) {
     return;
 }
 
-void usage(void){
-    cout << "Usage: ./Assembler <input_file>.txt <output_file>.txt <binary_file>.txt" << '\n';
-    cout << "Default input file: asmcode.txt" << '\n';
-    cout << "Default output file: hexcode.txt" << '\n';
-    cout << "Default binary file: bin.txt" << '\n';
-    cout << "Input, Output, and Binary file should be a text file" << endl;
+string hexBinConversion(char c) {
+    if (hex_to_bin_map.find(c) != hex_to_bin_map.end()) {
+        return hex_to_bin_map.at(c);
+    } else {
+        return "xxxx"; // Default value for invalid hex character
+    }
 }
