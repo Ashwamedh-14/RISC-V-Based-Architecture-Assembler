@@ -4,7 +4,7 @@ on:
   pull_request:
     branches: [main]
     paths:
-      - 'src/*'  # Trigger only when `main.cpp` changes
+      - 'src/*' 
       - 'include/*'
 
 jobs:
