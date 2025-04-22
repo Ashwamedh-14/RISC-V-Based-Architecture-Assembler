@@ -4,12 +4,14 @@ on:
   push:
     branches: [main]
     paths:
-       - 'New Code/main.cpp'  # Trigger only when `main.cpp` changes
+       - 'src/*'  # Trigger only when `main.cpp` changes
+       - 'include/*'
        - 'makefile'
   pull_request:
     branches: [main]
     paths:
-       - 'New Code/main.cpp'  # Trigger only when `main.cpp` changes
+       - 'src/*'  # Trigger only when `main.cpp` changes
+       - 'include/*'
        - 'makefile'
 
 jobs:
