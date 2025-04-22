@@ -95,7 +95,7 @@ jobs:
         run: mkdir -p bin/
 
       - name: Compile with clang++
-        run: clang++ -std=c++17 -static-libstdc++ -static-libgcc -Wall -Wextra -Iinclude src/*.cpp -o bin/Assembler_MacOS
+        run: clang++ -std=c++17 -stdlib=libc++ -Wall -Wextra -Iinclude src/*.cpp -o bin/Assembler_MacOS
 
       - name: Ensure Executable Works
         run: chmod +x bin/Assembler_MacOS
