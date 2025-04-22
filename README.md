@@ -160,6 +160,9 @@ You can specify the filenames you want the program to take input from and and gi
 
   # For both input and output file
   ./Assembler inputfilename.txt outputfilename.txt
+
+  # To specify the binary file name as well
+  ./Assembler inputfilename.txt outputfilename.txt binaryfilename.txt
   
   ```
 
