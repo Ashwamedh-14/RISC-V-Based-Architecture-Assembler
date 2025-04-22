@@ -76,19 +76,21 @@ int main(int argc, char **argv){
     hexfile << "v2.0 raw\n";
 
     while(getline(assembly_code,line)){
+        
+        line_num++;
+        
         // Convert assembly code to hex
         // and write to hexfile
         line = strip(line);
         toUpper(line);
         
         if (!line.size()){
-            line_num++;
             hexfile << "0000000\n";
             continue;
         }
 
         else if (count(line.begin(), line.end(), ';') == 0){
-            hexfile << "Error: Missing semicolon at line " << ++line_num << "\n";
+            hexfile << "Error: Missing semicolon at line " << line_num << "\n";
             ERR = true;
             continue;
         }
@@ -96,19 +98,18 @@ int main(int argc, char **argv){
         line = line.substr(0, line.find_first_of(';'));
 
         if (!line.size()) {
-            line_num++;
             hexfile << "0000000\n";
             continue;
         }
 
         else if (line.size() < 3){
-            hexfile << "Error: Invalid line at line " << ++line_num << "\n";
+            hexfile << "Error: Invalid line at line " << line_num << "\n";
             ERR = true;
             continue;
         }
         
 
-        parse(++line_num, line, hexfile);
+        parse(line_num, line, hexfile);
         hexfile << '\n';
     }
     hexfile << flush;
