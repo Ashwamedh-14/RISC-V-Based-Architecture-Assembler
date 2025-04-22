@@ -60,6 +60,6 @@ jobs:
 
             - name: Simple Compile with clang++
               run: clang++ -std=c++17 -stdlib=libc++ -Wall -Wextra -Iinclude src/*.cpp -o bin/Assembler_MacOS
-              
+
             - name: Ensure Executable Works
-              run: chmod +x Assembler
+              run: chmod +x bin/Assembler_MacOS
