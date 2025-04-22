@@ -4,7 +4,9 @@ on:
   push:
     branches: [main]
     paths:
-      - 'New Code/main.cpp'  # Trigger only when `main.cpp` changes
+      - 'src/*'  # Trigger only when `main.cpp` changes
+      - 'include/*'
+      - 'version.txt'  # Trigger when version.txt changes
 
 jobs:
   # Build job for Linux
