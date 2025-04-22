@@ -91,7 +91,21 @@ Following are the list of abbreviations that have / will be used:-
 >
 > `MacOS` users might also face the issue of the OS flagging it as a virus, the first time they run it. They will manually have to allow the program to be run.
 >
-> For people using `Linux` distros other than `Ubuntu`, do you really need a step by step guide to obtain the executable file for the [`source code`][4]? Just download the [`source code`][4] and compile it on your system, preferably with `C++17` or greater.  
+
+### Non-Ubuntu Linux Users
+
+For people running `Linux` distros other than Ubuntu, first kindly check whether the [`Linux executable`](https://github.com/Ashwamedh-14/RISC-V-Based-Architecture-Assembler/raw/refs/heads/main/bin/Assembler) file is correctly working on your system or not.
+
+If not, then clone the repository and compile the binary by yourself using the given command
+
+``` bash
+g++ -std=c++17 -Iinclude src/*.cpp -o Assembler
+```
+
+The Assembler binary should be present in the cloned repo's parent directory. If it is still not executable run the command `chmod +x Assembler` on the terminal.
+
+> **Note**  
+> If you are still facing problem, update, upgrade and ensure that you have `GNU g++` installed on system.
 
 ## Using
 
@@ -231,4 +245,3 @@ Blank lines are replaced with `0000000`, i.e. `NOP`, in `hecode.txt`
 [1]: https://ahduni.edu.in/academics/schools-centres/school-of-engineering-and-applied-science/people-1/mazad-zaveri/
 [2]: https://ahduni.edu.in/academics/schools-centres/school-of-engineering-and-applied-science/
 [3]: https://ahduni.edu.in/
-[4]: https://github.com/Ashwamedh-14/RISC-V-Based-Architecture-Assembler/raw/refs/heads/main/New%20Code/main.cpp
