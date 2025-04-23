@@ -5,6 +5,11 @@ Software: Assembly to Hex Converter, i.e, Assembler
 Description: 
 This program converts assembly code to hex code.
 The program reads the assembly code from a file named "asmcode.txt" and writes the hex code to a file named "hexcode.txt".
+It then also converts the hex code to binary code and write to a file named "bin.txt".
+People can specify the files to read or written to by the use of command line arguements:
+
+./Assembler <input_file>.txt <output_file>.txt <binary_file>.txt
+
 The assembly code should be written in the following format:
 1. Each line should contain only one instruction.
 2. The instruction should be written in the following format:
@@ -40,15 +45,15 @@ int main(int argc, char **argv){
     // Ensure I/O files have .txt extension
     if (input.find_last_of('.') == string::npos || input.substr(input.find_last_of('.') +1) != "txt"){
         usage();
-        return 1;
+        return 9;
     }
     else if (output.find_last_of('.') == string::npos || output.substr(output.find_last_of('.') +1) != "txt"){
         usage();
-        return 1;
+        return 10;
     }
     else if (binary.find_last_of('.') == string::npos || binary.substr(binary.find_last_of('.') +1) != "txt"){
         usage();
-        return 1;
+        return 11;
     }
 
     ifstream assembly_code(input);
@@ -59,7 +64,7 @@ int main(int argc, char **argv){
     if (!assembly_code.is_open()){
         cout << "Error: File " << input << " was not found, or we were unable to open it.\n";
         cout << "Check whether you have the file in the same directory, as well as the permission to read it" << endl;
-        return 1;
+        return 12;
     }
     
     ofstream hexfile(output);
@@ -68,7 +73,7 @@ int main(int argc, char **argv){
     if (!hexfile.is_open()){
         cout << "Error: File " << output << " was not found, or we were unable to open it.\n";
         cout << "Check whether you have the file in the same directory, as well as the permission to write to it" << endl;
-        return 1;
+        return 13;
     }
     
     string line;
@@ -120,7 +125,7 @@ int main(int argc, char **argv){
     if (ERR){
         cout << "Error: Errors were found in the assembly code. Check the output file for more details." << '\n';
         cout << "Error: Failed to generate binary code." << endl;
-        return 9;
+        return 15;
     }
 
     // Converting the hexcode to binary code and storing it in bin.txt
@@ -130,7 +135,7 @@ int main(int argc, char **argv){
     if (!hexfile_read.is_open()){
         cout << "Error: File " << output << " was not found, or we were unable to open it.\n";
         cout << "Check whether you have the file in the same directory, as well as the permission to read it" << endl;
-        return 1;
+        return 12;
     }
 
     ofstream binaryfile(binary);
@@ -139,7 +144,7 @@ int main(int argc, char **argv){
     if (!binaryfile.is_open()){
         cout << "Error: File " << output << " was not found, or we were unable to open it.\n";
         cout << "Check whether you have the file in the same directory, as well as the permission to write to it" << endl;
-        return 1;
+        return 14;
     }
     
     string hex_line;

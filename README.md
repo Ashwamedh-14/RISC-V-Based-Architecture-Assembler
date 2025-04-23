@@ -224,6 +224,32 @@ Blank lines are replaced with `0000000`, i.e. `NOP`, in `hecode.txt`
   - `RA` is incorrect
 - **All** `DAT`, `PORT Address`, `MEM Address` values are passed, parsed and taken as `8-bit hexadecimals`.
 
+## Error Codes
+
+These are the error numbers that you migh encounter during runtime. Attached is their meaning as well
+
+- 00: All good
+- 01: Invalid OPCode
+- 02: Invalid Dataline
+- 03: Invalid Reference to Register Rw
+- 04: Invalid Reference to Register Rx
+- 05: Invalid Reference to Register Ry
+- 06: Register Rw Out of Range
+- 07: Register Rx Out of Range
+- 08: Register Ry Out of Range
+- 09: Input File is not a text file
+- 10: Output File is not a text file
+- 11: Binary File is not a text file
+- 12: Unable to Find or Open the Input File, probably because not available at the specified path, or no read permission.
+- 13: Unable to Find or Open the Output File, probably because not available at the specified path, or no write permission.
+- 14: Unable to Find or Open the Binary File, probably because not avaialble at the specified path, or no write permission.
+- 15: There were some Errors in Assembly Code, due to which the equivalent binary file could not be generated.
+
+Kindly note the following
+
+- Error Codes 01 - 08 are related to the functioning of the assembler, and are used to generate appropriate error message in the hexfile.
+- Error Codes 09 - 11 are command line arguement based, and are used to verify the correct type of arguements are passed to the program.
+
 ## Technical Details
 
 - The numbering for the assembler starts at 1, i.e., the first line of the input file is numbered 1.

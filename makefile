@@ -67,7 +67,7 @@ test: $(target) $(OUTPUT_DIR)
 		echo "Running test 🧪 $$test_case:"; \
 		./$(target) $$input $$output_hex $$output_bin || { \
 			status=$$?; \
-			if [ $$status -eq 9 ] && [ ! -f $$expected_bin ]; then \
+			if [ $$status -eq 15 ] && [ ! -f $$expected_bin ]; then \
 				echo "✅ Test $$test_case passed (no expected binary output)."; \
 			else \
 				echo "❌ Test $$test_case failed with status code $$status"; \
