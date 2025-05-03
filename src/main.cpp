@@ -169,6 +169,8 @@ int main(int argc, char **argv){
     assembly_code.close();
     hexfile.close();
 
+    cout << "Hex code generated successfully. Check the output file: " << output << endl;
+
     // Binary code generation
 
     // Condition to check whether the user specified not to generate binary code
