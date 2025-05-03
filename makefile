@@ -30,16 +30,9 @@ OBJECTS := $(OBJECTS_CPP) $(OBJECTS_C)
 # Final Executable
 target := $(BIN_DIR)/Assembler
 
-.PHONY: setup all clean test clean_hard
+.PHONY: all clean test clean_hard
 
 all: $(target)
-
-setup:
-	@echo "Setting up the environment"
-	@echo "Updating and Upgrading the Environment"
-	@sudo apt update && sudo apt upgrade -y
-	@echo "Installing required packages"
-	@sudo apt install -y g++ git dos2unix
 
 # Create obj and bin folders if they don't exist
 $(OBJ_DIR):
