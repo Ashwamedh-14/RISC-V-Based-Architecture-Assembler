@@ -229,21 +229,13 @@ Blank lines are replaced with `0000000`, i.e. `NOP`, in `hecode.txt`
 These are the error numbers that you migh encounter during runtime. Attached is their meaning as well
 
 - 00: All good
-- 01: Invalid OPCode
-- 02: Invalid Dataline
-- 03: Invalid Reference to Register Rw
-- 04: Invalid Reference to Register Rx
-- 05: Invalid Reference to Register Ry
-- 06: Register Rw Out of Range
-- 07: Register Rx Out of Range
-- 08: Register Ry Out of Range
-- 09: Input File is not a text file
-- 10: Output File is not a text file
-- 11: Binary File is not a text file
-- 12: Unable to Find or Open the Input File, probably because not available at the specified path, or no read permission.
-- 13: Unable to Find or Open the Output File, probably because not available at the specified path, or no write permission.
-- 14: Unable to Find or Open the Binary File, probably because not avaialble at the specified path, or no write permission.
-- 15: There were some Errors in Assembly Code, due to which the equivalent binary file could not be generated.
+- 01: Input File is not a text file
+- 02: Output File is not a text file
+- 03: Binary File is not a text file
+- 04: Unable to Find or Open the Input File, probably because not available at the specified path, or no read permission.
+- 05: Unable to Find or Open the Output File, probably because not available at the specified path, or no write permission.
+- 06: Unable to Find or Open the Binary File, probably because not avaialble at the specified path, or no write permission.
+- 07: There were some Errors in Assembly Code, due to which the equivalent binary file could not be generated.
 
 Kindly note the following
 
