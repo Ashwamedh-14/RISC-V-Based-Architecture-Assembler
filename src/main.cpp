@@ -125,7 +125,6 @@ int main(int argc, char **argv){
         
 
         parse(line_num, line, hexfile);
-        hexfile << '\n';
     }
     hexfile << flush;
 
