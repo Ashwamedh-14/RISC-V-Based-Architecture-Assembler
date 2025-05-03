@@ -54,12 +54,13 @@ void usage(void);  // Function to tell what to pass is expected in command line 
 int main(int argc, char **argv){
     string input = "asmcode.txt";     // Default input file
     string output = "hexcode.txt";    // Default output file
-    string binary = "bin.txt";
-    int line_num = 0;
-    char c;
+    string binary = "bin.txt";         // Default binary file
+    int line_num = 0;           // Line number of the assembly code
+    bool make_bin = true; // Flag to check whether to make binary code or not
+    char c;         // Variable to store the command line argument
 
     // Using getopt to parse the command line arguments
-    while((c = getopt(argc, argv, ":i:o:b:")) != -1) {
+    while((c = getopt(argc, argv, ":i:o:nb:")) != -1) {
         switch (c) {
             case 'i':
                 input = optarg;
@@ -69,6 +70,9 @@ int main(int argc, char **argv){
                 break;
             case 'b':
                 binary = optarg;
+                break;
+                case 'n':
+                make_bin = false;
                 break;
             case ':':
                 cout << "Unrecognized option: " << (char)optopt << endl;
