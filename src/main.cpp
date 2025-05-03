@@ -28,7 +28,8 @@ extern "C" {                            // This ensure this particular code is c
     #include "getopt.h"
 }
 
-#include "assembler.h"
+// Including the rest of the headers
+#include "assembler.h"    // Header file for the Assembler
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -44,6 +45,7 @@ extern "C" {                            // This ensure this particular code is c
 #define UNABLE_TO_OPEN_OUTPUT_FILE 5
 #define UNABLE_TO_OPEN_BINARY_FILE 6
 #define ASSEMBLY_CODE_ERROR  7
+#define COMMAND_LINE_ERROR 8
 
 using namespace std;
 
@@ -53,40 +55,48 @@ int main(int argc, char **argv){
     string input = "asmcode.txt";     // Default input file
     string output = "hexcode.txt";    // Default output file
     string binary = "bin.txt";
-
-    // Check for command line arguements
-    if (argc > 1) input = argv[1];       // If one arguement is passed then it is the input file
-    if (argc > 2) output = argv[2];      // If two arguements are passed then the second arguement is the output file
-    if (argc > 3) binary = argv[3];     // If three arguements are passed then the third arguement is the binary file
-
-    // Ensure I/O files have .txt extension
-    if (input.find_last_of('.') == string::npos || input.substr(input.find_last_of('.') +1) != "txt"){
-        usage();
-        return INVALID_INPUT_FILE;
-    }
-    else if (output.find_last_of('.') == string::npos || output.substr(output.find_last_of('.') +1) != "txt"){
-        usage();
-        return INVALID_OUTPUT_FILE;
-    }
-    else if (binary.find_last_of('.') == string::npos || binary.substr(binary.find_last_of('.') +1) != "txt"){
-        usage();
-        return INVALID_BINARY_FILE;
-    }
-
-    ifstream assembly_code(input);
-    
     int line_num = 0;
+    char c;
+
+    // Using getopt to parse the command line arguments
+    while((c = getopt(argc, argv, ":i:o:b:")) != -1) {
+        switch (c) {
+            case 'i':
+                input = optarg;
+                break;
+            case 'o':
+                output = optarg;
+                break;
+            case 'b':
+                binary = optarg;
+                break;
+            case ':':
+                cout << "Unrecognized option: " << (char)optopt << endl;
+                return ASSEMBLY_CODE_ERROR;
+            case '?':
+                cout << "Expected argument for option: " << (char)optopt << '\n';
+                usage();
+                cout << flush;
+                return COMMAND_LINE_ERROR;
+            default:
+                usage();
+                cout << flush;
+                return COMMAND_LINE_ERROR;
+        }
+    }
+    
     
     // Checking whether we are able to open the input file
+    ifstream assembly_code(input);
     if (!assembly_code.is_open()){
         cout << "Error: File " << input << " was not found, or we were unable to open it.\n";
         cout << "Check whether you have the file in the same directory, as well as the permission to read it" << endl;
         return UNABLE_TO_OPEN_INPUT_FILE;
     }
     
-    ofstream hexfile(output);
-
+    
     // Checking whether we are able to open the output file
+    ofstream hexfile(output);
     if (!hexfile.is_open()){
         cout << "Error: File " << output << " was not found, or we were unable to open it.\n";
         cout << "Check whether you have the file in the same directory, as well as the permission to write to it" << endl;
@@ -146,18 +156,18 @@ int main(int argc, char **argv){
     }
 
     // Converting the hexcode to binary code and storing it in bin.txt
-    ifstream hexfile_read(output);
-
+    
     // Checking whether we are able to open the input file
+    ifstream hexfile_read(output);
     if (!hexfile_read.is_open()){
         cout << "Error: File " << output << " was not found, or we were unable to open it.\n";
         cout << "Check whether you have the file in the same directory, as well as the permission to read it" << endl;
         return UNABLE_TO_OPEN_INPUT_FILE;
     }
 
-    ofstream binaryfile(binary);
     
     // Checking whether we are able to open the output file
+    ofstream binaryfile(binary);
     if (!binaryfile.is_open()){
         cout << "Error: File " << output << " was not found, or we were unable to open it.\n";
         cout << "Check whether you have the file in the same directory, as well as the permission to write to it" << endl;

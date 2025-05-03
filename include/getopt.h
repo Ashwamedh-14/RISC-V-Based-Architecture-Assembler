@@ -18,6 +18,13 @@
    Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
    02111-1307 USA.  */
 
+   /*
+   Modified by: Ayush Purohit, 4th May 2025
+   Original File Part of GNU getopt under LGPL v2.1 Licence
+   Changes made:
+     - Added arguements to extern getopt function in the case GNU Library is not defined
+   */
+
 #ifndef _GETOPT_H
 
 #ifndef __need_getopt
@@ -168,7 +175,8 @@ extern int __posix_getopt (int ___argc, char *const *___argv,
 #  endif
 # endif
 #else /* not __GNU_LIBRARY__ */
-extern int getopt ();
+extern int getopt (int __argc, char *const *__argv, const char *__shortopts)     // Modified by Ayush Purohit on 4th May 2025
+       __THROW;
 #endif /* __GNU_LIBRARY__ */
 
 #ifndef __need_getopt

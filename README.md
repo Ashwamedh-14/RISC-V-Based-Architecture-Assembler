@@ -274,7 +274,7 @@ This project includes third-party code from the [getopt-for-windows](https://git
 - [`getopt.c`](./src/getopt.c) and [`getopt.h`](./include/getopt.h) are derived from the GNU C Library and are licensed under the **GNU Lesser General Public License (LGPL) v2.1**.
 - See [`COPYING`](./COPYING) for the full license text.
 
-These files are used unmodified (or describe your modifications if any), and included in accordance with the LGPL v2.1 terms.
+**Note:** The project include a modified version of [`getopt.h`](./include/getopt.h) (GNU LGPL 2.1). See top of the file for modification detail.
 
 ## License
 
