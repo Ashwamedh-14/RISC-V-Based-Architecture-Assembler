@@ -65,6 +65,7 @@ int main(int argc, char **argv){
             case 'i':
                 input = optarg;
                 if (input.find_last_of('.') == string::npos || input.substr(input.find_last_of('.') +1) != "txt"){
+                    cout << "Error: Invalid input file. The input file should be a text file.\n";
                     usage();
                     return INVALID_INPUT_FILE;
                 }
@@ -72,6 +73,7 @@ int main(int argc, char **argv){
             case 'o':
                 output = optarg;
                 if (output.find_last_of('.') == string::npos || output.substr(output.find_last_of('.') +1) != "txt"){
+                    cout << "Error: Invalid output file. The output file should be a text file.\n";
                     usage();
                     return INVALID_OUTPUT_FILE;
                 }
@@ -79,6 +81,7 @@ int main(int argc, char **argv){
             case 'b':
                 binary = optarg;
                 if (binary.find_last_of('.') == string::npos || binary.substr(binary.find_last_of('.') +1) != "txt"){
+                    cout << "Error: Invalid binary file. The binary file should be a text file.\n";
                     usage();
                     return INVALID_BINARY_FILE;
                 }
@@ -95,11 +98,9 @@ int main(int argc, char **argv){
             case '?':
                 cout << "Expected argument for option: " << (char)optopt << '\n';
                 usage();
-                cout << flush;
                 return COMMAND_LINE_ERROR;
             default:
                 usage();
-                cout << flush;
                 return COMMAND_LINE_ERROR;
         }
     }
@@ -168,6 +169,13 @@ int main(int argc, char **argv){
     assembly_code.close();
     hexfile.close();
 
+    // Binary code generation
+
+    // Condition to check whether the user specified not to generate binary code
+    if (!make_bin){
+        cout << "Specifically told not to generate binary code. Exiting the program." << endl;
+        return 0;
+    }
     if (ERR){
         cout << "Error: Errors were found in the assembly code. Check the output file for more details." << '\n';
         cout << "Error: Failed to generate binary code." << endl;
@@ -220,5 +228,5 @@ void usage(void) {
     cout << "  -b <binary_file> : Output file to write binary code (default: bin.txt)\n";
     cout << "  -n : Tells to not generate binary code\n";
     cout << "  -h : Show this help message\n";
-    cout << "\n\nKindly note that all the files should be text files\n";
+    cout << "\n\nKindly note that all the files should be text files" << endl;
 }
