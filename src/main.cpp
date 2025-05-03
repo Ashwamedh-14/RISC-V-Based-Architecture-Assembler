@@ -60,20 +60,35 @@ int main(int argc, char **argv){
     char c;         // Variable to store the command line argument
 
     // Using getopt to parse the command line arguments
-    while((c = getopt(argc, argv, ":i:o:nb:")) != -1) {
+    while((c = getopt(argc, argv, ":i:o:nhb:")) != -1) {
         switch (c) {
             case 'i':
                 input = optarg;
+                if (input.find_last_of('.') == string::npos || input.substr(input.find_last_of('.') +1) != "txt"){
+                    usage();
+                    return INVALID_INPUT_FILE;
+                }
                 break;
             case 'o':
                 output = optarg;
+                if (output.find_last_of('.') == string::npos || output.substr(output.find_last_of('.') +1) != "txt"){
+                    usage();
+                    return INVALID_OUTPUT_FILE;
+                }
                 break;
             case 'b':
                 binary = optarg;
+                if (binary.find_last_of('.') == string::npos || binary.substr(binary.find_last_of('.') +1) != "txt"){
+                    usage();
+                    return INVALID_BINARY_FILE;
+                }
                 break;
-                case 'n':
+            case 'n':
                 make_bin = false;
                 break;
+            case 'h':
+                usage();
+                return 0;
             case ':':
                 cout << "Unrecognized option: " << (char)optopt << endl;
                 return ASSEMBLY_CODE_ERROR;
@@ -198,9 +213,12 @@ int main(int argc, char **argv){
 
 // function to print use of command line arguement.
 void usage(void) {
-    cout << "Usage: ./Assembler <input_file>.txt <output_file>.txt <binary_file>.txt\n";
-    cout << "Default input file: asmcode.txt\n";
-    cout << "Default output file: hexcode.txt\n";
-    cout << "Default binary file: bin.txt\n";
-    cout << "Input, Output, and Binary files should be .txt files\n";
+    cout << "Usage: ./Assembler <options> ...\n";
+    cout << "Options being:\n";
+    cout << "  -i <input_file> : Input file containing assembly code (default: asmcode.txt)\n";
+    cout << "  -o <output_file> : Output file to write hex code (default: hexcode.txt)\n";
+    cout << "  -b <binary_file> : Output file to write binary code (default: bin.txt)\n";
+    cout << "  -n : Tells to not generate binary code\n";
+    cout << "  -h : Show this help message\n";
+    cout << "\n\nKindly note that all the files should be text files\n";
 }
