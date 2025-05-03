@@ -21,6 +21,13 @@ The assembly code should be written in the following format:
 3. The instruction should be followed by a semicolon.
 */
 
+// Including the header file for getopt
+extern "C" {                            // This ensure this particular code is compiled with C linkage
+
+    // This file and getopt.c file in src folder are licenced under GNU LGPL v2.1
+    #include "getopt.h"
+}
+
 #include "assembler.h"
 #include <iostream>
 #include <fstream>
