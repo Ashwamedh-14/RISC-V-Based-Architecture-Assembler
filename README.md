@@ -237,10 +237,9 @@ These are the error numbers that you migh encounter during runtime. Attached is 
 - 06: Unable to Find or Open the Binary File, probably because not avaialble at the specified path, or no write permission.
 - 07: There were some Errors in Assembly Code, due to which the equivalent binary file could not be generated.
 
-Kindly note the following
-
-- Error Codes 01 - 08 are related to the functioning of the assembler, and are used to generate appropriate error message in the hexfile.
-- Error Codes 09 - 11 are command line arguement based, and are used to verify the correct type of arguements are passed to the program.
+> **Kindly Note**
+> 
+> Error Codes 01 - 07 are command line arguement based, and are used to verify the correct type of arguements are passed to the program.
 
 ## Technical Details
 
@@ -266,3 +265,16 @@ Kindly note the following
 [1]: https://ahduni.edu.in/academics/schools-centres/school-of-engineering-and-applied-science/people-1/mazad-zaveri/
 [2]: https://ahduni.edu.in/academics/schools-centres/school-of-engineering-and-applied-science/
 [3]: https://ahduni.edu.in/
+
+## Third-Party Code and Licenses
+
+This project includes third-party code from the [getopt-for-windows](https://github.com/Chunde/getopt-for-windows) project for cross-platform command-line argument parsing.
+
+- [`getopt.c`](./src/getopt.c) and [`getopt.h`](./include/getopt.h) are derived from the GNU C Library and are licensed under the **GNU Lesser General Public License (LGPL) v2.1**.
+- See [`COPYING`](./COPYING) for the full license text.
+
+**Note:** The project include a modified version of [`getopt.h`](./include/getopt.h) (GNU LGPL 2.1). See top of the file for modification detail.
+
+## License
+
+This project is licensed under the **MIT License**. See the [LICENSE](./LICENSE) file for more details.

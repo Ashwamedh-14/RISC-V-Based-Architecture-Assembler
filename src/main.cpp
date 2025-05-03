@@ -21,7 +21,15 @@ The assembly code should be written in the following format:
 3. The instruction should be followed by a semicolon.
 */
 
-#include "assembler.h"
+// Including the header file for getopt
+extern "C" {                            // This ensure this particular code is compiled with C linkage
+
+    // This file and getopt.c file in src folder are licenced under GNU LGPL v2.1
+    #include "getopt.h"
+}
+
+// Including the rest of the headers
+#include "assembler.h"    // Header file for the Assembler
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -37,6 +45,7 @@ The assembly code should be written in the following format:
 #define UNABLE_TO_OPEN_OUTPUT_FILE 5
 #define UNABLE_TO_OPEN_BINARY_FILE 6
 #define ASSEMBLY_CODE_ERROR  7
+#define COMMAND_LINE_ERROR 8
 
 using namespace std;
 
@@ -45,41 +54,69 @@ void usage(void);  // Function to tell what to pass is expected in command line 
 int main(int argc, char **argv){
     string input = "asmcode.txt";     // Default input file
     string output = "hexcode.txt";    // Default output file
-    string binary = "bin.txt";
+    string binary = "bin.txt";         // Default binary file
+    int line_num = 0;           // Line number of the assembly code
+    bool make_bin = true; // Flag to check whether to make binary code or not
+    char c;         // Variable to store the command line argument
 
-    // Check for command line arguements
-    if (argc > 1) input = argv[1];       // If one arguement is passed then it is the input file
-    if (argc > 2) output = argv[2];      // If two arguements are passed then the second arguement is the output file
-    if (argc > 3) binary = argv[3];     // If three arguements are passed then the third arguement is the binary file
-
-    // Ensure I/O files have .txt extension
-    if (input.find_last_of('.') == string::npos || input.substr(input.find_last_of('.') +1) != "txt"){
-        usage();
-        return INVALID_INPUT_FILE;
+    // Using getopt to parse the command line arguments
+    while((c = getopt(argc, argv, ":i:o:nhb:")) != -1) {
+        switch (c) {
+            case 'i':
+                input = optarg;
+                if (input.find_last_of('.') == string::npos || input.substr(input.find_last_of('.') +1) != "txt"){
+                    cout << "Error: Invalid input file. The input file should be a text file.\n";
+                    usage();
+                    return INVALID_INPUT_FILE;
+                }
+                break;
+            case 'o':
+                output = optarg;
+                if (output.find_last_of('.') == string::npos || output.substr(output.find_last_of('.') +1) != "txt"){
+                    cout << "Error: Invalid output file. The output file should be a text file.\n";
+                    usage();
+                    return INVALID_OUTPUT_FILE;
+                }
+                break;
+            case 'b':
+                binary = optarg;
+                if (binary.find_last_of('.') == string::npos || binary.substr(binary.find_last_of('.') +1) != "txt"){
+                    cout << "Error: Invalid binary file. The binary file should be a text file.\n";
+                    usage();
+                    return INVALID_BINARY_FILE;
+                }
+                break;
+            case 'n':
+                make_bin = false;
+                break;
+            case 'h':
+                usage();
+                return 0;
+            case ':':
+                cout << "Unrecognized option: " << (char)optopt << endl;
+                return ASSEMBLY_CODE_ERROR;
+            case '?':
+                cout << "Expected argument for option: " << (char)optopt << '\n';
+                usage();
+                return COMMAND_LINE_ERROR;
+            default:
+                usage();
+                return COMMAND_LINE_ERROR;
+        }
     }
-    else if (output.find_last_of('.') == string::npos || output.substr(output.find_last_of('.') +1) != "txt"){
-        usage();
-        return INVALID_OUTPUT_FILE;
-    }
-    else if (binary.find_last_of('.') == string::npos || binary.substr(binary.find_last_of('.') +1) != "txt"){
-        usage();
-        return INVALID_BINARY_FILE;
-    }
-
-    ifstream assembly_code(input);
     
-    int line_num = 0;
     
     // Checking whether we are able to open the input file
+    ifstream assembly_code(input);
     if (!assembly_code.is_open()){
         cout << "Error: File " << input << " was not found, or we were unable to open it.\n";
         cout << "Check whether you have the file in the same directory, as well as the permission to read it" << endl;
         return UNABLE_TO_OPEN_INPUT_FILE;
     }
     
-    ofstream hexfile(output);
-
+    
     // Checking whether we are able to open the output file
+    ofstream hexfile(output);
     if (!hexfile.is_open()){
         cout << "Error: File " << output << " was not found, or we were unable to open it.\n";
         cout << "Check whether you have the file in the same directory, as well as the permission to write to it" << endl;
@@ -131,6 +168,15 @@ int main(int argc, char **argv){
     assembly_code.close();
     hexfile.close();
 
+    cout << "Hex code generated successfully. Check the output file: " << output << endl;
+
+    // Binary code generation
+
+    // Condition to check whether the user specified not to generate binary code
+    if (!make_bin){
+        cout << "Specifically told not to generate binary code. Exiting the program." << endl;
+        return 0;
+    }
     if (ERR){
         cout << "Error: Errors were found in the assembly code. Check the output file for more details." << '\n';
         cout << "Error: Failed to generate binary code." << endl;
@@ -138,18 +184,18 @@ int main(int argc, char **argv){
     }
 
     // Converting the hexcode to binary code and storing it in bin.txt
-    ifstream hexfile_read(output);
-
+    
     // Checking whether we are able to open the input file
+    ifstream hexfile_read(output);
     if (!hexfile_read.is_open()){
         cout << "Error: File " << output << " was not found, or we were unable to open it.\n";
         cout << "Check whether you have the file in the same directory, as well as the permission to read it" << endl;
         return UNABLE_TO_OPEN_INPUT_FILE;
     }
 
-    ofstream binaryfile(binary);
     
     // Checking whether we are able to open the output file
+    ofstream binaryfile(binary);
     if (!binaryfile.is_open()){
         cout << "Error: File " << output << " was not found, or we were unable to open it.\n";
         cout << "Check whether you have the file in the same directory, as well as the permission to write to it" << endl;
@@ -176,9 +222,12 @@ int main(int argc, char **argv){
 
 // function to print use of command line arguement.
 void usage(void) {
-    cout << "Usage: ./Assembler <input_file>.txt <output_file>.txt <binary_file>.txt\n";
-    cout << "Default input file: asmcode.txt\n";
-    cout << "Default output file: hexcode.txt\n";
-    cout << "Default binary file: bin.txt\n";
-    cout << "Input, Output, and Binary files should be .txt files\n";
+    cout << "Usage: ./Assembler <options> ...\n";
+    cout << "Options being:\n";
+    cout << "  -i <input_file> : Input file containing assembly code (default: asmcode.txt)\n";
+    cout << "  -o <output_file> : Output file to write hex code (default: hexcode.txt)\n";
+    cout << "  -b <binary_file> : Output file to write binary code (default: bin.txt)\n";
+    cout << "  -n : Tells to not generate binary code\n";
+    cout << "  -h : Show this help message\n";
+    cout << "\n\nKindly note that all the files should be text files" << endl;
 }

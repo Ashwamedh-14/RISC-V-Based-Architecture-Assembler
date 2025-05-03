@@ -1,5 +1,8 @@
 # Compiler and Flags
+CC := gcc
 CXX := g++
+
+CFLAGS := -std=c17 -static -static-libgcc -Wall -Wextra -Iinclude
 CXXFLAGS := -std=c++17 -static-libstdc++ -static-libgcc -Wall -Wextra -Iinclude
 
 # Directories
@@ -17,22 +20,19 @@ OUTPUT_DIR := ./tests/outputs
 TEST_CASES := 1 2 3 4 5
 
 # Source and Object Files
-SOURCEs := $(wildcard $(SRC_DIR)/*.cpp)
-OBJECTS := $(patsubst $(SRC_DIR)/%.cpp, $(OBJ_DIR)/%.o, $(SOURCEs))
+SOURCE_CPP_FILES := $(wildcard $(SRC_DIR)/*.cpp)
+SOURCE_C_FILES := $(wildcard $(SRC_DIR)/*.c)
+
+OBJECTS_CPP := $(patsubst $(SRC_DIR)/%.cpp, $(OBJ_DIR)/%.o, $(SOURCE_CPP_FILES))
+OBJECTS_C := $(patsubst $(SRC_DIR)/%.c, $(OBJ_DIR)/%.o, $(SOURCE_C_FILES))
+OBJECTS := $(OBJECTS_CPP) $(OBJECTS_C)
 
 # Final Executable
 target := $(BIN_DIR)/Assembler
 
-.PHONY: setup all clean
+.PHONY: all clean test clean_hard
 
 all: $(target)
-
-setup:
-	@echo "Setting up the environment"
-	@echo "Updating and Upgrading the Environment"
-	@sudo apt update && sudo apt upgrade -y
-	@echo "Installing required packages"
-	@sudo apt install -y g++ git dos2unix
 
 # Create obj and bin folders if they don't exist
 $(OBJ_DIR):
@@ -47,6 +47,10 @@ $(OUTPUT_DIR):
 # Rule to compile each .cpp file into .o file
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp | $(OBJ_DIR)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+# Rule to compile each .c file into .o file
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c | $(OBJ_DIR)
+	$(CC) $(CFLAGS) -c $< -o $@
 
 # Rule to link obj files into final binary
 $(target): $(OBJECTS) | $(BIN_DIR)
