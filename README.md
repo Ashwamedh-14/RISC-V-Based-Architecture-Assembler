@@ -266,3 +266,16 @@ Kindly note the following
 [1]: https://ahduni.edu.in/academics/schools-centres/school-of-engineering-and-applied-science/people-1/mazad-zaveri/
 [2]: https://ahduni.edu.in/academics/schools-centres/school-of-engineering-and-applied-science/
 [3]: https://ahduni.edu.in/
+
+## Third-Party Code and Licenses
+
+This project includes third-party code from the [getopt-for-windows](https://github.com/Chunde/getopt-for-windows) project for cross-platform command-line argument parsing.
+
+- `getopt.c`, `getopt.h`, and `getopt_int.h` are derived from the GNU C Library and are licensed under the **GNU Lesser General Public License (LGPL) v2.1**.
+- See [`COPYING`] for the full license text.
+
+These files are used unmodified (or describe your modifications if any), and included in accordance with the LGPL v2.1 terms.
+
+## License
+
+This project is licensed under the **MIT License**. See the [LICENSE](./LICENSE) file for more details.
