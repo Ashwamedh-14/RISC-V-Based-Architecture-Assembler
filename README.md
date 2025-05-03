@@ -237,10 +237,9 @@ These are the error numbers that you migh encounter during runtime. Attached is 
 - 06: Unable to Find or Open the Binary File, probably because not avaialble at the specified path, or no write permission.
 - 07: There were some Errors in Assembly Code, due to which the equivalent binary file could not be generated.
 
-Kindly note the following
-
-- Error Codes 01 - 08 are related to the functioning of the assembler, and are used to generate appropriate error message in the hexfile.
-- Error Codes 09 - 11 are command line arguement based, and are used to verify the correct type of arguements are passed to the program.
+> **Kindly Note**
+> 
+> Error Codes 01 - 07 are command line arguement based, and are used to verify the correct type of arguements are passed to the program.
 
 ## Technical Details
 
