@@ -271,8 +271,8 @@ Kindly note the following
 
 This project includes third-party code from the [getopt-for-windows](https://github.com/Chunde/getopt-for-windows) project for cross-platform command-line argument parsing.
 
-- `getopt.c`, `getopt.h`, and `getopt_int.h` are derived from the GNU C Library and are licensed under the **GNU Lesser General Public License (LGPL) v2.1**.
-- See [`COPYING`] for the full license text.
+- [`getopt.c`](./src/getopt.c) and [`getopt.h`](./include/getopt.h) are derived from the GNU C Library and are licensed under the **GNU Lesser General Public License (LGPL) v2.1**.
+- See [`COPYING`](./COPYING) for the full license text.
 
 These files are used unmodified (or describe your modifications if any), and included in accordance with the LGPL v2.1 terms.
 
