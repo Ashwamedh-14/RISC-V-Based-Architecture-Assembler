@@ -59,15 +59,6 @@ static const map<string,string> op_code = {
     {"JMPPCRNZ", "1C"}
 };
 
-// function to print use of command line arguement.
-void usage(void) {
-    cout << "Usage: ./Assembler <input_file>.txt <output_file>.txt <binary_file>.txt\n";
-    cout << "Default input file: asmcode.txt\n";
-    cout << "Default output file: hexcode.txt\n";
-    cout << "Default binary file: bin.txt\n";
-    cout << "Input, Output, and Binary files should be .txt files\n";
-}
-
 // Function to convert lowercase letters to uppercase
 void toUpper(string &s){
     for (char &c : s) {

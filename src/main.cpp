@@ -27,6 +27,8 @@ The assembly code should be written in the following format:
 
 using namespace std;
 
+void usage(void);  // Function to tell what to pass is expected in command line arguement
+
 int main(int argc, char **argv){
     string input = "asmcode.txt";     // Default input file
     string output = "hexcode.txt";    // Default output file
@@ -160,3 +162,11 @@ int main(int argc, char **argv){
     return 0;
 }
 
+// function to print use of command line arguement.
+void usage(void) {
+    cout << "Usage: ./Assembler <input_file>.txt <output_file>.txt <binary_file>.txt\n";
+    cout << "Default input file: asmcode.txt\n";
+    cout << "Default output file: hexcode.txt\n";
+    cout << "Default binary file: bin.txt\n";
+    cout << "Input, Output, and Binary files should be .txt files\n";
+}
