@@ -13,7 +13,6 @@ struct Instruction {
 };
 
 // Helper Functions
-void usage(void);
 void toUpper(std::string &s);
 std::string strip(const std::string &s);
 std::string hexBinConversion(char c);
