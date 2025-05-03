@@ -54,33 +54,53 @@ void usage(void);  // Function to tell what to pass is expected in command line 
 int main(int argc, char **argv){
     string input = "asmcode.txt";     // Default input file
     string output = "hexcode.txt";    // Default output file
-    string binary = "bin.txt";
-    int line_num = 0;
-    char c;
+    string binary = "bin.txt";         // Default binary file
+    int line_num = 0;           // Line number of the assembly code
+    bool make_bin = true; // Flag to check whether to make binary code or not
+    char c;         // Variable to store the command line argument
 
     // Using getopt to parse the command line arguments
-    while((c = getopt(argc, argv, ":i:o:b:")) != -1) {
+    while((c = getopt(argc, argv, ":i:o:nhb:")) != -1) {
         switch (c) {
             case 'i':
                 input = optarg;
+                if (input.find_last_of('.') == string::npos || input.substr(input.find_last_of('.') +1) != "txt"){
+                    cout << "Error: Invalid input file. The input file should be a text file.\n";
+                    usage();
+                    return INVALID_INPUT_FILE;
+                }
                 break;
             case 'o':
                 output = optarg;
+                if (output.find_last_of('.') == string::npos || output.substr(output.find_last_of('.') +1) != "txt"){
+                    cout << "Error: Invalid output file. The output file should be a text file.\n";
+                    usage();
+                    return INVALID_OUTPUT_FILE;
+                }
                 break;
             case 'b':
                 binary = optarg;
+                if (binary.find_last_of('.') == string::npos || binary.substr(binary.find_last_of('.') +1) != "txt"){
+                    cout << "Error: Invalid binary file. The binary file should be a text file.\n";
+                    usage();
+                    return INVALID_BINARY_FILE;
+                }
                 break;
+            case 'n':
+                make_bin = false;
+                break;
+            case 'h':
+                usage();
+                return 0;
             case ':':
                 cout << "Unrecognized option: " << (char)optopt << endl;
                 return ASSEMBLY_CODE_ERROR;
             case '?':
                 cout << "Expected argument for option: " << (char)optopt << '\n';
                 usage();
-                cout << flush;
                 return COMMAND_LINE_ERROR;
             default:
                 usage();
-                cout << flush;
                 return COMMAND_LINE_ERROR;
         }
     }
@@ -149,6 +169,15 @@ int main(int argc, char **argv){
     assembly_code.close();
     hexfile.close();
 
+    cout << "Hex code generated successfully. Check the output file: " << output << endl;
+
+    // Binary code generation
+
+    // Condition to check whether the user specified not to generate binary code
+    if (!make_bin){
+        cout << "Specifically told not to generate binary code. Exiting the program." << endl;
+        return 0;
+    }
     if (ERR){
         cout << "Error: Errors were found in the assembly code. Check the output file for more details." << '\n';
         cout << "Error: Failed to generate binary code." << endl;
@@ -194,9 +223,12 @@ int main(int argc, char **argv){
 
 // function to print use of command line arguement.
 void usage(void) {
-    cout << "Usage: ./Assembler <input_file>.txt <output_file>.txt <binary_file>.txt\n";
-    cout << "Default input file: asmcode.txt\n";
-    cout << "Default output file: hexcode.txt\n";
-    cout << "Default binary file: bin.txt\n";
-    cout << "Input, Output, and Binary files should be .txt files\n";
+    cout << "Usage: ./Assembler <options> ...\n";
+    cout << "Options being:\n";
+    cout << "  -i <input_file> : Input file containing assembly code (default: asmcode.txt)\n";
+    cout << "  -o <output_file> : Output file to write hex code (default: hexcode.txt)\n";
+    cout << "  -b <binary_file> : Output file to write binary code (default: bin.txt)\n";
+    cout << "  -n : Tells to not generate binary code\n";
+    cout << "  -h : Show this help message\n";
+    cout << "\n\nKindly note that all the files should be text files" << endl;
 }
