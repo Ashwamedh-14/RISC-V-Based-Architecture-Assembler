@@ -102,15 +102,10 @@ jobs:
             exit 1
           fi
     
-      - name: Set GNU Compilers in Environment
-        run: |
-          echo "CXX=g++-13" >> $GITHUB_ENV
-          echo "CC=gcc-13" >> $GITHUB_ENV
-    
       - name: Build using Make
         run: |
           mkdir -p bin
-          make all
+          make CC=gcc-13 CXX=g++-13 all
     
       - name: Rename Executable for macOS
         run: mv bin/Assembler bin/Assembler_MacOS
