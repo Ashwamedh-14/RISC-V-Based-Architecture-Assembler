@@ -60,7 +60,8 @@ $(target): $(OBJECTS) | $(BIN_DIR)
 # Rule to run tests
 test: $(target) $(OUTPUT_DIR)
 	@echo "Running tests..."
-	@FAILED=false; \
+	@sh -c '\
+	FAILED=false; \
 	for test_case in $(TEST_CASES); do \
 		input="$(INPUT_DIR)/input_$$test_case.txt"; \
 		expected_hex="$(EXPECTED_DIR)/expected_hex_$$test_case.txt"; \
@@ -97,14 +98,12 @@ test: $(target) $(OUTPUT_DIR)
 		fi; \
 		echo "Test $$test_case completed."; \
 	done; \
-
-	@echo "All tests completed."
-
-	@if [ "$(FAILED)" = "true" ]; then \
+	echo "All tests completed."; \
+	if [ "$$FAILED" = "true" ]; then \
 	    exit 1; \
 	else \
 	    echo "✅ All tests passed successfully!"; \
-	fi;
+	fi'
 
 
 
