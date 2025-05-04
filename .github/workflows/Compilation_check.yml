@@ -1,6 +1,7 @@
 name: Check Whether Compilable or Not
 
 on:
+  workflow_dispatch:
   push:
     branches: [test]
     paths:
