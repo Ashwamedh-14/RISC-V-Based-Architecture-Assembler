@@ -30,7 +30,7 @@ OBJECTS := $(OBJECTS_CPP) $(OBJECTS_C)
 # Final Executable
 target := $(BIN_DIR)/Assembler
 
-.PHONY: all clean test clean_hard
+.PHONY: all clean test clean_hard preprocess
 
 all: $(target)
 
@@ -56,9 +56,15 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c | $(OBJ_DIR)
 $(target): $(OBJECTS) | $(BIN_DIR)
 	$(CXX) $(CXXFLAGS) $(OBJECTS) -o $(target)
 
+# Pre-processing rule to convert line endings from CRLF to LF
+# This is useful for Windows users to ensure consistent line endings
+preprocess:
+	@echo "Preprocessing test files (dos2unix)..."
+	@find $(INPUT_DIR) $(EXPECTED_DIR) -type f -name '*.txt' -exec dos2unix {} + 2>/dev/null || true
+	@echo "✅ Preprocessing complete."
 
 # Rule to run tests
-test: $(target) $(OUTPUT_DIR)
+test: $(target) $(OUTPUT_DIR) preprocess
 	@echo "Running tests..."
 	@sh -c '\
 	FAILED=false; \
