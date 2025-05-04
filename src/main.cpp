@@ -66,35 +66,39 @@ int main(int argc, char **argv){
                 input = optarg;
                 if (input.find_last_of('.') == string::npos || input.substr(input.find_last_of('.') +1) != "txt"){
                     cout << "Error: Invalid input file. The input file should be a text file.\n";
-                    usage();
-                    return INVALID_INPUT_FILE;
+                    ERR = true;
                 }
                 break;
+
             case 'o':
                 output = optarg;
                 if (output.find_last_of('.') == string::npos || output.substr(output.find_last_of('.') +1) != "txt"){
                     cout << "Error: Invalid output file. The output file should be a text file.\n";
-                    usage();
-                    return INVALID_OUTPUT_FILE;
+                    ERR = true;
                 }
                 break;
+
             case 'b':
                 binary = optarg;
                 if (binary.find_last_of('.') == string::npos || binary.substr(binary.find_last_of('.') +1) != "txt"){
                     cout << "Error: Invalid binary file. The binary file should be a text file.\n";
-                    usage();
-                    return INVALID_BINARY_FILE;
+                    ERR = true;
                 }
                 break;
+
             case 'n':
                 make_bin = false;
                 break;
+
             case 'h':
                 usage();
                 return 0;
+
             case ':':
                 cout << "Unrecognized option: " << (char)optopt << endl;
-                return COMMAND_LINE_ERROR;
+                ERR = true;
+                break;
+
             case '?':
                 cout << "Expected argument for option: " << (char)optopt << '\n';
                 usage();
@@ -104,7 +108,7 @@ int main(int argc, char **argv){
                 return COMMAND_LINE_ERROR;
         }
     }
-    
+    if (ERR) return COMMAND_LINE_ERROR; // If there was an error in the command line arguments, return error code
     
     // Checking whether we are able to open the input file
     ifstream assembly_code(input);

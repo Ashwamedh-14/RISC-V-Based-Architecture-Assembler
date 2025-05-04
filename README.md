@@ -141,34 +141,29 @@ In case the executable file does not run upon clicking it, especially in the cas
 
 ### Command Line Arguements
 
-You can specify the filenames you want the program to take input from and and give out put to. To do this perform the following steps:
+By default you don't have to explicitly provide the name of the output file for hexadecimal code or binary code, given the input file, `asmcode.txt` is located in the same folder as the executable and is readable. However, if you wish you can specify all the three files through command line arguements, along with a couple of other functionalities.
 
-- Open the terminal
-- Go to the directory in which your executable file is stored
-  
-  ``` Bash
-  # Go to the directory in which your executable file is stored
-  cd directory/in/which/your/file/is/stored
-  ```
+The general syntax of command line arguements are:
 
-- Run the following command
+``` Bash
+./Assembler -flag <value> ...
+```
 
-  ``` Bash
+Here, `-flag` can mean any one, or more of the following:
 
-  # For input file
-  ./Assembler inputfilename.txt
+- `-i \<input_file\>`: Input file containing `assembly` code (default: asmcode.txt)
+- `-o \<output_file\>`: Output file in which `hexadecimal` code will be stored (default: hexcode.txt)
+- `-b \<binary_file\>`: Output file in which `binary` code will be stored (default: bin.txt)
+- `-n`: Tells `Assembler` to not generate `binary` code
+- `-h`: Outputs the help message, as given here
 
-  # For both input and output file
-  ./Assembler inputfilename.txt outputfilename.txt
+Kindly keep the following points in mind
 
-  # To specify the binary file name as well
-  ./Assembler inputfilename.txt outputfilename.txt binaryfilename.txt
-  
-  ```
-
-- Notice that for specifying an output file, you need to specify an input file. This will be changed in future.
-- Also ensure that the input and output files are `text` files only.
-- If you don't specify the `I/O` files, the `Assembler` will use the default files for `I/O`, i.e., `asmcode.txt` and `hexcode.txt`.
+- All flags followed by `<value>` means that they expect you to pass a value to them when invoked.
+- The ordering of the flags do not matter
+- `-n` will always override the behaviour of `-b`.
+- `-h` will always override the behaviour of rest of the flags. In fact, passing the `-h` flag means the `Assembler` will only output the help section, and will not assemble your source code.
+- All I/O files are supposed to be text files.
 
 ## Syntax
 
@@ -238,7 +233,7 @@ These are the error numbers that you migh encounter during runtime. Attached is 
 - 07: There were some Errors in Assembly Code, due to which the equivalent binary file could not be generated.
 
 > **Kindly Note**
-> 
+>
 > Error Codes 01 - 07 are command line arguement based, and are used to verify the correct type of arguements are passed to the program.
 
 ## Technical Details
