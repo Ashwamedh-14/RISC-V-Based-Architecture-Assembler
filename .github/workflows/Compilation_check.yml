@@ -1,6 +1,11 @@
 name: Check Whether Compilable or Not
 
 on:
+  push:
+    branches: [test]
+    paths:
+      - 'src/*' 
+      - 'include/*'
   pull_request:
     branches: [main]
     paths:
@@ -20,7 +25,7 @@ jobs:
               run: sudo apt-get install -y build-essential make
 
             - name: Compiling the binary
-              run: g++ -std=c++17 -static-libstdc++ -static-libgcc -Wall -Wextra -Iinclude src/*.cpp -o bin/Assembler
+              run: make
         
             - name: Ensure Executable Works
               run: chmod +x bin/Assembler
@@ -35,31 +40,50 @@ jobs:
               id: cache-mingw
               uses: actions/cache@v3
               with:
-                path: "C:\\mingw64"
-                key: ${{ runner.os }}-mingw-cache-v1
+                path: "C:\\ProgramData\\mingw64\\mingw64"
+                key: ${{ runner.os }}-mingw-cache-v2
                 restore-keys: |
                   ${{ runner.os }}-mingw-cache-
                     
             - name: Install MinGW (If Not Cached)
               if: steps.cache-mingw.outputs.cache-hit != 'true'
-              run: choco install mingw -y
+              run: choco install mingw make -y
             
             - name: Add MinGW to PATH
               run: |
                 echo "Adding MinGW to PATH"
-                echo "C:\\mingw64\\bin" >> $env:GITHUB_PATH
+                echo "C:\\ProgramData\\mingw64\\mingw64\\bin" >> $env:GITHUB_PATH
                 
             - name: Simple Compile with g++
-              run: g++ -std=c++17 -static-libstdc++ -static-libgcc -Wall -Wextra -Iinclude src/*.cpp -o bin/Assembler_x64
+              run: make
 
     build-macos:
-        runs-on: macos-latest
-        steps:
-            - name: Checkout Code
-              uses: actions/checkout@v3
-
-            - name: Simple Compile with clang++
-              run: clang++ -std=c++17 -stdlib=libc++ -Wall -Wextra -Iinclude src/*.cpp -o bin/Assembler_MacOS
-
-            - name: Ensure Executable Works
-              run: chmod +x bin/Assembler_MacOS
+      runs-on: macos-latest
+      steps:
+        - name: Checkout Code
+          uses: actions/checkout@v3
+      
+        - name: Install GNU GCC, G++ and Make
+          run: |
+            brew install gcc make
+            gpp_version=$(g++-13 -dumpversion | cut -d. -f1)
+            if [ "$gpp_version" -lt 7 ]; then
+              echo "g++ version must be 7 or higher for C++17 support"
+              exit 1
+            fi
+      
+        - name: Set GNU Compilers in Environment
+          run: |
+            echo "CXX=g++-13" >> $GITHUB_ENV
+            echo "CC=gcc-13" >> $GITHUB_ENV
+      
+        - name: Build using Make
+          run: |
+            mkdir -p bin
+            make all
+      
+        - name: Rename Executable for macOS
+          run: mv bin/Assembler bin/Assembler_MacOS
+      
+        - name: Ensure Executable Works
+          run: chmod +x bin/Assembler_MacOS

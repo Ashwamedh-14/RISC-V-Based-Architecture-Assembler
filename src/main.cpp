@@ -94,7 +94,7 @@ int main(int argc, char **argv){
                 return 0;
             case ':':
                 cout << "Unrecognized option: " << (char)optopt << endl;
-                return ASSEMBLY_CODE_ERROR;
+                return COMMAND_LINE_ERROR;
             case '?':
                 cout << "Expected argument for option: " << (char)optopt << '\n';
                 usage();

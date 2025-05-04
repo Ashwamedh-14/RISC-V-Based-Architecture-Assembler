@@ -2,7 +2,7 @@ name: C++ CI
 
 on:
   push:
-    branches: [main]
+    branches: [main, test]
     paths:
       - 'src/*'  
       - 'include/*'
@@ -22,8 +22,11 @@ jobs:
       - name: Create bin Directory
         run: mkdir -p bin/
 
-      - name: Compile with g++
-        run: g++ -std=c++17 -static-libstdc++ -static-libgcc -Wall -Wextra -Iinclude src/*.cpp -o bin/Assembler
+      - name: Install dependencies
+        run: sudo apt install build-essential make
+
+      - name: Compile with make
+        run: make
 
       - name: Ensure Executable Works
         run: chmod +x bin/Assembler
@@ -48,19 +51,19 @@ jobs:
         id: cache-mingw
         uses: actions/cache@v3
         with:
-          path: "C:\\mingw64"
-          key: ${{ runner.os }}-mingw-cache-v1
+          path: "C:\\ProgramData\\mingw64\\mingw64"
+          key: ${{ runner.os }}-mingw-cache-v2
           restore-keys: |
             ${{ runner.os }}-mingw-cache-
               
-      - name: Install MinGW (If Not Cached)
+      - name: Install MinGW (If Not Cached) and make
         if: steps.cache-mingw.outputs.cache-hit != 'true'
-        run: choco install mingw -y
+        run: choco install mingw make -y
       
       - name: Add MinGW to PATH
         run: |
           echo "Adding MinGW to PATH"
-          echo "C:\\mingw64\\bin" >> $env:GITHUB_PATH
+          echo "C:\\ProgramData\\mingw64\\mingw64\\bin" >> $env:GITHUB_PATH
 
       - name: Create bin Directory (if not exists)
         run: |
@@ -68,9 +71,11 @@ jobs:
             mkdir bin
           }
 
-      - name: Compile with g++
-        run: g++ -std=c++17 -static-libstdc++ -static-libgcc -Wall -Wextra -Iinclude src/*.cpp -o bin/Assembler_x64
-
+      - name: Compile with make
+        run: make
+      
+      - name: Changing Executable name to correct one
+        run: ren ".\\bin\\Assembler.exe" ".\\bin\\Assembler_x64.exe"
       - name: Ensure Executable Works
         run: |
           if (!(Test-Path bin/Assembler_x64.exe)) { exit 1 }
@@ -87,24 +92,38 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
-
-      - name: Read Version Number
-        run: echo "CURRENT_VERSION=$(cat version.txt)" >> $GITHUB_ENV
-
-      - name: Create bin Directory
-        run: mkdir -p bin/
-
-      - name: Compile with clang++
-        run: clang++ -std=c++17 -stdlib=libc++ -Wall -Wextra -Iinclude src/*.cpp -o bin/Assembler_MacOS
-
+    
+      - name: Install GNU GCC, G++ and Make
+        run: |
+          brew install gcc make
+          gpp_version=$(g++-13 -dumpversion | cut -d. -f1)
+          if [ "$gpp_version" -lt 7 ]; then
+            echo "g++ version must be 7 or higher for C++17 support"
+            exit 1
+          fi
+    
+      - name: Set GNU Compilers in Environment
+        run: |
+          echo "CXX=g++-13" >> $GITHUB_ENV
+          echo "CC=gcc-13" >> $GITHUB_ENV
+    
+      - name: Build using Make
+        run: |
+          mkdir -p bin
+          make all
+    
+      - name: Rename Executable for macOS
+        run: mv bin/Assembler bin/Assembler_MacOS
+    
       - name: Ensure Executable Works
         run: chmod +x bin/Assembler_MacOS
-
+    
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
           name: Assembler-macos
           path: bin/Assembler_MacOS
+
 
   # Commit the executables & version update
   commit-executables:
