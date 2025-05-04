@@ -76,7 +76,7 @@ test: $(target) $(OUTPUT_DIR) preprocess
 		output_bin="$(OUTPUT_DIR)/output_bin_$$test_case.txt"; \
 		dos2unix $$input $$expected_hex $$expected_bin 2>/dev/null || true; \
 		echo "Running test 🧪 $$test_case:"; \
-		./$(target) $$input $$output_hex $$output_bin || { \
+		./$(target) -i $$input -o $$output_hex -b $$output_bin || { \
 			status=$$?; \
 			if [ $$status -eq 7 ] && [ ! -f $$expected_bin ]; then \
 				echo "✅ Test $$test_case passed (no expected binary output)."; \
