@@ -58,6 +58,11 @@ jobs:
             - name: Simple Compile with g++
               run: make
 
+            - name: Changing Executable name to correct one
+              run: Rename-Item -Path bin/Assembler.exe -NewName bin/Assembler_x64.exe
+
+            
+
     build-macos:
       runs-on: macos-latest
       steps:
