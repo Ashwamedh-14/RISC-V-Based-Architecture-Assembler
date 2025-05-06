@@ -161,19 +161,11 @@ void parse(int line_num, const string &line, ofstream &out_file) {
         }
 
         if (temp[0] == 'R') {
-            if (temp.size() == 2 || temp.size() == 3) {
-                if (instr.reg_num < 3) {
+            if (instr.reg_num < 3) {
                     instr.registers[instr.reg_num++] = temp;
-                } 
-                else {
-                    out_file << "Error: Too many registers at line number " << line_num << "\n";
-                    ERR = true;
-                    return;
-                }
             } 
             else {
-                out_file << "Error: Invalid Register at line " << line_num << ".\n";
-                out_file << "Register Passed: " << temp;
+                out_file << "Error: Too many registers at line number " << line_num << "\n";
                 ERR = true;
                 return;
             }
