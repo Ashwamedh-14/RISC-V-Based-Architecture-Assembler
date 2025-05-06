@@ -75,7 +75,7 @@ jobs:
         run: make
       
       - name: Changing Executable name to correct one
-        run: ren ".\\bin\\Assembler.exe" ".\\bin\\Assembler_x64.exe"
+        run: Rename-Item -Path bin/Assembler.exe -NewName bin/Assembler_x64.exe
       - name: Ensure Executable Works
         run: |
           if (!(Test-Path bin/Assembler_x64.exe)) { exit 1 }
