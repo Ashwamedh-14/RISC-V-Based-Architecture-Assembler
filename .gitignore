@@ -2,6 +2,7 @@
 *.exe
 test.*
 *.txt
+!version.txt
 !tests/*/*
 *.o
 obj/
