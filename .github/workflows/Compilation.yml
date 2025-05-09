@@ -72,10 +72,8 @@ jobs:
           }
 
       - name: Compile with make
-        run: make
+        run: make windows
       
-      - name: Changing Executable name to correct one
-        run: Rename-Item -Path bin/Assembler.exe -NewName bin/Assembler_x64.exe
       - name: Ensure Executable Works
         run: |
           if (!(Test-Path bin/Assembler_x64.exe)) { exit 1 }
@@ -105,11 +103,8 @@ jobs:
       - name: Build using Make
         run: |
           mkdir -p bin
-          make CC=gcc-13 CXX=g++-13 all
-    
-      - name: Rename Executable for macOS
-        run: mv bin/Assembler bin/Assembler_MacOS
-    
+          make CC=gcc-13 CXX=g++-13 macos
+
       - name: Ensure Executable Works
         run: chmod +x bin/Assembler_MacOS
     

@@ -5,6 +5,7 @@ on:
   push:
     branches: [test]
     paths:
+      - '.github/workflows/Compilation_check.yml'
       - 'src/*' 
       - 'include/*'
   pull_request:
