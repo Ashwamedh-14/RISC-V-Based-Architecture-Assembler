@@ -44,8 +44,8 @@ extern "C" {                            // This ensure this particular code is c
 #define UNABLE_TO_OPEN_INPUT_FILE 4
 #define UNABLE_TO_OPEN_OUTPUT_FILE 5
 #define UNABLE_TO_OPEN_BINARY_FILE 6
-#define ASSEMBLY_CODE_ERROR  7
-#define COMMAND_LINE_ERROR 8
+#define COMMAND_LINE_ERROR 7
+#define ASSEMBLY_CODE_ERROR  8
 
 using namespace std;
 

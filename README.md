@@ -99,21 +99,21 @@ For people running `Linux` distros other than Ubuntu, first kindly check whether
 If not, then clone the repository and compile the binary by yourself using the given command
 
 ``` bash
-g++ -std=c++17 -Iinclude src/*.cpp -o Assembler
+make
 ```
 
-The Assembler binary should be present in the cloned repo's parent directory. If it is still not executable run the command `chmod +x Assembler` on the terminal.
+The Assembler binary should be present in the bin directory with the name `Assembler`. If the file is not executable still, check file permissions and update accordingly
 
 > **Note**  
-> If you are still facing problem, update, upgrade and ensure that you have `GNU g++` installed on system.
+> If you are still facing problem, update, upgrade and ensure that you have `GNU g++` as well as `make` installed on system.
 
 ## Using
 
 - Write your `assembly` program in a `text file` and name it `asmcode.txt`.
 - Place the executable file in the same folder as `asmcode.txt`.
 - Run the executable file.
-- A text file with the name `hexcode.txt` should be formed.
-- You can upload this file in the ROM of your processor.
+- Two text files with the name `hexcode.txt` and `bin.txt` should be formed.
+- You can upload this file in the `ROM` of your processor.
 
 ### MacOS and Linux Users
 
@@ -134,10 +134,10 @@ In case the executable file does not run upon clicking it, especially in the cas
   ./Assembler_MacOS
 
   # For Linux (Ubuntu) Users
-  ./Assemnler  
+  ./Assembler  
   ```
 
-- `hexcode.txt` should now be generated.
+- `hexcode.txt` and `bin.txt` should now be generated.
 
 ### Command Line Arguements
 
@@ -207,7 +207,7 @@ AND,R12,R1,R2;        This is a comment
 
 ### Blank Lines
 
-Blank lines are replaced with `0000000`, i.e. `NOP`, in `hecode.txt`
+Blank lines are replaced with `0000000`, i.e. `NOP`, in `hexcode.txt`
 
 ### Points to remember
 
@@ -230,7 +230,8 @@ These are the error numbers that you migh encounter during runtime. Attached is 
 - 04: Unable to Find or Open the Input File, probably because not available at the specified path, or no read permission.
 - 05: Unable to Find or Open the Output File, probably because not available at the specified path, or no write permission.
 - 06: Unable to Find or Open the Binary File, probably because not avaialble at the specified path, or no write permission.
-- 07: There were some Errors in Assembly Code, due to which the equivalent binary file could not be generated.
+- 07: There was error in Arguements Passed to the Program
+- 08: There were some Errors in Assembly Code, due to which the equivalent binary file could not be generated.
 
 > **Kindly Note**
 >
@@ -257,9 +258,6 @@ These are the error numbers that you migh encounter during runtime. Attached is 
 - Same as `MEM`, to read / write data to any `I/O` port, you will need to use `regs`.
 - The compiled binaries are compatible with `x64` architecture **only**.
 
-[1]: https://ahduni.edu.in/academics/schools-centres/school-of-engineering-and-applied-science/people-1/mazad-zaveri/
-[2]: https://ahduni.edu.in/academics/schools-centres/school-of-engineering-and-applied-science/
-[3]: https://ahduni.edu.in/
 
 ## Third-Party Code and Licenses
 
@@ -273,3 +271,7 @@ This project includes third-party code from the [getopt-for-windows](https://git
 ## License
 
 This project is licensed under the **MIT License**. See the [LICENSE](./LICENSE) file for more details.
+
+[1]: https://ahduni.edu.in/academics/schools-centres/school-of-engineering-and-applied-science/people-1/mazad-zaveri/
+[2]: https://ahduni.edu.in/academics/schools-centres/school-of-engineering-and-applied-science/
+[3]: https://ahduni.edu.in/
