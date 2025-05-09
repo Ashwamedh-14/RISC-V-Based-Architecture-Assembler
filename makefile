@@ -52,21 +52,22 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp | $(OBJ_DIR)
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c | $(OBJ_DIR)
 	$(CC) $(CFLAGS) -c $< -o $@
 
-# Rule to link obj files into final binary
+# Rule to link obj files into final binary : linux
 $(target): $(OBJECTS) | $(BIN_DIR)
 	$(CXX) $(CXXFLAGS) $(OBJECTS) -o $(target)
 
-# Rename the target to Assembler_x64.exe for Windows
-windows: $(target)
-	@echo "Renaming target to Assembler_x64.exe..."
-	@mv $(target).exe $(BIN_DIR)/Assembler_x64.exe
-	@echo "✅ Renamed target to Assembler_x64.exe."
+# Rule to link obj files into final binary : windows
+windows: $(OBJECTS) | $(BIN_DIR)
+	$(CXX) $(CXXFLAGS) $(OBJECTS) -o $(target)_x64
+	@echo "Windows build complete. Executable: $(target)_x64"
+	@echo "To run the Windows build, use the command: ./$(target)_x64"
 
-# Rename the target to Assembler_MacOS for macOS
-macos: $(target)
-	@echo "Renaming target to Assembler_MacOS..."
-	@mv $(target) $(BIN_DIR)/Assembler_MacOS
-	@echo "✅ Renamed target to Assembler_MacOS."
+# Rule to link obj files into final binary : macos
+macos: $(OBJECTS) | $(BIN_DIR)
+	$(CXX) $(CXXFLAGS) $(OBJECTS) -o $(target)_MacOS
+	@echo "MacOS build complete. Executable: $(target)_MacOS"
+	@echo "To run the MacOS build, use the command: ./$(target)_MacOS"
+
 
 # Pre-processing rule to convert line endings from CRLF to LF
 # This is useful for Windows users to ensure consistent line endings
