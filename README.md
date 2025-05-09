@@ -242,7 +242,7 @@ These are the error numbers that you migh encounter during runtime. Attached is 
 - The numbering for the assembler starts at 1, i.e., the first line of the input file is numbered 1.
 - The assembler is **case-insensitive**.
 - The processor is an `8-bit` processor, i.e., its `regs` are capable of storing `8 bits`, or a `byte`, of data at a time.
-- The processor has a `25-bit` wide `bus`, where:
+- The processor has a `25-bit` wide `Instruction Memory Bus`, where:
   - The first `5 bits` are reserved for `OP Code`.
   - The next `12 bits` are distributed among 3, `4bit` wide `reg address`. The distribution is:
     - The first `4 bits` are reserved for `Rw`, i.e., `Register Write`.
