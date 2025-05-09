@@ -59,7 +59,7 @@ jobs:
               run: make
 
             - name: Changing Executable name to correct one
-              run: Rename-Item -Path bin/Assembler.exe -NewName bin/Assembler_x64.exe
+              run: Rename-Item -Path 'bin\Assembler.exe' -NewName 'bin\Assembler_x64.exe'
 
             
 
