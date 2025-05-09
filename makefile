@@ -30,7 +30,7 @@ OBJECTS := $(OBJECTS_CPP) $(OBJECTS_C)
 # Final Executable
 target := $(BIN_DIR)/Assembler
 
-.PHONY: all clean test clean_hard preprocess
+.PHONY: all clean test clean_hard preprocess windows macos
 
 all: $(target)
 
@@ -55,6 +55,18 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c | $(OBJ_DIR)
 # Rule to link obj files into final binary
 $(target): $(OBJECTS) | $(BIN_DIR)
 	$(CXX) $(CXXFLAGS) $(OBJECTS) -o $(target)
+
+# Rename the target to Assembler_x64.exe for Windows
+windows: $(target)
+	@echo "Renaming target to Assembler_x64.exe..."
+	@mv $(target) $(BIN_DIR)/Assembler_x64.exe
+	@echo "✅ Renamed target to Assembler_x64.exe."
+
+# Rename the target to Assembler_MacOS for macOS
+macos: $(target)
+	@echo "Renaming target to Assembler_MacOS..."
+	@mv $(target) $(BIN_DIR)/Assembler_MacOS
+	@echo "✅ Renamed target to Assembler_MacOS."
 
 # Pre-processing rule to convert line endings from CRLF to LF
 # This is useful for Windows users to ensure consistent line endings
