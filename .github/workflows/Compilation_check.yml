@@ -56,7 +56,7 @@ jobs:
                 echo "C:\\ProgramData\\mingw64\\mingw64\\bin" >> $env:GITHUB_PATH
                 
             - name: Simple Compile with g++
-              run: make
+              run: make windows
 
 
             
@@ -79,7 +79,7 @@ jobs:
         - name: Build using Make
           run: |
             mkdir -p bin
-            make CC=gcc-13 CXX=g++-13 all
+            make CC=gcc-13 CXX=g++-13 macos
       
         - name: Ensure Executable Works
           run: chmod +x bin/Assembler_MacOS
