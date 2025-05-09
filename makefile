@@ -59,7 +59,7 @@ $(target): $(OBJECTS) | $(BIN_DIR)
 # Rename the target to Assembler_x64.exe for Windows
 windows: $(target)
 	@echo "Renaming target to Assembler_x64.exe..."
-	@mv $(target) $(BIN_DIR)/Assembler_x64.exe
+	@mv $(target).exe $(BIN_DIR)/Assembler_x64.exe
 	@echo "✅ Renamed target to Assembler_x64.exe."
 
 # Rename the target to Assembler_MacOS for macOS
