@@ -91,7 +91,7 @@ test: $(target) $(OUTPUT_DIR) preprocess
 		echo "Running test 🧪 $$test_case:"; \
 		./$(target) -i $$input -o $$output_hex -b $$output_bin || { \
 			status=$$?; \
-			if [ $$status -eq 7 ] && [ ! -f $$expected_bin ]; then \
+			if [ $$status -eq 8 ] && [ ! -f $$expected_bin ]; then \
 				echo "✅ Test $$test_case passed (no expected binary output)."; \
 			else \
 				echo "❌ Test $$test_case failed with status code $$status"; \
