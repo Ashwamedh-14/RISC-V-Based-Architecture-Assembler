@@ -241,5 +241,5 @@ void usage(void) {
     cout << "  5. The output file will be overwritten if it already exists.\n";
     cout << "  6. The binary file will be overwritten if it already exists.\n";
     cout << "  7. Flags followed by <value> means that providing a value upon invoking those flags is necessary.\n";
-    cout << "  8. -n ovverides the -b flag, if provided.\n";
+    cout << "  8. -n ovverides the -b flag, if provided." << endl;
 }
