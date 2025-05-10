@@ -232,6 +232,14 @@ void usage(void) {
     cout << "  -o <output_file> : Output file to write hex code (default: hexcode.txt)\n";
     cout << "  -b <binary_file> : Output file to write binary code (default: bin.txt)\n";
     cout << "  -n : Tells to not generate binary code\n";
-    cout << "  -h : Show this help message\n";
-    cout << "\n\nKindly note that all the files should be text files" << endl;
+    cout << "  -h : Show this help message. It will override the execution of the program and only show this message\n";
+    cout << "\n\nKindly Note:-\n";
+    cout << "  1. All the files should be in the same directory as this executable.\n";
+    cout << "  2. If not in the same directory, the path specified should be valid.\n";
+    cout << "  3. All the I/O files should be a text files.\n";
+    cout << "  4. The input file should contain assembly code in the specified format.\n";
+    cout << "  5. The output file will be overwritten if it already exists.\n";
+    cout << "  6. The binary file will be overwritten if it already exists.\n";
+    cout << "  7. Flags followed by <value> means that providing a value upon invoking those flags is necessary.\n";
+    cout << "  8. -n ovverides the -b flag, if provided.\n";
 }

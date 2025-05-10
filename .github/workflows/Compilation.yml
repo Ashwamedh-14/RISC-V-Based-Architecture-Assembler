@@ -141,10 +141,6 @@ jobs:
           name: Assembler-macos
           path: bin/
 
-      - name: Get Version Number
-        run: |
-          VERSION=$(cat version.txt)
-
       - name: Configure Git
         run: |
           git config --global user.name "github-actions"
@@ -156,7 +152,7 @@ jobs:
       - name: Commit Executables & Version Update
         run: |
           git add bin/
-          git commit -m "Added executables for version $VERSION"
+          git commit -m "Added executables for the modified source code, header file or version number."
           git push https://github.com/${{ github.repository }}.git HEAD:add-executables-${{ github.sha }}
 
       - name: Create & Auto-Merge Pull Request
@@ -164,8 +160,8 @@ jobs:
           GH_PAT: ${{ secrets.GH_PAT }}
         run: |
           gh auth login --with-token <<< "$GH_PAT"
-          PR_URL=$(gh pr create --title "Added executables for version $VERSION" \
-                                --body "This PR adds the executables for version $VERSION" \
+          PR_URL=$(gh pr create --title "Added executables for the modified source code, header file or version number." \
+                                --body "This PR was triggered and created to sdd executables for the modified source code, header file or version number." \
                                 --head add-executables-${{ github.sha }} \
                                 --base main)
           echo "Pull request created: $PR_URL"
