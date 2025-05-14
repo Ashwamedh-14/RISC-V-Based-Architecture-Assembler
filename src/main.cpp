@@ -55,7 +55,7 @@ int main(int argc, char **argv){
     string input = "asmcode.txt";     // Default input file
     string output = "hexcode.txt";    // Default output file
     string binary = "bin.txt";         // Default binary file
-    int line_num = 0;           // Line number of the assembly code
+    size_t line_num = 0;           // Line number of the assembly code
     bool make_bin = true; // Flag to check whether to make binary code or not
     char c;         // Variable to store the command line argument
 
