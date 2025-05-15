@@ -31,6 +31,7 @@ extern "C" {                            // This ensure this particular code is c
 // Including the rest of the headers
 #include "assembler.h"    // Header file for the Assembler
 #include <iostream>
+#include <cstddef> // For size_t
 #include <fstream>
 #include <sstream>
 #include <vector>
