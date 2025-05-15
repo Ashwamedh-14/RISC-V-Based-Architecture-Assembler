@@ -1,5 +1,7 @@
 #include "assembler.h"
 #include <iostream>
+#include <cstddef> // For size_t
+#include <cstdint>
 #include <regex>
 #include <map>
 #include <sstream>
@@ -18,7 +20,10 @@ using namespace std;
 
 bool ERR = 0;
 
-static const vector<char> hex_chars = {'0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F'};
+static const char hex_chars[16] = {
+    '0', '1', '2', '3', '4', '5', '6', '7',
+    '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'
+};
 
 static const map<char, string> hex_to_bin_map = {
     {'0', "0000"}, {'1', "0001"}, {'2', "0010"}, {'3', "0011"},
@@ -88,7 +93,7 @@ Meaning of returned values
 7: Register Rx Out of Range
 8: Register Ry Out of Range
 */
-int instr_chk(Instruction &instr){
+uint8_t instr_chk(Instruction &instr){
 
     // regular expression checks whether the string has valid hex_chars
     // and checks whether the passed is string either 1 or 2 characters long
@@ -107,7 +112,7 @@ int instr_chk(Instruction &instr){
         instr.registers[0] = "";
     }
 
-    for (unsigned short int i = 0; i < 3; i++){                      // Checks valid register
+    for (uint8_t i = 0; i < 3; i++){                      // Checks valid register
         if (instr.registers[i].empty()) {
            instr.registers[i] = "0";
            continue;
@@ -136,7 +141,7 @@ int instr_chk(Instruction &instr){
     return 0;
 }
 
-void parse(int line_num, const string &line, ofstream &out_file) {
+void parse(size_t line_num, const string &line, ofstream &out_file) {
     Instruction instr;
     stringstream ss(line);
     string temp;

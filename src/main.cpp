@@ -182,7 +182,7 @@ int main(int argc, char **argv){
         cout << "Specifically told not to generate binary code. Exiting the program." << endl;
         return 0;
     }
-    if (ERR){
+    else if (ERR){
         cout << "Error: Errors were found in the assembly code. Check the output file for more details." << '\n';
         cout << "Error: Failed to generate binary code." << endl;
         return ASSEMBLY_CODE_ERROR;
@@ -212,7 +212,7 @@ int main(int argc, char **argv){
     getline(hexfile_read, hex_line); // Read the first line and skip it
     while (getline(hexfile_read, hex_line)){
         binaryfile << hex_line[0];
-        for(int i = 1; i < 7; i++){
+        for(uint8_t i = 1; i < 7; i++){
             binaryfile << hexBinConversion(hex_line[i]);
         }
         binaryfile << '\n';
