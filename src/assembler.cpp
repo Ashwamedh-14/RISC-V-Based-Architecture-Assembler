@@ -18,7 +18,7 @@ using namespace std;
 
 bool ERR = 0;
 
-static const vector<char> hex_chars = {'0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F'};
+static const char hex_chars[16] = {'1','2','3','4','5','6','7','8','9','A','B','C','D','E','F'};
 
 static const map<char, string> hex_to_bin_map = {
     {'0', "0000"}, {'1', "0001"}, {'2', "0010"}, {'3', "0011"},
