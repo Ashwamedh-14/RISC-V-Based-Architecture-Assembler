@@ -5,7 +5,7 @@
 The assembler is designed to translate assembly instruction into equivalent hexadecimal code for RISC-V based processor as designed in [Digital Model of Processor](./Digital%20Model%20of%20Processor.circ). The full list of Valid OP Codes are given in the text file [Valid OP Codes](./Valid%20OP%20Codes.txt) along with the information that would be required to pass for that OP Code for it to be a valid instruction.
 
 > **NOTE**  
-> The design of the processor is done by **[Prof. Mazad Zaveri][1]** of **[School of Engineering and Applied Sciences][2], [Ahmedabad University][3]** for the course **CSE302 Computer Organisation and Architecture**. All rights of the design of the processor rests with him along with the **Instruction Set** that is valid for the processor.
+> The design of the processor is done by **[Prof. Mazad Zaveri][1]** of **[School of Engineering and Applied Sciences][2], [Ahmedabad University][3]** for the course **CSE302 Computer Organization and Architecture**. All rights of the design of the processor rests with him along with the **Instruction Set** that is valid for the processor.
 
 ## Abbreviations
 
@@ -139,17 +139,17 @@ In case the executable file does not run upon clicking it, especially in the cas
 
 - `hexcode.txt` and `bin.txt` should now be generated.
 
-### Command Line Arguements
+### Command Line Arguments
 
-By default you don't have to explicitly provide the name of the output file for hexadecimal code or binary code, given the input file, `asmcode.txt` is located in the same folder as the executable and is readable. However, if you wish you can specify all the three files through command line arguements, along with a couple of other functionalities.
+By default, you don't have to explicitly provide the name of the output file for hexadecimal code or binary code, given the input file, `asmcode.txt` is located in the same folder as the executable and is readable. However, if you wish you can specify all the three files through command line arguments, along with a couple of other functionalities.
 
-The general syntax of command line arguements are:
+The general syntax of command line arguments are:
 
 ``` Bash
 ./Assembler -flag <value> ...
 ```
 
-Here, `-flag` can mean any one, or more of the following:
+Here, `-flag` can mean any-one, or more of the following:
 
 - `-i \<input_file\>`: Input file containing `assembly` code (default: asmcode.txt)
 - `-o \<output_file\>`: Output file in which `hexadecimal` code will be stored (default: hexcode.txt)
@@ -161,8 +161,8 @@ Kindly keep the following points in mind
 
 - All flags followed by `<value>` means that they expect you to pass a value to them when invoked.
 - The ordering of the flags do not matter
-- `-n` will always override the behaviour of `-b`.
-- `-h` will always override the behaviour of rest of the flags. In fact, passing the `-h` flag means the `Assembler` will only output the help section, and will not assemble your source code.
+- `-n` will always override the behavior of `-b`.
+- `-h` will always override the behavior of rest of the flags. In fact, passing the `-h` flag means the `Assembler` will only output the help section, and will not assemble your source code.
 - All I/O files are supposed to be text files.
 
 ## Syntax
@@ -177,7 +177,7 @@ All statements start with a valid `opcode`. This is usually followed by the requ
 AND,R12,R1,R2;
 ```
 
-Notice the use of **commas** to seperate the `parameters` of the `opcode`. Use of these commas is **important**, both for successful compilation, as well as for your understanding. For the correct `syntax` and `parameters` for each `opcode`, kindly refer to [**Valid OP Codes**](./Valid%20OP%20Codes.txt)
+Notice the use of **commas** to separate the `parameters` of the `opcode`. Use of these commas is **important**, both for successful compilation, and for your understanding. For the correct `syntax` and `parameters` for each `opcode`, kindly refer to [**Valid OP Codes**](./Valid%20OP%20Codes.txt)
 
 ### Ending a Line
 
@@ -221,7 +221,7 @@ Blank lines are replaced with `0000000`, i.e. `NOP`, in `hexcode.txt`
 
 ## Error Codes
 
-These are the error numbers that you migh encounter during runtime. Attached is their meaning as well
+These are the error numbers that you might encounter during runtime. Attached is their meaning as well
 
 - 00: All good
 - 01: Input File is not a text file
@@ -229,19 +229,19 @@ These are the error numbers that you migh encounter during runtime. Attached is 
 - 03: Binary File is not a text file
 - 04: Unable to Find or Open the Input File, probably because not available at the specified path, or no read permission.
 - 05: Unable to Find or Open the Output File, probably because not available at the specified path, or no write permission.
-- 06: Unable to Find or Open the Binary File, probably because not avaialble at the specified path, or no write permission.
-- 07: There was error in Arguements Passed to the Program
+- 06: Unable to Find or Open the Binary File, probably because not available at the specified path, or no write permission.
+- 07: There was error in Arguments Passed to the Program
 - 08: There were some Errors in Assembly Code, due to which the equivalent binary file could not be generated.
 
 > **Kindly Note**
 >
-> Error Codes 01 - 07 are command line arguement based, and are used to verify the correct type of arguements are passed to the program.
+> Error Codes 01–07 are command line argument based, and are used to verify the correct type of arguments are passed to the program.
 
 ## Technical Details
 
 - The numbering for the assembler starts at 1, i.e., the first line of the input file is numbered 1.
 - The assembler is **case-insensitive**.
-- The processor is an `8-bit` processor, i.e., its `regs` are capable of storing `8 bits`, or a `byte`, of data at a time.
+- The processor is a `8-bit` processor, i.e., its `regs` are capable of storing `8 bits`, or a `byte`, of data at a time.
 - The processor has a `25-bit` wide `Instruction Memory Bus`, where:
   - The first `5 bits` are reserved for `OP Code`.
   - The next `12 bits` are distributed among 3, `4bit` wide `reg address`. The distribution is:
@@ -266,7 +266,7 @@ This project includes third-party code from the [getopt-for-windows](https://git
 - [`getopt.c`](./src/getopt.c) and [`getopt.h`](./include/getopt.h) are derived from the GNU C Library and are licensed under the **GNU Lesser General Public License (LGPL) v2.1**.
 - See [`COPYING`](./COPYING) for the full license text.
 
-**Note:** The project include a modified version of [`getopt.h`](./include/getopt.h) (GNU LGPL 2.1). See top of the file for modification detail.
+**Note:** The project includes a modified version of [`getopt.h`](./include/getopt.h) (GNU LGPL 2.1). See top of the file for modification detail.
 
 ## License
 
