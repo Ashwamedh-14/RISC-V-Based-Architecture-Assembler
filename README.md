@@ -11,52 +11,19 @@ The assembler is designed to translate assembly instruction into equivalent hexa
 
 Following are the list of abbreviations that have / will be used:-
 
-<table>
-  <tr>
-    <th>Abbreviations</th>
-    <th>Refers To</th>
-  </tr>
-  <tr>
-    <td>COA</td>
-    <td>Computer Organisation and Architecture</td>
-  </tr>
-  <tr>
-    <td>CSE302</td>
-    <td>Refers to COA</td>
-  </tr>
-  <tr>
-    <td>SEAS</td>
-    <td>School of Engineering and Applied Sciences</td>
-  </tr>
-  <tr>
-    <td>AU</td>
-    <td>Ahmedabd University</td>
-  </tr>
-  <tr>
-    <td>OP Code</td>
-    <td>OPeration Code</td>
-  </tr>
-  <tr>
-    <td>Hex</td>
-    <td>Hexadecimal</td>
-  </tr>
-  <tr>
-    <td>Reg</td>
-    <td>Registers</td>
-  </tr>
-  <tr>
-    <td>MEM</td>
-    <td>Main Memory</td>
-  </tr>
-  <tr>
-    <td>DAT</td>
-    <td>Data Line</td>
-  </tr>
-  <tr>
-    <td>PC</td>
-    <td>Program Counter</td>
-  </tr>
-</table>
+
+| Abbreviations | Refers To                                 |
+|---------------|-------------------------------------------|
+| COA           | Computer Organisation and Architecture    |
+| CSE302        | Refers to COA                             |
+| SEAS          | School of Engineering and Applied Sciences|
+| AU            | Ahmedabad University                      |
+| OP Code       | Operation Code                            |
+| Hex           | Hexadecimal                               |
+| Reg           | Registers                                 |
+| MEM           | Main Memory                               |
+| DAT           | Data Line                                 |
+| PC            | Program Counter                           |
 
 ## Pre-installation
 
@@ -70,47 +37,43 @@ Following are the list of abbreviations that have / will be used:-
 
 ## Setting Up
 
-- Install the [**Digital Model of Processor**](https://github.com/Ashwamedh-14/RISC-V-Based-Architecture-Assembler/raw/refs/heads/main/Digital%20Model%20of%20Processor.circ).
+Visit the [**Releases**](https://github.com/Ashwamedh-14/RISC-V-Based-Architecture-Assembler/releases) page to download precompiled executables:
 
-- For `Windows x64` users, install [`Assembler_x64.exe`](https://github.com/Ashwamedh-14/RISC-V-Based-Architecture-Assembler/raw/refs/heads/main/bin/Assembler_x64.exe)  
+- For **Windows x64**: Download `Assembler_x64.exe`
+- For **Linux**: Download `Assembler`
+- Or you can download the `zip` file for either of the two.
 
-- For `MacOS` users, install [`Assembler_MacOS`](https://github.com/Ashwamedh-14/RISC-V-Based-Architecture-Assembler/raw/refs/heads/main/bin/Assembler_MacOS)  
+> **Note**: macOS users must build from source due to platform restrictions on unsigned executables. See "Building from Source" below.
 
-- For `Linux (Ubuntu)` users, install [`Assembler`](https://github.com/Ashwamedh-14/RISC-V-Based-Architecture-Assembler/raw/refs/heads/main/bin/Assembler)
+### Post-download (Linux Users)
 
-> **NOTE**
-> For `Linux` and `MacOS` users, before being able to run the executable file, run the following commands in the terminal
->
-> ``` bash
-> # First getting the terminal to the file location
-> cd "Path/to/the/directory/in/which/executable/is/located"
->
-> # changing permission for the file to make it executable
-> chmod +x filename
-> ```
->
-> `MacOS` users might also face the issue of the OS flagging it as a virus, the first time they run it. They will manually have to allow the program to be run.
->
+Before running the downloaded file:
 
-### Non-Ubuntu Linux Users
+```bash
+cd /path/to/download
+chmod +x Assembler
+```
 
-For people running `Linux` distros other than Ubuntu, first kindly check whether the [`Linux executable`](https://github.com/Ashwamedh-14/RISC-V-Based-Architecture-Assembler/raw/refs/heads/main/bin/Assembler) file is correctly working on your system or not.
+If the executable does not run on your Linux system, follow the build instructions below.
 
-If not, then clone the repository and compile the binary by yourself using the given command
+### Building from Source
+
+Clone the repo and build the executable using the below given commands.
 
 ``` bash
+git clone https://github.com/Ashwamedh-14/RISC-V-Based-Architecture-Assembler.git
+cd RISC-V-Based-Architecture-Assembler
 make
 ```
 
-The Assembler binary should be present in the bin directory with the name `Assembler`. If the file is not executable still, check file permissions and update accordingly
+The compiled binary will be located at bin/Assembler
 
-> **Note**  
-> If you are still facing problem, update, upgrade and ensure that you have `GNU g++` as well as `make` installed on system.
+> **Note:** Ensure you have `g++` and `make` installed. Use your system's package manager (e.g., sudo apt install build-essential on Debian based distros).
 
 ## Using
 
 - Write your `assembly` program in a `text file` and name it `asmcode.txt`.
-- Place the executable file in the same folder as `asmcode.txt`.
+- Place the executable file in the same directory as `asmcode.txt`.
 - Run the executable file.
 - Two text files with the name `hexcode.txt` and `bin.txt` should be formed.
 - You can upload this file in the `ROM` of your processor.

@@ -80,7 +80,7 @@ jobs:
         - name: Build using Make
           run: |
             mkdir -p bin
-            make CC=gcc-13 CXX=g++-13 macos
+            make CC=gcc-13 CXX=g++-13
       
         - name: Ensure Executable Works
           run: chmod +x bin/Assembler_MacOS

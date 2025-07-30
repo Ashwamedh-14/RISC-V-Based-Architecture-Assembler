@@ -55,18 +55,13 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c | $(OBJ_DIR)
 # Rule to link obj files into final binary : linux
 $(target): $(OBJECTS) | $(BIN_DIR)
 	$(CXX) $(CXXFLAGS) $(OBJECTS) -o $(target)
-
+	@echo "Build complete. Executable: $(target)"
+	@echo "To run the build, use the command: ./$(target)"
 # Rule to link obj files into final binary : windows
 windows: $(OBJECTS) | $(BIN_DIR)
 	$(CXX) $(CXXFLAGS) $(OBJECTS) -o $(target)_x64
 	@echo "Windows build complete. Executable: $(target)_x64"
 	@echo "To run the Windows build, use the command: ./$(target)_x64"
-
-# Rule to link obj files into final binary : macos
-macos: $(OBJECTS) | $(BIN_DIR)
-	$(CXX) $(CXXFLAGS) $(OBJECTS) -o $(target)_MacOS
-	@echo "MacOS build complete. Executable: $(target)_MacOS"
-	@echo "To run the MacOS build, use the command: ./$(target)_MacOS"
 
 
 # Pre-processing rule to convert line endings from CRLF to LF

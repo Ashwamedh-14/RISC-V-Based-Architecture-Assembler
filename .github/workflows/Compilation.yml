@@ -2,11 +2,8 @@ name: C++ CI
 
 on:
   push:
-    branches: [main]
-    paths:
-      - 'src/*'  
-      - 'include/*'
-      - 'version.txt' 
+    tags:
+      - 'v*'
 
 jobs:
   # Build job for Linux
@@ -44,9 +41,6 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: Read Version Number
-        run: echo "CURRENT_VERSION=$(Get-Content version.txt)" | Out-File -FilePath $env:GITHUB_ENV -Append
-
       - name: Use cache MinGW
         id: cache-mingw
         uses: actions/cache@v3
@@ -55,11 +49,11 @@ jobs:
           key: ${{ runner.os }}-mingw-cache-v2
           restore-keys: |
             ${{ runner.os }}-mingw-cache-
-              
+
       - name: Install MinGW (If Not Cached) and make
         if: steps.cache-mingw.outputs.cache-hit != 'true'
         run: choco install mingw make -y
-      
+
       - name: Add MinGW to PATH
         run: |
           echo "Adding MinGW to PATH"
@@ -73,7 +67,7 @@ jobs:
 
       - name: Compile with make
         run: make windows
-      
+
       - name: Ensure Executable Works
         run: |
           if (!(Test-Path bin/Assembler_x64.exe)) { exit 1 }
@@ -84,90 +78,53 @@ jobs:
           name: Assembler-windows
           path: bin/Assembler_x64.exe
 
-  # Build job for macOS
-  build-macos:
-    runs-on: macos-latest
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3
-    
-      - name: Install GNU GCC, G++ and Make
-        run: |
-          brew install gcc make
-          gpp_version=$(g++-13 -dumpversion | cut -d. -f1)
-          if [ "$gpp_version" -lt 7 ]; then
-            echo "g++ version must be 7 or higher for C++17 support"
-            exit 1
-          fi
-    
-      - name: Build using Make
-        run: |
-          mkdir -p bin
-          make CC=gcc-13 CXX=g++-13 macos
-
-      - name: Ensure Executable Works
-        run: chmod +x bin/Assembler_MacOS
-    
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: Assembler-macos
-          path: bin/Assembler_MacOS
-
-
-  # Commit the executables & version update
-  commit-executables:
-    needs: [build-linux, build-windows, build-macos]
+  # Create Release with Executables
+  release:
+    needs: [build-linux, build-windows]
     runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
     steps:
-      - name: Checkout Code
+      - name: Checkout code
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # Needed to fetch full tag history for tag messages
 
       - name: Download Linux Executable
         uses: actions/download-artifact@v4
         with:
           name: Assembler-linux
-          path: bin/
+          path: artifacts/
 
       - name: Download Windows Executable
         uses: actions/download-artifact@v4
         with:
           name: Assembler-windows
-          path: bin/
+          path: artifacts/
 
-      - name: Download macOS Executable
-        uses: actions/download-artifact@v4
+      - name: Zip Artifacts
+        run: |
+          cd artifacts
+          zip Assembler-linux.zip Assembler
+          zip Assembler-windows.zip Assembler_x64.exe
+
+      - name: Get tag message
+        id: tag_message
+        run: |
+          TAG_NAME="${GITHUB_REF#refs/tags/}"
+          MESSAGE=$(git for-each-ref refs/tags/$TAG_NAME --format='%(contents)')
+          echo "message<<EOF" >> $GITHUB_OUTPUT
+          echo "$MESSAGE" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Create GitHub Release and Upload Assets
+        uses: softprops/action-gh-release@v2
         with:
-          name: Assembler-macos
-          path: bin/
+          name: ${{ github.ref_name }}
+          tag_name: ${{ github.ref_name }}
+          body: ${{ steps.tag_message.outputs.message }}
+          files: |
+            artifacts/Assembler
+            artifacts/Assembler_x64.exe
+            artifacts/Assembler-linux.zip
+            artifacts/Assembler-windows.zip
 
-      - name: Configure Git
-        run: |
-          git config --global user.name "github-actions"
-          git config --global user.email "github-actions@github.com"
-
-      - name: Create New Branch
-        run: git checkout -b add-executables-${{ github.sha }}
-
-      - name: Commit Executables & Version Update
-        run: |
-          git add bin/
-          git commit -m "Added executables for the modified source code, header file or version number."
-          git push https://github.com/${{ github.repository }}.git HEAD:add-executables-${{ github.sha }}
-
-      - name: Create & Auto-Merge Pull Request
-        env:
-          GH_PAT: ${{ secrets.GH_PAT }}
-        run: |
-          gh auth login --with-token <<< "$GH_PAT"
-          PR_URL=$(gh pr create --title "Added executables for the modified source code, header file or version number." \
-                                --body "This PR was triggered and created to sdd executables for the modified source code, header file or version number." \
-                                --head add-executables-${{ github.sha }} \
-                                --base main)
-          echo "Pull request created: $PR_URL"
-          
-          # Extract PR number from URL
-          PR_NUMBER=$(basename "$PR_URL")
-
-          # Auto-merge the PR
-          gh pr merge "$PR_NUMBER" --merge --admin
