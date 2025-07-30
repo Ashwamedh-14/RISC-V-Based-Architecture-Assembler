@@ -104,7 +104,7 @@ In case the executable file does not run upon clicking it, especially in the cas
 
 ### Command Line Arguments
 
-By default, you don't have to explicitly provide the name of the output file for hexadecimal code or binary code, given the input file, `asmcode.txt` is located in the same folder as the executable and is readable. However, if you wish you can specify all the three files through command line arguments, along with a couple of other functionalities.
+By default, you don't have to explicitly provide the name of the output file for hexadecimal code or binary code, given the input file, `asmcode.txt` is located in the same directory as the executable and is readable. However, if you wish you can specify all the three files through command line arguments, along with a couple of other functionalities.
 
 The general syntax of command line arguments are:
 

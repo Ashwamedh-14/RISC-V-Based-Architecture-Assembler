@@ -83,4 +83,4 @@ jobs:
             make CC=gcc-13 CXX=g++-13
       
         - name: Ensure Executable Works
-          run: chmod +x bin/Assembler_MacOS
+          run: chmod +x bin/Assembler
