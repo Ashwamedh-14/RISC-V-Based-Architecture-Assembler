@@ -6,6 +6,12 @@
 #include <cstdint>
 #include <fstream>
 
+struct Opcode{
+    std::string opcode;
+    std::string hex;
+    int max_instruction;
+};
+
 struct Instruction {
     std::string opcode;                                            // Opcode of the instruction
     std::array<std::string, 3> registers = {"", "", ""};           // Registers used in the instruction
@@ -14,8 +20,6 @@ struct Instruction {
 };
 
 // Helper Functions
-void toUpper(std::string &s);
-std::string strip(const std::string &s);
 std::string hexBinConversion(char c);
 
 // Main Functions

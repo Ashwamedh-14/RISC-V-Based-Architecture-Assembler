@@ -244,3 +244,19 @@ void usage(void) {
     cout << "  7. Flags followed by <value> means that providing a value upon invoking those flags is necessary.\n";
     cout << "  8. -n ovverides the -b flag, if provided." << endl;
 }
+
+// Function to convert a lowercase letter in a string to uppercase
+void toUpper(string &s){
+    for (char &c : s) {
+        if (c >= 'a' && c <= 'z'){
+            c = c - 32; // Convert to uppercase
+        }
+    }
+}
+
+// Function to remove leading and trailing whitespaces from a string
+string strip(const string &s) {
+    size_t start = s.find_first_not_of(" ");
+    size_t end = s.find_last_not_of(" ");
+    return (start == string::npos) ? "" : s.substr(start, end - start + 1);
+}
