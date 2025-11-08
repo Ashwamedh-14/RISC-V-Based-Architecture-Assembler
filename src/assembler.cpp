@@ -20,6 +20,11 @@ using namespace std;
 
 bool ERR = 0;
 
+// regular expression checks whether the string has valid hex_chars
+// and checks whether the passed is string either 1 or 2 characters long
+static const regex reg_dat("^[0-9A-F]{1,2}$");
+static const regex reg_reg("^R[0-9]{1,2}$");
+
 static const char hex_chars[16] = {
     '0', '1', '2', '3', '4', '5', '6', '7',
     '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'
@@ -95,10 +100,6 @@ Meaning of returned values
 */
 uint8_t instr_chk(Instruction &instr){
 
-    // regular expression checks whether the string has valid hex_chars
-    // and checks whether the passed is string either 1 or 2 characters long
-    regex reg_dat("^[0-9A-F]{1,2}$");
-    regex reg_reg("^R[0-9]{1,2}$");
     int temp;
     if (op_code.find(instr.opcode) == op_code.end()) return INVALID_OPCODE;    // Checks valid opcode
 
