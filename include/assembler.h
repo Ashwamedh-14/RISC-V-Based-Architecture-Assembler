@@ -7,13 +7,18 @@
 #include <fstream>
 
 struct Opcode{
+    /*
+    * The 2 LSB bit indicate total number of parameters needed for given opcode
+    * The next 2 indicate number of registers needed in parameters
+    * The next bit indicates whether a Dataline value is required
+    */
+    unsigned char instr_num;
     std::string opcode;
     std::string hex;
-    int max_instruction;
 };
 
 struct Instruction {
-    std::string opcode;                                            // Opcode of the instruction
+    const Opcode *opcode;                                            // Opcode of the instruction
     std::array<std::string, 3> registers = {"", "", ""};           // Registers used in the instruction
     int reg_num;                                                   // Number of registers used in the instruction
     std::string dataline;                                          // Data line of the instruction
