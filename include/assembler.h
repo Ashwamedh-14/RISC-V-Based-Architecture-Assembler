@@ -26,6 +26,8 @@ struct Instruction {
 
 // Helper Functions
 std::string hexBinConversion(char c);
+std::string strip(const string &s);
+void toUpper(string &s);
 
 // Main Functions
 uint8_t instr_chk(Instruction &instr); // Function to check whether the values in Instruction are correct
