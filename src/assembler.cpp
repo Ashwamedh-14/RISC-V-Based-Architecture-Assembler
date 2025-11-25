@@ -7,6 +7,8 @@
 #include <sstream>
 #include <algorithm>
 
+// Defining Error Codes
+#define INVALID_LINE 100
 #define INVALID_OPCODE 101
 #define INVALID_DATALINE 102
 #define REG_W_INVALID_REFERENCE 103
@@ -16,14 +18,20 @@
 #define REG_RX_OUT_OF_RANGE 107
 #define REG_RY_OUT_OF_RANGE 108
 #define JUMP_OUT_OF_RANGE 109
+#define INVALID_PARAM_NUM 110
+#define INVALID_REG_NUM 111
+#define INVALID_DAT_REF 112
+#define INVALID_LABEL_REF 113
 
 using namespace std;
 
+// Error variable
 bool ERR = 0;
-// regular expression checks whether the string has valid hex_chars
-// and checks whether the passed is string either 1 or 2 characters long
-static const regex REG_DAT("^[0-9A-F]{1,2}$");
-static const regex REG_REG("^R[0-9]{1,2}$");
+
+// regular expression checks
+static const regex REG_DAT("^[0-9A-F]{1,2}$");              // Whether valid Data for Dataline
+static const regex REG_REG("^R[0-9]{1,2}$");                // Whether valid Register Reference
+static const regex REG_LABEL("^[A-Za-z_][A-Za-z0-9_]*$");   // Whether valid Label
 
 static const char HEX_CHARS[] = {
     '0', '1', '2', '3', '4', '5', '6', '7',
@@ -95,34 +103,25 @@ string strip(const string &s) {
 }
 
 bool isValidLabel(const string &s){
-    size_t colonPos;
     string label;
     string stripped;
     
     stripped = strip(s);
     
-    // Cannot contain semicolon;
-    if (stripped.find(';') != string::npos) return false;
+    // Conditions
+    if (stripped.empty()) return false;                             // Should not be empty
+    else if (stripped.find(';') != string::npos) return false;      // Should not end with a semi-colon              
+    else if (stripped[stripped.size() - 1] != ':') return false;    // Should end with a colon
 
-    // Must end with a colon
-    if (stripped.back() != ':') return false;
-
-    // Removing Spaces before a colon
-    colonPos =  s.find_last_not_of(" \t", stripped.size() - 2);
-    if (colonPos == string::npos) return false;
+    // If the above conditions are passed, we remove the colon, and strip the passed label again
+    label = strip(stripped.substr(0, stripped.size() - 1));
     
-    label = stripped.substr(0, colonPos + 1);
-
-
-    // First character should be an alphabet
-    if (!isalpha(label[0])) return false;
-
-    // Checking if remainig characters are alphanumeric or underscore;
-    for (char c: label){
-        if (!isalnum(c) && c != '_') return false;
-    }
+    // return false if it is a valid OPCODE
+    if (findOpcode(label)) return false;
+    else if (!regex_match(label, REG_LABEL)) return false;
 
     return true;
+
 }
 
 bool isLabelRecorded(const string &s, const map<string, size_t> &labels){
@@ -164,13 +163,16 @@ uint8_t instr_chk(Instruction &instr, const map<string, size_t> &labels){
 
     // Checking for registers
     for (uint8_t i = 0; i < 3; i++){
-        if (instr.registers[i].empty()) instr.registers[i] = "0";
+        if (instr.registers[i].empty()) {
+            instr.registers[i] = "0";
+            continue;
+        }
         else if (!regex_match(instr.registers[i], REG_REG)){
             if (i == 0) return REG_W_INVALID_REFERENCE;
             else if (i == 1) return REG_RX_INVALID_REFERENCE;
             else return REG_RY_INVALID_REFERENCE;
         }
-        temp = stoi(instr.registers[i].substr(1, instr.registers[i].size() - 1));
+        temp = stoi(instr.registers[i].substr(1, instr.registers[i].size()));
         if (temp >= 16){
             if (i == 0) return REG_W_OUT_OF_RANGE;
             else if (i == 1) return REG_RX_OUT_OF_RANGE;
@@ -183,7 +185,11 @@ uint8_t instr_chk(Instruction &instr, const map<string, size_t> &labels){
     if (instr.dataline.empty()) return 0;
     else if (isValidLabel(instr.dataline + ":")) {
         // It's syntactically a label; now check if it's defined
-        if (!isLabelRecorded(instr.dataline, labels)) return INVALID_DATALINE;
+        if (!isLabelRecorded(instr.dataline, labels) && !regex_match(instr.dataline, REG_DAT)) return INVALID_LABEL_REF;
+        else if (regex_match(instr.dataline, REG_DAT)){
+            if (instr.dataline.size() == 1) instr.dataline = "0" + instr.dataline;
+            return 0;
+        }
     
         temp = labels.at(instr.dataline);
         if (temp > 255) return JUMP_OUT_OF_RANGE;
@@ -206,112 +212,154 @@ uint8_t instr_chk(Instruction &instr, const map<string, size_t> &labels){
 }
 
 
-
-void parse(size_t line_num, const string &line, const map<string, size_t> &labels, ofstream &out_file) {
+// Main Parsing Logic
+uint8_t parse(size_t line_num, const string &line, const map<string, size_t> &labels, ofstream &out_file) {
     Instruction instr;
     string word;
-    stringstream ss(line);
+    string wrong_code;
+    int error_num = 0;
     int param_num = 0;
 
     instr.reg_num = 0;
     instr.dataline = "";
-
+   
+    stringstream ss(line);
     // Getting Opcode
     getline(ss, word, ',');
     instr.opcode = findOpcode(strip(word));
+
+    if (!instr.opcode) wrong_code = word;
     
     // Getting rest of the instructions
     while (getline(ss, word, ',')){
         if (param_num >= 4){
-            out_file << "Error: Invalid line at line number " << line_num << ".\n";
+            out_file << "Error (Code 100): Bad line at line number " << line_num << ".\n";
             out_file << "Too many parameters passed.\n";
+            ERR = true;
+            return INVALID_LINE;
         }
         word = strip(word);
         
         if (word.empty()){
-            out_file << "Error: Invalid line at line number " << line_num << " and parameter number " << param_num << ".\n";
+            out_file << "Error (Code 100): Bad line at line number " << line_num << " and parameter number " << param_num << ".\n";
             out_file << "Passed value:  \"\".\n";
             ERR = true;
-            return;
+            return INVALID_LINE;
         }
+
+        else if (word[0] == 'R' && word.size() > 3) instr.dataline = word;
         
-        if (word[0] == 'R' && instr.reg_num >= 3){
-            out_file << "Error: Too many register references at line number " << line_num << ".\n";
-            out_file << "Total Register References: 4.\n";
+        else if (word[0] == 'R' && instr.reg_num >= 3){
+            out_file << "Error (Code 111): Too many register references at line number " << line_num << ".\n";
+            out_file << "Maximum Register References allowed: 3.\n";
             ERR = true;
-            return;
+            return INVALID_REG_NUM;
         }
         else if (word[0] == 'R') instr.registers[instr.reg_num++] = word;
         else instr.dataline = word;
         param_num++;
     }
 
-    switch (instr_chk(instr, labels)){
+    error_num = instr_chk(instr, labels);
+
+    switch (error_num){
         case 0:
             // No error
             break;
 
         case INVALID_OPCODE:
-            out_file << "Error (Code 101): Invalid opcode at line " << line_num << ".\n" 
+            out_file << "Error (Code 101): Invalid opcode: " << wrong_code << ", at line " << line_num << ".\n";
             out_file << "Hint: Check for typos or undefined instruction mnemonic.\n";
             ERR = true;
-            return;
+            break;
 
         case INVALID_DATALINE:
-            out_file << "Error (Code 102): Invalid or undefined data/label at line " << line_num << ".\n"
+            out_file << "Error (Code 102): Invalid or undefined data/label: " << instr.dataline << ", at line " << line_num << ".\n";
             out_file << "Hint: Ensure the immediate value is valid hex, or the label is defined earlier.\n";
             ERR = true;
-            return;
+            break;
 
         case REG_W_INVALID_REFERENCE:
-            out_file << "Error (Code 103): Invalid destination register reference at line " << line_num << ".\n"
+            out_file << "Error (Code 103): Invalid destination register (Rw) reference: " << instr.registers[0] << ", at line " << line_num << ".\n";
             out_file << "Hint: Register names must be in the form R0–R15.\n";
             ERR = true;
-            return;
+            break;
 
         case REG_RX_INVALID_REFERENCE:
-            out_file << "Error (Code 104): Invalid source register (Rx) reference at line " << line_num << ".\n"
+            out_file << "Error (Code 104): Invalid source register (Rx) reference: " << instr.registers[1] << ", at line " << line_num << ".\n";
             out_file << "Hint: Register names must be in the form R0–R15.\n";
             ERR = true;
-            return;
+            break;
 
         case REG_RY_INVALID_REFERENCE:
-            out_file << "Error (Code 105): Invalid second source register (Ry) reference at line " << line_num << ".\n"
+            out_file << "Error (Code 105): Invalid second source register (Ry) reference: " << instr.registers[2] << ", at line " << line_num << ".\n";
             out_file << "Hint: Register names must be in the form R0–R15.\n";
             ERR = true;
-            return;
+            break;
 
         case REG_W_OUT_OF_RANGE:
-            out_file << "Error (Code 106): Destination register out of range at line " << line_num << ".\n"
+            out_file << "Error (Code 106): Destination register (Rw) out of range at line " << line_num << ".\n";
             out_file << "Hint: Only registers R0–R15 are valid.\n";
             ERR = true;
-        return;
+            break;
 
         case REG_RX_OUT_OF_RANGE:
-            out_file << "Error (Code 107): Source register (Rx) out of range at line " << line_num << ".\n"
+            out_file << "Error (Code 107): Source register (Rx) out of range at line " << line_num << ".\n";
             out_file << "Hint: Only registers R0–R15 are valid.\n";
             ERR = true;
-            return;
+            break;
 
         case REG_RY_OUT_OF_RANGE:
-            out_file << "Error (Code 108): Second source register (Ry) out of range at line " << line_num << ".\n"
+            out_file << "Error (Code 108): Second source register (Ry) out of range at line " << line_num << ".\n";
             out_file << "Hint: Only registers R0–R15 are valid.\n";
             ERR = true;
-            return;
+            break;
 
         case JUMP_OUT_OF_RANGE:
-            out_file << "Error (Code 109): Jump target out of range at line " << line_num << ".\n"
-            out_file << "Hint: Label address exceeds 255. Ensure label positions fit in 8-bit address space.\n";
+            out_file << "Error (Code 109): Jump target out of range at line " << line_num << ".\n";
+            out_file << "Hint: Label address exceeds 255. Ensure label positions fit in 8-bit number size.\n";
             ERR = true;
-            return;
+            break;
 
-        default:
-            out_file << "Error: Unknown internal error at line " << line_num << ".\n";
+        case INVALID_LABEL_REF:
+            out_file << "Error (Code 113): Referenced Label: " << instr.dataline << " at line" << line_num << "not found.\n";
+            out_file << "The error could either be due to invalid label name, or no label of same name was found.\n";
             ERR = true;
-            return;
+            break;
+        
+        default:
+            out_file << "Error (Code 100): Bad line at line number " << line_num << ".\n";
+            ERR = true;
+            return INVALID_LINE;
     };
 
+    if (error_num) return error_num;
 
+    else if (param_num != (instr.opcode->instr_num & 0x03)){       // Checking the 2 LSB bits for expected number of parameters
+        out_file << "Error (Code 110): Invalid number of parameters for OPCODE: " << instr.opcode->opcode << ", at line number " << line_num << ".\n";
+        out_file << "Expected number of parameters: " << (instr.opcode->instr_num & 0x03) << ", ";
+        out_file << "Received: " << param_num << ".\n";
+        ERR = true;
+        return INVALID_PARAM_NUM;
+    }
+    else if (instr.reg_num != ((instr.opcode->instr_num >> 2) & 0x03)) { // Shifting 2 bits and checking the 2 LSB bits for expected number of register references
+        out_file << "Error (Code 111): Invalid number of registers referenced for OPCODE: " << instr.opcode->opcode << ", at line number " << line_num << ".\n";
+        out_file << "Expected number of refereced registers: " << ((instr.opcode->instr_num >> 2) & 0x03) << ", ";
+        out_file << "Received: " << instr.reg_num << ".\n";
+        ERR = true;
+        return INVALID_REG_NUM;
+    }
+    else if ((instr.opcode->instr_num & 0x10) && instr.dataline.empty()){
+        out_file << "Error (Code 112): Expected Data on Dataline for OPCODE: " << instr.opcode->opcode << ", at line number " << line_num << " ";
+        out_file << "But non was passed.\n";
+        ERR = true;
+        return INVALID_DAT_REF;
+    }
+    else if (instr.dataline.empty()) instr.dataline = "00";
+
+    out_file << instr.opcode->hex << instr.registers[0] << instr.registers[1] << instr.registers[2] << instr.dataline << "\n";
+    
+    return 0;
 
 }
 

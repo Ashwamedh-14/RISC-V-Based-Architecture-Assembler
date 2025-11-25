@@ -5,6 +5,7 @@
 #include <array>
 #include <cstdint>
 #include <fstream>
+#include <map>
 
 struct Opcode{
     /*
@@ -26,12 +27,12 @@ struct Instruction {
 
 // Helper Functions
 std::string hexBinConversion(char c);
-std::string strip(const string &s);
-void toUpper(string &s);
+std::string strip(const std::string &s);
+void toUpper(std::string &s);
 
 // Main Functions
-uint8_t instr_chk(Instruction &instr); // Function to check whether the values in Instruction are correct
-void parse(size_t line_num, const std::string &line, std::ofstream &out_file); // Function to parse the instruction and check for errors
+uint8_t instr_chk(Instruction &instr, const std::map<std::string, size_t> &labels); // Function to check whether the values in Instruction are correct
+uint8_t parse(size_t line_num, const std::string &line, const std::map<std::string, size_t> &labels, std::ofstream &out_file); // Function to parse the instruction and check for errors
 
 extern bool ERR;
 

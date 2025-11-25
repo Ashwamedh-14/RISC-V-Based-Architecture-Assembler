@@ -5,7 +5,7 @@ Software: Assembly to Hex Converter, i.e, Assembler
 Description: 
 This program converts assembly code to hex code.
 The program reads the assembly code from a file named "asmcode.txt" and writes the hex code to a file named "hexcode.txt".
-It then also converts the hex code to binary code and write to a file named "bin.txt".
+It then also converts the hex code to binary code and writes to a file named "bin.txt".
 People can specify the files to read or written to by the use of command line arguements:
 
 ./Assembler <input_file>.txt <output_file>.txt <binary_file>.txt
@@ -59,7 +59,7 @@ int main(int argc, char **argv){
     size_t line_num = 0;           // Line number of the assembly code
     bool make_bin = true; // Flag to check whether to make binary code or not
     char c;         // Variable to store the command line argument
-
+    map<string, size_t> labels;
     // Using getopt to parse the command line arguments
     while((c = getopt(argc, argv, ":i:o:nhb:")) != -1) {
         switch (c) {
@@ -166,7 +166,7 @@ int main(int argc, char **argv){
         }
         
 
-        parse(line_num, line, hexfile);
+        parse(line_num, line, labels, hexfile);
     }
     hexfile << flush;
 
