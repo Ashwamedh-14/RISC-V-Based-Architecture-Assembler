@@ -202,7 +202,8 @@ These are the error numbers that you might encounter during runtime. Attached is
 
 ## Technical Details
 
-- The numbering for the assembler starts at 1, i.e., the first line of the input file is numbered 1.
+- For human readability, the line numbering will start from 1 in error messages.
+- For the programs themselves, the first line will be numbered 0, i.e, hardcoded jmp, or similar instructions, must be done keeping in mind the first line is line 0.
 - The assembler is **case-insensitive**.
 - The processor is a `8-bit` processor, i.e., its `regs` are capable of storing `8 bits`, or a `byte`, of data at a time.
 - The processor has a `25-bit` wide `Instruction Memory Bus`, where:

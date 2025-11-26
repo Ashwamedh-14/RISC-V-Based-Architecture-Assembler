@@ -149,6 +149,8 @@ int main(int argc, char **argv){
         return UNABLE_TO_OPEN_OUTPUT_FILE;
     }
 
+    
+
     // First pass
     // Formatting Assembly code
     // This parse does not check whether the line is valid instruction or not.
@@ -159,7 +161,6 @@ int main(int argc, char **argv){
     // **NOTE**
     // Since the labels will be replaced with the hexadecimal value of their locations in JMP statements, their line numbering starts from 0.
     while(getline(assembly_code, line)){      
-        // Sanitizing
         line = sanitizeLine(line);
         
         // The line should be now completely uppercase, stripped of leading and trailing whitespaces and tabs, and comments removed.
@@ -223,6 +224,7 @@ int main(int argc, char **argv){
     // Resetting the line number
     line_num = 0;
     
+    // Putting the header for logisim
     hexfile << "v2.0 raw\n";
 
     while(getline(format_read,line)){
@@ -231,15 +233,8 @@ int main(int argc, char **argv){
         
         // Convert assembly code to hex
         // and write to hexfile
-        line = strip(line);
-        toUpper(line);
-        
-        if (!line.size()){
-            hexfile << "0000000\n";
-            continue;
-        }
 
-        else if (count(line.begin(), line.end(), ';') == 0){
+        if (count(line.begin(), line.end(), ';') == 0){
             hexfile << "Error: Missing semicolon at line " << line_num << "\n";
             ERR = true;
             continue;
@@ -247,18 +242,12 @@ int main(int argc, char **argv){
 
         line = line.substr(0, line.find_first_of(';'));
 
-        if (!line.size()) {
-            hexfile << "0000000\n";
-            continue;
-        }
-
-        else if (line.size() < 3){
+        if (line.size() < 3){
             hexfile << "Error: Invalid line at line " << line_num << "\n";
             ERR = true;
             continue;
         }
         
-
         parse(line_num, line, labels, hexfile);
     }
     hexfile << flush;
@@ -266,6 +255,12 @@ int main(int argc, char **argv){
     assembly_code.close();
     hexfile.close();
 
+    if (ERR){
+        cout << "Error: Errors were found in the assembly code. Check the output file for more details." << endl;
+        if (make_bin) cout << "Error: Failed to generate binary code." << endl;
+        return ASSEMBLY_CODE_ERROR;
+    }
+    
     cout << "Hex code generated successfully. Check the output file: " << output << endl;
 
     // Binary code generation
@@ -275,13 +270,6 @@ int main(int argc, char **argv){
         cout << "Specifically told not to generate binary code. Exiting the program." << endl;
         return 0;
     }
-    else if (ERR){
-        cout << "Error: Errors were found in the assembly code. Check the output file for more details." << '\n';
-        cout << "Error: Failed to generate binary code." << endl;
-        return ASSEMBLY_CODE_ERROR;
-    }
-
-    // Converting the hexcode to binary code and storing it in bin.txt
     
     // Checking whether we are able to open the input file
     ifstream hexfile_read(output);

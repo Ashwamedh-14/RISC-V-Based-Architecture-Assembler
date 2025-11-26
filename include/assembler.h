@@ -27,9 +27,11 @@ struct Instruction {
 
 // Helper Functions
 void toUpper(std::string &s);
-std::string hexBinConversion(char c);
 std::string strip(const std::string &s);
 std::string sanitizeLine(const std::string &s);
+
+// Check functions
+std::string hexBinConversion(char c);
 bool isValidLabel(const std::string &s);
 bool isLabelRecorded(const std::string &s, const std::map<std::string, size_t> &labels);
 

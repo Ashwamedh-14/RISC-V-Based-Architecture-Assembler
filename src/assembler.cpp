@@ -22,6 +22,8 @@
 #define INVALID_REG_NUM 111
 #define INVALID_DAT_REF 112
 #define INVALID_LABEL_REF 113
+#define INVALID_INPUT_PORT 114
+#define INVALID_OUTPUT_PORT 115
 
 using namespace std;
 
@@ -44,6 +46,11 @@ static const string BIN_STR[] = {
     "1000", "1001", "1010", "1011",
     "1100", "1101", "1110", "1111"
 };
+
+static const string INPUT_PORTS[] = {"F1", "F2", "F3", "F4"};
+
+static const string OUTPUT_PORTS[] = {"F8", "F9", "FA", "FB"};
+
 
 static const Opcode OP_TABLE[] = {
     {0x00, "NOP", "00"},
@@ -78,9 +85,10 @@ static const Opcode OP_TABLE[] = {
 };
 
 static const size_t OP_TABLE_SIZE = sizeof(OP_TABLE) / sizeof(OP_TABLE[0]); // Should be 29 for now
+static const size_t INPUT_PORT_NUMBERS = sizeof(INPUT_PORTS) / sizeof(INPUT_PORTS[0]);
+static const size_t OUTPUT_PORT_NUMBERS = sizeof(OUTPUT_PORTS) / sizeof(OUTPUT_PORTS[0]);
 
 // Helper functions
-
 const Opcode* findOpcode(const string &name){
     for (size_t i = 0; i < OP_TABLE_SIZE; i++){
         if (OP_TABLE[i].opcode == name) return &OP_TABLE[i];
@@ -94,6 +102,15 @@ void toUpper(string &s){
             c = c - 32; // Convert to uppercase
         }
     }
+}
+
+// Function to check whether a string is present in the given array
+// If yes, returns the index, if no returns -1
+int isPresent(const string &s, const string *array, size_t array_size){
+    for (size_t i = 0; i < array_size; i++){
+        if (array[i] == s) return i;
+    }
+    return -1;
 }
 
 string strip(const string &s) {
@@ -370,6 +387,18 @@ uint8_t parse(size_t line_num, const string &line, const map<string, size_t> &la
         out_file << "But non was passed.\n";
         ERR = true;
         return INVALID_DAT_REF;
+    }
+    else if (instr.opcode->opcode == "IN" && isPresent(instr.dataline, INPUT_PORTS, INPUT_PORT_NUMBERS) == -1){
+        out_file << "Error (Code 114): Invalid input port at line number " << line_num << ".\n";
+        out_file << "Passed port: " << instr.dataline << ".\n";
+        ERR = true;
+        return INVALID_INPUT_PORT;
+    }
+    else if (instr.opcode->opcode == "OUT" && isPresent(instr.dataline, OUTPUT_PORTS, OUTPUT_PORT_NUMBERS) == -1){
+        out_file << "Error (Code 115): Invalid output port at line number " << line_num << ".\n";
+        out_file << "Passed port: " << instr.dataline << ".\n";
+        ERR = true;
+        return INVALID_OUTPUT_PORT;
     }
     else if (instr.dataline.empty()) instr.dataline = "00";
 
