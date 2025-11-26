@@ -11,14 +11,21 @@ People can specify the files to read or written to by the use of command line ar
 ./Assembler <input_file>.txt <output_file>.txt <binary_file>.txt
 
 The assembly code should be written in the following format:
-1. Each line should contain only one instruction.
+1. Each line should contain only one instruction or a label.
 2. The instruction should be written in the following format:
     <OPCODE>, <REGISTER1>, <REGISTER2>, <REGISTER3>, <DATALINE>;
     where:
     a. OPCODE: The operation code of the instruction. It should be written in uppercase.
     b. REGISTER1, REGISTER2, REGISTER3: The registers used in the instruction. The registers should be written in the format "R<register number>". The register number should be written in decimal.
-    c. DATALINE: The data to be used in the instruction. It should be written in hexadecimal. Can be PORT or MEM Address too
+    c. DATALINE: The data to be used in the instruction. It should be written in hexadecimal, unless a label name. Can be PORT Address, MEM Address or a existing Label name too.
 3. The instruction should be followed by a semicolon.
+4. A label should be written in the following format:
+    <Label_Name>:
+    where <Label_Name> is a valid name of a label.
+5. Rules regarding labels are:
+    a. A line with a label should always end with a colon
+    b. A label must always start with an alphabet or an underscore
+    c. Only alphanumeric characters and underscores are allowed in valid label names.
 */
 
 // Including the header file for getopt
@@ -53,15 +60,21 @@ using namespace std;
 void usage(void);  // Function to tell what to pass is expected in command line arguement
 
 int main(int argc, char **argv){
-    string input = "asmcode.txt";     // Default input file
-    string output = "hexcode.txt";    // Default output file
-    string binary = "bin.txt";         // Default binary file
-    size_t line_num = 0;           // Line number of the assembly code
+    string input = "asmcode.txt";       // Default input file
+    string output = "hexcode.txt";      // Default output file
+    string binary = "bin.txt";          // Default binary file
+    string formatted = "format.txt";    // Default format file for assembly
+    string line;
+    size_t line_num = 0;                // Line number of the assembly code
     bool make_bin = true; // Flag to check whether to make binary code or not
     char c;         // Variable to store the command line argument
     map<string, size_t> labels;
+
+    // Setting ERR to false;
+    ERR = false;
+
     // Using getopt to parse the command line arguments
-    while((c = getopt(argc, argv, ":i:o:nhb:")) != -1) {
+    while((c = getopt(argc, argv, ":i:o:b:f:nh")) != -1) {
         switch (c) {
             case 'i':
                 input = optarg;
@@ -83,6 +96,14 @@ int main(int argc, char **argv){
                 binary = optarg;
                 if (binary.find_last_of('.') == string::npos || binary.substr(binary.find_last_of('.') +1) != "txt"){
                     cout << "Error: Invalid binary file. The binary file should be a text file.\n";
+                    ERR = true;
+                }
+                break;
+
+            case 'f':
+                formatted = optarg;
+                if (formatted.find_last_of('.') == string::npos || formatted.substr(binary.find_last_of('.') +1) != "txt"){
+                    cout << "Error: Invalid format file. The format file should be a text file.\n";
                     ERR = true;
                 }
                 break;
@@ -120,7 +141,78 @@ int main(int argc, char **argv){
     }
     
     
-    // Checking whether we are able to open the output file
+    // Checking whether we are able to open the format file
+    ofstream format_file(formatted);
+    if (!format_file.is_open()){
+        cout << "Error: File " << formatted << " was not found, or we were unable to open it.\n";
+        cout << "Check whether you have the file in the same directory, as well as the permission to write to it" << endl;
+        return UNABLE_TO_OPEN_OUTPUT_FILE;
+    }
+
+    // First pass
+    // Formatting Assembly code
+    // This parse does not check whether the line is valid instruction or not.
+    // It checks just two things:
+    // 1. If the line is blank, skip it, don't include it in the formatted assembly code
+    // 2. If a label is encountered, check it, record it along with its line number, and replace it with an NOP statement
+    //
+    // **NOTE**
+    // Since the labels will be replaced with the hexadecimal value of their locations in JMP statements, their line numbering starts from 0.
+    while(getline(assembly_code, line)){      
+        // Sanitizing
+        line = sanitizeLine(line);
+        
+        // The line should be now completely uppercase, stripped of leading and trailing whitespaces and tabs, and comments removed.
+        if (!line.size()) continue;
+        else if (isValidLabel(line)) {
+            // Removes the last colon, and strips the remaining word to remove whitspaces and tab characters
+            // which could have been placed in between the label name and semi-colon
+            line = strip(line.substr(0, line.size() - 1));      
+            if (isLabelRecorded(line, labels)){
+                format_file << "Error: Duplicate label '" << line << "' at line number " << ++line_num << ".\n";     // ++line_number for human understandable line numbering
+                format_file << "Label already defined at line number " << labels[line] << ".\n";
+                ERR = true;
+                continue;
+            }
+            labels[line] = line_num;
+            format_file << "NOP;\n";
+        }
+        else{
+            line = line.substr(0, line.find_first_of(';'));
+            if (!line.size()) continue;                           // Skip the line with only a semi-colon present;
+            format_file << line << ";\n";
+        }
+        line_num++;
+    }
+    
+    // flushing the formatted file
+    format_file << flush;
+
+    format_file.close();
+    assembly_code.close();
+    
+
+    // At this point, all the assembly code should be formatted neatly in our intermediate text file.
+    // There will be no spaces, all labels would be recorded and stored in a map to their expected line number.
+    // Now we check if we hit any error, if yes, we don't begin the second parsing
+
+    if (ERR) {
+        cout << "Found Errors in labelling. Not converting to hex_code. See file: " << formatted << " for errors.\n";
+        cout << "Exiting..." << endl;
+        return ASSEMBLY_CODE_ERROR;
+    }
+
+    // If no errors were found, we open formatted file in read mode, and hex file in write mode.
+    
+    ifstream format_read(formatted);
+    if (!format_read.is_open()){
+        cout << "Error: File " << formatted << " was not found, or we were unable to open it.\n";
+        cout << "Check whether you have the file in the same directory, as well as the permission to read it" << endl;
+        return UNABLE_TO_OPEN_INPUT_FILE;
+    }
+    
+    
+    // Checking whether we are able to open the format file
     ofstream hexfile(output);
     if (!hexfile.is_open()){
         cout << "Error: File " << output << " was not found, or we were unable to open it.\n";
@@ -128,11 +220,12 @@ int main(int argc, char **argv){
         return UNABLE_TO_OPEN_OUTPUT_FILE;
     }
     
-    string line;
-
+    // Resetting the line number
+    line_num = 0;
+    
     hexfile << "v2.0 raw\n";
 
-    while(getline(assembly_code,line)){
+    while(getline(format_read,line)){
         
         line_num++;
         
@@ -232,6 +325,7 @@ void usage(void) {
     cout << "  -i <input_file> : Input file containing assembly code (default: asmcode.txt)\n";
     cout << "  -o <output_file> : Output file to write hex code (default: hexcode.txt)\n";
     cout << "  -b <binary_file> : Output file to write binary code (default: bin.txt)\n";
+    cout << "  -f <format_file> : Format file to write formatted code (default: format.txt)\n";
     cout << "  -n : Tells to not generate binary code\n";
     cout << "  -h : Show this help message. It will override the execution of the program and only show this message\n";
     cout << "\n\nKindly Note:-\n";

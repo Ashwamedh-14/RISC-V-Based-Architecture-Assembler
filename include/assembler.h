@@ -26,9 +26,13 @@ struct Instruction {
 };
 
 // Helper Functions
+void toUpper(std::string &s);
 std::string hexBinConversion(char c);
 std::string strip(const std::string &s);
-void toUpper(std::string &s);
+std::string sanitizeLine(const std::string &s);
+bool isValidLabel(const std::string &s);
+bool isLabelRecorded(const std::string &s, const std::map<std::string, size_t> &labels);
+
 
 // Main Functions
 uint8_t instr_chk(Instruction &instr, const std::map<std::string, size_t> &labels); // Function to check whether the values in Instruction are correct

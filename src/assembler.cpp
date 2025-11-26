@@ -102,6 +102,15 @@ string strip(const string &s) {
     return (start == string::npos) ? "" : s.substr(start, end - start + 1);
 }
 
+// This function removes comments, makes the line uppercase, and returns it removing leading and trailing whitespaces or tabs.
+string sanitizeLine(const string &s){
+    string uncommented = s;
+    size_t comment = s.find("//");              // Comments can be specified by starting the comment with '//'
+    if (comment != string::npos) uncommented = s.substr(0, comment);
+    toUpper(uncommented);
+    return strip(uncommented);
+}
+
 bool isValidLabel(const string &s){
     string label;
     string stripped;
@@ -127,6 +136,13 @@ bool isValidLabel(const string &s){
 bool isLabelRecorded(const string &s, const map<string, size_t> &labels){
     if (labels.find(s) == labels.end()) return false;
     return true;
+}
+
+string hexBinConversion(char c) {
+    for (uint8_t i = 0; i < 16; i++){
+        if (HEX_CHARS[i] == c) return BIN_STR[i];
+    }
+    return "xxxx";
 }
 
 /*
@@ -361,11 +377,4 @@ uint8_t parse(size_t line_num, const string &line, const map<string, size_t> &la
     
     return 0;
 
-}
-
-string hexBinConversion(char c) {
-    for (uint8_t i = 0; i < 16; i++){
-        if (HEX_CHARS[i] == c) return BIN_STR[i];
-    }
-    return "xxxx";
 }
