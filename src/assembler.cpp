@@ -22,8 +22,9 @@
 #define INVALID_REG_NUM 111
 #define INVALID_DAT_REF 112
 #define INVALID_LABEL_REF 113
-#define INVALID_INPUT_PORT 114
-#define INVALID_OUTPUT_PORT 115
+#define INVALID_LABEL_USE 114
+#define INVALID_INPUT_PORT 115
+#define INVALID_OUTPUT_PORT 116
 
 using namespace std;
 
@@ -223,7 +224,9 @@ uint8_t instr_chk(Instruction &instr, const map<string, size_t> &labels){
             if (instr.dataline.size() == 1) instr.dataline = "0" + instr.dataline;
             return 0;
         }
-    
+
+        // Now that we know it really is a label and is defined in the source code, we check whether the opcode provided is the correct one.
+        if (instr.opcode->opcode.substr(0,3) != "JMP") return INVALID_LABEL_USE;
         temp = labels.at(instr.dataline);
         if (temp > 255) return JUMP_OUT_OF_RANGE;
         else if (temp == 0){
@@ -246,7 +249,7 @@ uint8_t instr_chk(Instruction &instr, const map<string, size_t> &labels){
 
 
 // Main Parsing Logic
-uint8_t parse(size_t line_num, const string &line, const map<string, size_t> &labels, ofstream &out_file) {
+uint8_t parse(size_t line_num, const string &line, const string block_label, const map<string, size_t> &labels, ofstream &out_file) {
     Instruction instr;
     string word;
     string wrong_code;
@@ -266,6 +269,7 @@ uint8_t parse(size_t line_num, const string &line, const map<string, size_t> &la
     // Getting rest of the instructions
     while (getline(ss, word, ',')){
         if (param_num >= 4){
+            if (!block_label.empty()) out_file << "In block: " << block_label << ".\n";
             out_file << "Error (Code 100): Bad line at line number " << line_num << ".\n";
             out_file << "Too many parameters passed.\n";
             ERR = true;
@@ -274,6 +278,7 @@ uint8_t parse(size_t line_num, const string &line, const map<string, size_t> &la
         word = strip(word);
         
         if (word.empty()){
+            if (!block_label.empty()) out_file << "In block: " << block_label << ".\n";
             out_file << "Error (Code 100): Bad line at line number " << line_num << " and parameter number " << param_num << ".\n";
             out_file << "Passed value:  \"\".\n";
             ERR = true;
@@ -283,6 +288,7 @@ uint8_t parse(size_t line_num, const string &line, const map<string, size_t> &la
         else if (word[0] == 'R' && word.size() > 3) instr.dataline = word;
         
         else if (word[0] == 'R' && instr.reg_num >= 3){
+            if (!block_label.empty()) out_file << "In block: " << block_label << ".\n";
             out_file << "Error (Code 111): Too many register references at line number " << line_num << ".\n";
             out_file << "Maximum Register References allowed: 3.\n";
             ERR = true;
@@ -294,12 +300,15 @@ uint8_t parse(size_t line_num, const string &line, const map<string, size_t> &la
     }
 
     error_num = instr_chk(instr, labels);
+    
+    // checking to see if there is any error, to get a default message for all switch cases with error;
+    if (error_num && !block_label.empty()) out_file << "In block: " << block_label << ".\n";
 
     switch (error_num){
         case 0:
             // No error
             break;
-
+   
         case INVALID_OPCODE:
             out_file << "Error (Code 101): Invalid opcode: " << wrong_code << ", at line " << line_num << ".\n";
             out_file << "Hint: Check for typos or undefined instruction mnemonic.\n";
@@ -355,11 +364,17 @@ uint8_t parse(size_t line_num, const string &line, const map<string, size_t> &la
             break;
 
         case INVALID_LABEL_REF:
-            out_file << "Error (Code 113): Referenced Label: " << instr.dataline << " at line" << line_num << "not found.\n";
+            out_file << "Error (Code 113): Referenced Label: " << instr.dataline << " at line " << line_num << " not found.\n";
             out_file << "The error could either be due to invalid label name, or no label of same name was found.\n";
             ERR = true;
             break;
-        
+
+        case INVALID_LABEL_USE:
+            out_file << "Error (Code 114): Inavlid use of label with opcode " << instr.opcode->opcode << ", at line " << line_num  << ".\n";
+            out_file << "The error is because labels are explicitly only to be used with `jmp`, or similar statements.\n";
+            ERR = true;
+            break;
+
         default:
             out_file << "Error (Code 100): Bad line at line number " << line_num << ".\n";
             ERR = true;
@@ -369,6 +384,7 @@ uint8_t parse(size_t line_num, const string &line, const map<string, size_t> &la
     if (error_num) return error_num;
 
     else if (param_num != (instr.opcode->instr_num & 0x03)){       // Checking the 2 LSB bits for expected number of parameters
+        if (!block_label.empty()) out_file << "In block: " << block_label << ".\n";
         out_file << "Error (Code 110): Invalid number of parameters for OPCODE: " << instr.opcode->opcode << ", at line number " << line_num << ".\n";
         out_file << "Expected number of parameters: " << (instr.opcode->instr_num & 0x03) << ", ";
         out_file << "Received: " << param_num << ".\n";
@@ -376,6 +392,7 @@ uint8_t parse(size_t line_num, const string &line, const map<string, size_t> &la
         return INVALID_PARAM_NUM;
     }
     else if (instr.reg_num != ((instr.opcode->instr_num >> 2) & 0x03)) { // Shifting 2 bits and checking the 2 LSB bits for expected number of register references
+        if (!block_label.empty()) out_file << "In block: " << block_label << ".\n";
         out_file << "Error (Code 111): Invalid number of registers referenced for OPCODE: " << instr.opcode->opcode << ", at line number " << line_num << ".\n";
         out_file << "Expected number of refereced registers: " << ((instr.opcode->instr_num >> 2) & 0x03) << ", ";
         out_file << "Received: " << instr.reg_num << ".\n";
@@ -383,23 +400,28 @@ uint8_t parse(size_t line_num, const string &line, const map<string, size_t> &la
         return INVALID_REG_NUM;
     }
     else if ((instr.opcode->instr_num & 0x10) && instr.dataline.empty()){
+        if (!block_label.empty()) out_file << "In block: " << block_label << ".\n";
         out_file << "Error (Code 112): Expected Data on Dataline for OPCODE: " << instr.opcode->opcode << ", at line number " << line_num << " ";
         out_file << "But non was passed.\n";
         ERR = true;
         return INVALID_DAT_REF;
     }
     else if (instr.opcode->opcode == "IN" && isPresent(instr.dataline, INPUT_PORTS, INPUT_PORT_NUMBERS) == -1){
-        out_file << "Error (Code 114): Invalid input port at line number " << line_num << ".\n";
+        if (!block_label.empty()) out_file << "In block: " << block_label << ".\n";
+        out_file << "Error (Code 115): Invalid input port at line number " << line_num << ".\n";
         out_file << "Passed port: " << instr.dataline << ".\n";
         ERR = true;
         return INVALID_INPUT_PORT;
     }
     else if (instr.opcode->opcode == "OUT" && isPresent(instr.dataline, OUTPUT_PORTS, OUTPUT_PORT_NUMBERS) == -1){
-        out_file << "Error (Code 115): Invalid output port at line number " << line_num << ".\n";
+        if (!block_label.empty()) out_file << "In block: " << block_label << ".\n";
+        out_file << "Error (Code 116): Invalid output port at line number " << line_num << ".\n";
         out_file << "Passed port: " << instr.dataline << ".\n";
         ERR = true;
         return INVALID_OUTPUT_PORT;
     }
+
+    // If after all these checkes, dataline is still empty, it means the dataline is not used, so we write "00" to it
     else if (instr.dataline.empty()) instr.dataline = "00";
 
     out_file << instr.opcode->hex << instr.registers[0] << instr.registers[1] << instr.registers[2] << instr.dataline << "\n";

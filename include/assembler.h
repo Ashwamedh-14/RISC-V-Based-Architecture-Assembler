@@ -35,10 +35,9 @@ std::string hexBinConversion(char c);
 bool isValidLabel(const std::string &s);
 bool isLabelRecorded(const std::string &s, const std::map<std::string, size_t> &labels);
 
-
 // Main Functions
 uint8_t instr_chk(Instruction &instr, const std::map<std::string, size_t> &labels); // Function to check whether the values in Instruction are correct
-uint8_t parse(size_t line_num, const std::string &line, const std::map<std::string, size_t> &labels, std::ofstream &out_file); // Function to parse the instruction and check for errors
+uint8_t parse(size_t line_num, const std::string &line, const std::string block_label, const std::map<std::string, size_t> &labels, std::ofstream &out_file); // Function to parse the instruction and check for errors
 
 extern bool ERR;
 

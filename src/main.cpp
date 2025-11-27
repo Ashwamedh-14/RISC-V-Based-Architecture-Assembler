@@ -45,6 +45,7 @@ extern "C" {                            // This ensure this particular code is c
 #include <map>
 #include <regex>
 #include <string>
+#include <filesystem>
 
 #define INVALID_INPUT_FILE 1
 #define INVALID_OUTPUT_FILE 2
@@ -64,21 +65,27 @@ int main(int argc, char **argv){
     string output = "hexcode.txt";      // Default output file
     string binary = "bin.txt";          // Default binary file
     string formatted = "format.txt";    // Default format file for assembly
+    string label = "";                  // Keeping label blank in case there is no label at line 0
     string line;
-    size_t line_num = 0;                // Line number of the assembly code
-    bool make_bin = true; // Flag to check whether to make binary code or not
+    size_t line_num = 0;                // Line number of the assembly code 
     char c;         // Variable to store the command line argument
     map<string, size_t> labels;
 
     // Setting ERR to false;
     ERR = false;
-
+    /*
+     * Flag to make checks
+     * 0th bit set. Make a binary file (default);
+     * 1st bit set. Only compile till the formatted file, will generate the format file
+     * 2nd bit set. Generate the format file. Set with flag -f
+    */
+    unsigned char flag = 0x01;
     // Using getopt to parse the command line arguments
-    while((c = getopt(argc, argv, ":i:o:b:f:nh")) != -1) {
+    while((c = getopt(argc, argv, ":i:o:b:f:cnh")) != -1) {
         switch (c) {
             case 'i':
                 input = optarg;
-                if (input.find_last_of('.') == string::npos || input.substr(input.find_last_of('.') +1) != "txt"){
+                if (input.find_last_of('.') == string::npos || input.substr(input.find_last_of('.') + 1) != "txt"){
                     cout << "Error: Invalid input file. The input file should be a text file.\n";
                     ERR = true;
                 }
@@ -86,7 +93,7 @@ int main(int argc, char **argv){
 
             case 'o':
                 output = optarg;
-                if (output.find_last_of('.') == string::npos || output.substr(output.find_last_of('.') +1) != "txt"){
+                if (output.find_last_of('.') == string::npos || output.substr(output.find_last_of('.') + 1) != "txt"){
                     cout << "Error: Invalid output file. The output file should be a text file.\n";
                     ERR = true;
                 }
@@ -94,22 +101,27 @@ int main(int argc, char **argv){
 
             case 'b':
                 binary = optarg;
-                if (binary.find_last_of('.') == string::npos || binary.substr(binary.find_last_of('.') +1) != "txt"){
+                if (binary.find_last_of('.') == string::npos || binary.substr(binary.find_last_of('.') + 1) != "txt"){
                     cout << "Error: Invalid binary file. The binary file should be a text file.\n";
                     ERR = true;
                 }
                 break;
 
             case 'f':
+                flag |= 0x04;
                 formatted = optarg;
-                if (formatted.find_last_of('.') == string::npos || formatted.substr(binary.find_last_of('.') +1) != "txt"){
+                if (formatted.find_last_of('.') == string::npos || formatted.substr(binary.find_last_of('.') + 1) != "txt"){
                     cout << "Error: Invalid format file. The format file should be a text file.\n";
                     ERR = true;
                 }
                 break;
 
+            case 'c':
+                flag |= 0x02;
+                break;
+
             case 'n':
-                make_bin = false;
+                flag &= 0xfe;         // Resetting bit 0;
                 break;
 
             case 'h':
@@ -176,10 +188,10 @@ int main(int argc, char **argv){
                 continue;
             }
             labels[line] = line_num;
-            format_file << "NOP;\n";
+            format_file << line << ":\n";
         }
         else{
-            line = line.substr(0, line.find_first_of(';'));
+            line = strip(line.substr(0, line.find_first_of(';')));
             if (!line.size()) continue;                           // Skip the line with only a semi-colon present;
             format_file << line << ";\n";
         }
@@ -198,10 +210,13 @@ int main(int argc, char **argv){
     // Now we check if we hit any error, if yes, we don't begin the second parsing
 
     if (ERR) {
-        cout << "Found Errors in labelling. Not converting to hex_code. See file: " << formatted << " for errors.\n";
+        cout << "Found Errors in labelling.\n";
+        if (!(flag & 0x02)) cout << "Not converting to hex_code. See file: " << formatted << " for errors.\n";
         cout << "Exiting..." << endl;
         return ASSEMBLY_CODE_ERROR;
     }
+
+    if (flag & 0x02) return 0;
 
     // If no errors were found, we open formatted file in read mode, and hex file in write mode.
     
@@ -233,8 +248,15 @@ int main(int argc, char **argv){
         
         // Convert assembly code to hex
         // and write to hexfile
+        
+        if (isValidLabel(line)){
+            label = line.substr(0, line.size() - 1);
+            hexfile << "0000000\n";
+            continue;
+        }
 
-        if (count(line.begin(), line.end(), ';') == 0){
+        else if (count(line.begin(), line.end(), ';') == 0){
+            if (!label.empty()) hexfile << "In block: " << label << "\n";
             hexfile << "Error: Missing semicolon at line " << line_num << "\n";
             ERR = true;
             continue;
@@ -243,21 +265,24 @@ int main(int argc, char **argv){
         line = line.substr(0, line.find_first_of(';'));
 
         if (line.size() < 3){
+            if (!label.empty()) hexfile << "In block: " << label << "\n";
             hexfile << "Error: Invalid line at line " << line_num << "\n";
             ERR = true;
             continue;
         }
-        
-        parse(line_num, line, labels, hexfile);
+        parse(line_num, line, label, labels, hexfile);
     }
     hexfile << flush;
 
-    assembly_code.close();
+    format_read.close();
     hexfile.close();
+
+    if (!(flag & 0x04)) filesystem::remove(formatted);
 
     if (ERR){
         cout << "Error: Errors were found in the assembly code. Check the output file for more details." << endl;
-        if (make_bin) cout << "Error: Failed to generate binary code." << endl;
+        if (!(flag & 0x04)) cout << "If your source code had blank lines and labels, generate the formatted file and check against that file." << endl;
+        if (flag & 0x01) cout << "Error: Failed to generate binary code." << endl;
         return ASSEMBLY_CODE_ERROR;
     }
     
@@ -266,7 +291,7 @@ int main(int argc, char **argv){
     // Binary code generation
 
     // Condition to check whether the user specified not to generate binary code
-    if (!make_bin){
+    if (!(flag & 0x01)){
         cout << "Specifically told not to generate binary code. Exiting the program." << endl;
         return 0;
     }

@@ -14,7 +14,7 @@ Following are the list of abbreviations that have / will be used:-
 
 | Abbreviations | Refers To                                 |
 |---------------|-------------------------------------------|
-| COA           | Computer Organisation and Architecture    |
+| COA           | Computer Organization and Architecture    |
 | CSE302        | Refers to COA                             |
 | SEAS          | School of Engineering and Applied Sciences|
 | AU            | Ahmedabad University                      |
@@ -58,6 +58,8 @@ If the executable does not run on your Linux system, follow the build instructio
 
 ### Building from Source
 
+> **Note:** Ensure you have `g++` and `make` installed. Use your system's package manager (e.g., sudo apt install build-essential on Debian based distros).
+
 Clone the repo and build the executable using the below given commands.
 
 ``` bash
@@ -68,7 +70,6 @@ make
 
 The compiled binary will be located at bin/Assembler
 
-> **Note:** Ensure you have `g++` and `make` installed. Use your system's package manager (e.g., sudo apt install build-essential on Debian based distros).
 
 ## Using
 
@@ -114,9 +115,11 @@ The general syntax of command line arguments are:
 
 Here, `-flag` can mean any-one, or more of the following:
 
-- `-i \<input_file\>`: Input file containing `assembly` code (default: asmcode.txt)
-- `-o \<output_file\>`: Output file in which `hexadecimal` code will be stored (default: hexcode.txt)
-- `-b \<binary_file\>`: Output file in which `binary` code will be stored (default: bin.txt)
+- `-i <input_file>`: Input file containing `assembly` code (default: asmcode.txt)
+- `-o <output_file>`: Output file in which `hexadecimal` code will be stored (default: hexcode.txt)
+- `-b <binary_file>`: Output file in which `binary` code will be stored (default: bin.txt)
+- `-f <format_file>`: Intermediate file in which a formatted assembly code will be stored. Generates the formatted file.
+- `-c`: Tells `Assembler` to stop execution after formatted file is constructed. Naturally, generates the formatted file.
 - `-n`: Tells `Assembler` to not generate `binary` code
 - `-h`: Outputs the help message, as given here
 
@@ -127,6 +130,18 @@ Kindly keep the following points in mind
 - `-n` will always override the behavior of `-b`.
 - `-h` will always override the behavior of rest of the flags. In fact, passing the `-h` flag means the `Assembler` will only output the help section, and will not assemble your source code.
 - All I/O files are supposed to be text files.
+
+### **NEW** Format File
+
+In version 2.0 and onwards, before the actual parsing and assembling of your code occurs, the Assembler first formats your source code and puts it into a text file which by default is named `format.txt`.
+
+In this step, the following things happen:
+1. All comments are removed.
+2. All leading and trailing spaces are removed
+3. All blank lines are removed
+4. Labels defined are recorded along with their line numbers.
+
+It is important to remember that you should not attempt to modify the generated formatted code. Rather, just modify your source code.
 
 ## Syntax
 
@@ -168,9 +183,99 @@ AND,R12,R1,R2;        This is a comment
                       This is not a comment and will be parsed
 ```
 
-### Blank Lines
+**NEW: Version 2 and Onwards**
 
-Blank lines are replaced with `0000000`, i.e. `NOP`, in `hexcode.txt`
+`//` can be used to demarcate the start of a comment. In fact, its preferable this way.
+
+### **NEW:** Labels
+
+From Version 2 and onwards, the assembler supports labelling blocks of code.
+
+For a label to be valid, it must:
+
+1. Not be a `keyword`. 
+2. Start with an alphabet or a `_`.
+3. Only contain alphanumeric characters or `_`.
+
+Kindly note that labels are case-insensitive. So `label`, `LABEL`, `lABEL`, `Label`, etc., all mean the same thing.
+
+Therefore, some valid labels are:
+
+``` txt
+_
+_____
+label
+_1
+_start
+f9
+example_10
+```
+
+Keep in mind while the first 2 are also valid label names, why would you want to do that???
+
+Some invalid labels are:
+
+``` txt
+9label
+first label
+label@1
+life!@#$
+```
+
+To define a label for a block of code, remember the following:
+
+1. The label for the block comes first.
+2. The line with the label should end with a colon `:`. **Do not** end it with a semicolon `;`.
+
+Hence, a valid label definition could be:
+
+```
+// Some code
+
+label:
+
+// Code for block label
+
+```
+
+> **NOTE**
+> A block of code belongs to a label, as long as the assembler doesn't encounter a new label
+
+Labels are only meant to be used in `jmp`, or similar instruction, statements. Therefore, you can write something along the lines of:
+
+``` txt
+// Some code
+
+label1:
+    // code for label1
+
+label2:
+    // code for label2
+    jmpz, label1;
+    
+label3:
+    // code for label3
+```
+
+Of course, you can still give the direct hexadecimal value of the line you want to jump to in a `jmp` statement, but it is not really encouraged
+
+```txt
+// Some code
+
+label1:
+    // code for label1
+
+label2:
+    // code for label2
+    jmpz, label1;           // recommended method
+    
+label3:
+    // code for label3
+    jmp, 0A;                // not recommended method
+```
+
+However, if for some reason you still want to give raw hexadecimal values to `jmp` statements, kindly then generate a formatted version of your assembly code to check errors against, if any.
+
 
 ### Points to remember
 
@@ -181,6 +286,7 @@ Blank lines are replaced with `0000000`, i.e. `NOP`, in `hexcode.txt`
   - `R01` is correct and also equivalent to `R1`
   - `RA` is incorrect
 - **All** `DAT`, `PORT Address`, `MEM Address` values are passed, parsed and taken as `8-bit hexadecimals`.
+- `jmp` statements can have both labels and direct hexadecimal values, though the use of labels is encouraged.
 
 ## Error Codes
 
@@ -203,7 +309,7 @@ These are the error numbers that you might encounter during runtime. Attached is
 ## Technical Details
 
 - For human readability, the line numbering will start from 1 in error messages.
-- For the programs themselves, the first line will be numbered 0, i.e, hardcoded jmp, or similar instructions, must be done keeping in mind the first line is line 0.
+- For the programs themselves, the first line will be numbered 0, i.e, hardcoded `jmp`, or similar instructions, must be done keeping in mind the first line is line 0.
 - The assembler is **case-insensitive**.
 - The processor is a `8-bit` processor, i.e., its `regs` are capable of storing `8 bits`, or a `byte`, of data at a time.
 - The processor has a `25-bit` wide `Instruction Memory Bus`, where:
