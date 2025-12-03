@@ -11,3 +11,4 @@ tests/outputs
 !tests/expected/hex/*
 *.o
 *.json
+*.cache

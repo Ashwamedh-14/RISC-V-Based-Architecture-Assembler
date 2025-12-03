@@ -5,7 +5,6 @@
 #include <regex>
 #include <map>
 #include <sstream>
-#include <algorithm>
 
 // Defining Error Codes
 #define INVALID_LINE 100

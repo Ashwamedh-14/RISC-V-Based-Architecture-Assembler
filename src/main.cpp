@@ -40,12 +40,10 @@ extern "C" {                            // This ensure this particular code is c
 #include <iostream>
 #include <cstddef> // For size_t
 #include <fstream>
-#include <sstream>
-#include <vector>
 #include <map>
-#include <regex>
 #include <string>
 #include <filesystem>
+#include <algorithm>
 
 #define INVALID_INPUT_FILE 1
 #define INVALID_OUTPUT_FILE 2
