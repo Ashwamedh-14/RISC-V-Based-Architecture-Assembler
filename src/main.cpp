@@ -177,7 +177,7 @@ int main(int argc, char **argv){
         
         // The line should be now completely uppercase, stripped of leading and trailing whitespaces and tabs, and comments removed.
         if (!line.size()) continue;
-        else if (isValidLabel(line)) {
+        else if ((line.find(':') != string::npos) && isValidLabel(line)) {
             // Removes the last colon, and strips the remaining word to remove whitspaces and tab characters
             // which could have been placed in between the label name and semi-colon
             line = strip(line.substr(0, line.size() - 1));      
@@ -189,6 +189,12 @@ int main(int argc, char **argv){
             }
             labels[line] = line_num;
             format_file << line << ":\n";
+        }
+        else if (line.find(':') != string::npos){
+            format_file << "Error: Invalid label definition: '" << line << "', at line number << " << ++line_num << ".\n";
+            format_file << "Recheck valid label definitions.\n";
+            ERR = true;
+            continue;
         }
         else{
             line = strip(line.substr(0, line.find_first_of(';')));

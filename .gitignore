@@ -1,9 +1,12 @@
 .vscode
+bin
+obj
 *.exe
 test.*
 *.txt
 !version.txt
-!tests/*/*
+tests/outputs
+!tests/inputs/*
+!tests/expected/bin_f/*
+!tests/expected/hex/*
 *.o
-obj/
-bin

@@ -1,0 +1,6 @@
+AND,R1,R2,R3; this should be ignored
+OR,R4,R5,R6;    // inline comment
+EXOR,R1,R1,R1;
+// full line comment
+ADD,R2,R2,R2; // mixing comments
+NOP; more garbage here

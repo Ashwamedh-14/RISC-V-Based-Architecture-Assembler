@@ -73,51 +73,71 @@ preprocess:
 
 # Rule to run tests
 test: $(target) $(OUTPUT_DIR) preprocess
-	@echo "Running tests..."
-	@sh -c '\
-	FAILED=false; \
-	for test_case in $(TEST_CASES); do \
-		input="$(INPUT_DIR)/input_$$test_case.txt"; \
-		expected_hex="$(EXPECTED_DIR)/expected_hex_$$test_case.txt"; \
-		expected_bin="$(EXPECTED_DIR)/expected_bin_$$test_case.txt"; \
-		output_hex="$(OUTPUT_DIR)/output_hex_$$test_case.txt"; \
-		output_bin="$(OUTPUT_DIR)/output_bin_$$test_case.txt"; \
-		dos2unix $$input $$expected_hex $$expected_bin 2>/dev/null || true; \
-		echo "Running test 🧪 $$test_case:"; \
-		./$(target) -i $$input -o $$output_hex -b $$output_bin || { \
-			status=$$?; \
-			if [ $$status -eq 8 ] && [ ! -f $$expected_bin ]; then \
-				echo "✅ Test $$test_case passed (no expected binary output)."; \
-			else \
-				echo "❌ Test $$test_case failed with status code $$status"; \
-				FAILED=true; \
-			fi; \
-		}; \
-		echo "Comparing output with expected results..."; \
-		if cmp -s $$output_hex $$expected_hex; then \
-			echo "✅ Hex output matches expected results for test $$test_case"; \
-		else \
-			echo "❌ Hex output does not match expected results for test $$test_case"; \
-			git diff --no-index --color $$output_hex $$expected_hex; \
-			FAILED=true; \
-		fi; \
-		if [ -f $$expected_bin ]; then \
-			if cmp -s $$output_bin $$expected_bin; then \
-				echo "✅ Binary output matches expected results for test $$test_case"; \
-			else \
-				echo "❌ Binary output does not match expected results for test $$test_case"; \
-				git diff --no-index --color $$output_bin $$expected_bin; \
-				FAILED=true; \
-			fi; \
-		fi; \
-		echo "Test $$test_case completed."; \
+	@echo "==============================="
+	@echo "        Running Tests"
+	@echo "==============================="
+
+	@FAILED=false; \
+	for input_file in $(INPUT_DIR)/input_*.txt; do \
+	    case=$$(basename "$$input_file" .txt | sed 's/input_//'); \
+	    echo ""; \
+	    echo "🧪 Running test case: $$case"; \
+	    \
+	    input="$(INPUT_DIR)/input_$$case.txt"; \
+	    out_hex="$(OUTPUT_DIR)/hex/$$case.txt"; \
+	    out_bin="$(OUTPUT_DIR)/bin/$$case.txt"; \
+	    exp_hex="$(EXPECTED_DIR)/hex/$$case.txt"; \
+	    exp_bin="$(EXPECTED_DIR)/bin_f/$$case.txt"; \
+	    \
+	    : "Normalize Windows line endings"; \
+	    dos2unix $$input $$exp_hex $$exp_bin 2>/dev/null || true; \
+	    \
+	    : "Run assembler"; \
+	    if ! ./$(target) -i $$input -o $$out_hex -b $$out_bin; then \
+	        status=$$?; \
+	        if [ $$status -eq 8 ] && [ ! -f $$exp_bin ]; then \
+	            echo "   ✔ Status OK: Binary output intentionally skipped (code 8)"; \
+	        else \
+	            echo "   ❌ Assembler returned error code $$status"; \
+	            FAILED=true; \
+	            continue; \
+	        fi; \
+	    fi; \
+	    \
+	    echo "   🔍 Comparing hex output..."; \
+	    if cmp -s $$out_hex $$exp_hex; then \
+	        echo "   ✔ Hex OK"; \
+	    else \
+	        echo "   ❌ Hex mismatch!"; \
+	        git diff --no-index --color $$out_hex $$exp_hex; \
+	        FAILED=true; \
+	    fi; \
+	    \
+	    echo "   🔍 Comparing binary output..."; \
+	    if [ -f $$exp_bin ]; then \
+	        if cmp -s $$out_bin $$exp_bin; then \
+	            echo "   ✔ Bin OK"; \
+	        else \
+	            echo "   ❌ Bin mismatch!"; \
+	            git diff --no-index --color $$out_bin $$exp_bin; \
+	            FAILED=true; \
+	        fi; \
+	    else \
+	        echo "   ↪ No expected binary output — skipping."; \
+	    fi; \
+	    \
+	    echo "   ✓ Completed test $$case"; \
 	done; \
-	echo "All tests completed."; \
+	echo ""; \
+	echo "==============================="; \
+	echo "        Test Summary"; \
+	echo "==============================="; \
 	if [ "$$FAILED" = "true" ]; then \
+	    echo "❌ Some tests FAILED"; \
 	    exit 1; \
 	else \
 	    echo "✅ All tests passed successfully!"; \
-	fi'
+	fi
 
 
 

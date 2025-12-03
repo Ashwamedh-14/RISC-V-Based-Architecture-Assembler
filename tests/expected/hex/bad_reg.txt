@@ -1,0 +1,5 @@
+v2.0 raw
+Error (Code 106): Destination register (Rw) out of range at line 1.
+Hint: Only registers R0–R15 are valid.
+Error (Code 105): Invalid second source register (Ry) reference: RA, at line 2.
+Hint: Register names must be in the form R0–R15.

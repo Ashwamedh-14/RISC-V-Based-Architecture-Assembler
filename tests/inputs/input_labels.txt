@@ -1,0 +1,11 @@
+start:
+    NOP;
+    ADD,R1,R2,R3;
+    JMP,next;
+
+middle:
+    SUB,R4,R5,R6;
+
+NEXT:
+    ADDI,R7,R8,0A;
+    JMP,start;

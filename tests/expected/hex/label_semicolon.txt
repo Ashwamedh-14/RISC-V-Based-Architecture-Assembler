@@ -1,0 +1,4 @@
+v2.0 raw
+Error (Code 101): Invalid opcode: LOOP:, at line 1.
+Hint: Check for typos or undefined instruction mnemonic.
+0412300
