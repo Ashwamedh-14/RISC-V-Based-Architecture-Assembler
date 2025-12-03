@@ -184,12 +184,13 @@ int main(int argc, char **argv){
                 case 0:
                     if (isLabelRecorded(line, labels)){
                         format_file << "Error: Already duplicate label: " << strip(line.substr(0, line.size() - 1)) << ", at line number " << ++line_num << ".\n";
-                        format_file << "Labels should be unique!!!\n";
+                        format_file << "Label already defined at: " << labels[strip(line.substr(0, line.size() - 1))] + 1 << ".\n";
                         ERR = true;
                         continue;
                     }
                     line = sanitizeLine(line.substr(0, line.size() - 1));
                     labels[line] = line_num;
+                    format_file << line << ":\n";
                     break;
                 case 1:
                     format_file << "Empty labels are invalid\n";
@@ -220,6 +221,9 @@ int main(int argc, char **argv){
                     format_file << "Unknown Label Error\n";
                     ERR = true;
             }
+        }
+        else {
+
         }
         line_num++;
     }
