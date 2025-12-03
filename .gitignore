@@ -10,3 +10,4 @@ tests/outputs
 !tests/expected/bin_f/*
 !tests/expected/hex/*
 *.o
+*.json
