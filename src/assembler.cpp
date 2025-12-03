@@ -128,25 +128,34 @@ string sanitizeLine(const string &s){
     return strip(uncommented);
 }
 
-bool isValidLabel(const string &s){
+/*
+ * This function returns the following codes
+ * 0: All good
+ * 1: Empty label
+ * 2: Label ends with a semi-colon
+ * 3: Label does not end with a colon
+ * 4: Label is a valid OPCODE
+ * 5: Label is not a valid label name
+*/
+uint8_t isValidLabel(const string &s){
     string label;
     string stripped;
     
     stripped = strip(s);
     
     // Conditions
-    if (stripped.empty()) return false;                             // Should not be empty
-    else if (stripped.find(';') != string::npos) return false;      // Should not end with a semi-colon              
-    else if (stripped[stripped.size() - 1] != ':') return false;    // Should end with a colon
+    if (stripped.empty()) return 1;                             // Should not be empty
+    else if (stripped.find(';') != string::npos) return 2;      // Should not end with a semi-colon              
+    else if (stripped[stripped.size() - 1] != ':') return 3;    // Should end with a colon
 
     // If the above conditions are passed, we remove the colon, and strip the passed label again
     label = strip(stripped.substr(0, stripped.size() - 1));
     
     // return false if it is a valid OPCODE
-    if (findOpcode(label)) return false;
-    else if (!regex_match(label, REG_LABEL)) return false;
+    if (findOpcode(label)) return 4;
+    else if (!regex_match(label, REG_LABEL)) return 5;
 
-    return true;
+    return 0;
 
 }
 
@@ -216,7 +225,7 @@ uint8_t instr_chk(Instruction &instr, const map<string, size_t> &labels){
         
     // Checking valid dataline
     if (instr.dataline.empty()) return 0;
-    else if (isValidLabel(instr.dataline + ":")) {
+    else if (!isValidLabel(instr.dataline + ":")) {
         // It's syntactically a label; now check if it's defined
         if (!isLabelRecorded(instr.dataline, labels) && !regex_match(instr.dataline, REG_DAT)) return INVALID_LABEL_REF;
         else if (regex_match(instr.dataline, REG_DAT)){

@@ -32,7 +32,7 @@ std::string sanitizeLine(const std::string &s);
 
 // Check functions
 std::string hexBinConversion(char c);
-bool isValidLabel(const std::string &s);
+uint8_t isValidLabel(const std::string &s);
 bool isLabelRecorded(const std::string &s, const std::map<std::string, size_t> &labels);
 
 // Main Functions

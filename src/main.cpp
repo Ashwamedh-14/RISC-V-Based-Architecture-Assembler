@@ -175,29 +175,51 @@ int main(int argc, char **argv){
         
         // The line should be now completely uppercase, stripped of leading and trailing whitespaces and tabs, and comments removed.
         if (!line.size()) continue;
-        else if ((line.find(':') != string::npos) && isValidLabel(line)) {
-            // Removes the last colon, and strips the remaining word to remove whitspaces and tab characters
-            // which could have been placed in between the label name and semi-colon
-            line = strip(line.substr(0, line.size() - 1));      
-            if (isLabelRecorded(line, labels)){
-                format_file << "Error: Duplicate label '" << line << "' at line number " << ++line_num << ".\n";     // ++line_number for human understandable line numbering
-                format_file << "Label already defined at line number " << labels[line] << ".\n";
-                ERR = true;
-                continue;
-            }
-            labels[line] = line_num;
-            format_file << line << ":\n";
-        }
         else if (line.find(':') != string::npos){
-            format_file << "Error: Invalid label definition: '" << line << "', at line number << " << ++line_num << ".\n";
-            format_file << "Recheck valid label definitions.\n";
-            ERR = true;
-            continue;
-        }
-        else{
-            line = strip(line.substr(0, line.find_first_of(';')));
-            if (!line.size()) continue;                           // Skip the line with only a semi-colon present;
-            format_file << line << ";\n";
+            c = isValidLabel(line);         // Reusing 'c' here since the return type is uint8_t which is typically an unsigned char
+            
+            if (c) format_file << "Error: Invalid Label at line " << ++line_num << ".\n";
+
+            switch (c){
+                case 0:
+                    if (isLabelRecorded(line, labels)){
+                        format_file << "Error: Already duplicate label: " << strip(line.substr(0, line.size() - 1)) << ", at line number " << ++line_num << ".\n";
+                        format_file << "Labels should be unique!!!\n";
+                        ERR = true;
+                        continue;
+                    }
+                    line = sanitizeLine(line.substr(0, line.size() - 1));
+                    labels[line] = line_num;
+                    break;
+                case 1:
+                    format_file << "Empty labels are invalid\n";
+                    ERR = true;
+                    continue;
+
+                case 2:
+                    format_file << "Label ended with a semi-colon\n";
+                    ERR = true;
+                    continue;
+
+                case 3:
+                    format_file << "Label does not end with a colon\n";
+                    ERR = true;
+                    continue;
+
+                case 4:
+                    format_file << "Label: " << strip(line.substr(0, line.size() - 1)) << " is a valid OPCode, which is a reserved name\n";
+                    ERR = true;
+                    continue;
+
+                case 5:
+                    format_file << "Label: " << strip(line.substr(0, line.size() - 1)) << " is not a valid label name\n";
+                    ERR = true;
+                    continue;
+
+                default:
+                    format_file << "Unknown Label Error\n";
+                    ERR = true;
+            }
         }
         line_num++;
     }
