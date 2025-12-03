@@ -108,8 +108,8 @@ int main(int argc, char **argv){
             case 'f':
                 flag |= 0x04;
                 formatted = optarg;
-                if (formatted.find_last_of('.') == string::npos || formatted.substr(binary.find_last_of('.') + 1) != "txt"){
-                    cout << "Error: Invalid format file. The format file should be a text file.\n";
+                if (formatted.find_last_of('.') == string::npos || formatted.substr(formatted.find_last_of('.') + 1) != "txt"){
+                    cout << "Error: Invalid format file. The format file " << formatted << " should be a text file.\n";
                     ERR = true;
                 }
                 break;
@@ -223,7 +223,9 @@ int main(int argc, char **argv){
             }
         }
         else {
-
+            line = strip(line.substr(0, line.find_first_of(';')));
+            if (!line.size()) continue;                           // Skip the line with only a semi-colon present;
+            format_file << line << ";\n";
         }
         line_num++;
     }
@@ -279,7 +281,7 @@ int main(int argc, char **argv){
         // Convert assembly code to hex
         // and write to hexfile
         
-        if (isValidLabel(line)){
+        if (!isValidLabel(line)){
             label = line.substr(0, line.size() - 1);
             hexfile << "0000000\n";
             continue;

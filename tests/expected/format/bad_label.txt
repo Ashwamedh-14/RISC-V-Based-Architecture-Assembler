@@ -1,0 +1,3 @@
+Error: Invalid Label at line 1.
+Label: 9LABEL is not a valid label name
+ADD,R1,R1,R1;

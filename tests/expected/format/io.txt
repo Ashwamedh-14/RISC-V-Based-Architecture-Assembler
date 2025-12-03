@@ -1,0 +1,5 @@
+IN,R1,F1;
+IN,R2,F4;
+OUT,F8,R3;
+OUT,FA,R15;
+NOP;

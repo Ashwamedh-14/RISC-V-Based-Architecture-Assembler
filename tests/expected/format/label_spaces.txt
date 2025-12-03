@@ -1,0 +1,3 @@
+LOOP:
+ADD,R1,R1,R1;
+JMP,LOOP;
