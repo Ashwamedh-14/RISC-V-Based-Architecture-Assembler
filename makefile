@@ -15,7 +15,7 @@ BIN_DIR := bin
 INPUT_DIR := ./tests/inputs
 EXPECTED_DIR := ./tests/expected
 OUTPUT_DIR := ./tests/outputs
-test_file := test.sh
+test_file := ./test.sh
 
 # Source and Object Files
 SOURCE_CPP_FILES := $(wildcard $(SRC_DIR)/*.cpp)
@@ -63,8 +63,8 @@ windows: $(OBJECTS) | $(BIN_DIR)
 
 
 # Rule to run tests
-test: $(target) $(OUTPUT_DIR) $(test_file)
-
+test: $(target) $(INPUT_DIR) $(OUTPUT_DIR) $(EXPECTED_DIR) $(test_file)
+	$(test_file) $(target) $(INPUT_DIR) $(OUTPUT_DIR) $(EXPECTED_DIR)
 
 clean:
 	rm -rf $(OUTPUT_DIR)

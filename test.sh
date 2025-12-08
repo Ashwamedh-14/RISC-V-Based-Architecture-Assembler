@@ -109,10 +109,21 @@ echo "2. ALL THE DIRECTORIES CORRECTLY STRUCTURED"
 echo "3. ASSMEBLER CORRECTLY IN PLACE AND EXECUTABLE"
 echo -e "4. ALL THE EXPECTED FORMAT, HEX, and BIN files are in their place${RST}\n\n"
 
+sleep 10
+
 # Test cases
 echo -e "${BLU}Starting Test Cases:${RST}\n"
 case_num=1
-flag=0x00   # Flag to note whether hex and binary are required
+
+# Flag to note whether hex and binary are required
+# if 0th bit is set, then no binary file to generate
+# if 1st bit is set, then no binary and hex file to set
+# if 4th bit is set, binary or hex file was generated when they were not expected
+# if 6th bit is set, this test case has failed
+# if 7th bit is set, some test cases have failed
+flag=0x00   
+
+
 
 for input_file in "$INPUT_DIR"/input_*.txt; do
     name=$(basename $input_file .txt | sed 's/input_//')
@@ -127,7 +138,7 @@ for input_file in "$INPUT_DIR"/input_*.txt; do
     out_hex="$OUTPUT_HEX/$name.txt"
     out_bin="$OUTPUT_BIN/$name.txt"
 
-    echo "${BLU}Case:${RST} $case_num"
+    echo "${BLU}Test 🧪🧪 Case:${RST} $case_num"
     echo "${BLU}Input_file:${RST} $name"
     
     if [[ ! -f "$exp_fmt" ]]; then
@@ -142,13 +153,13 @@ for input_file in "$INPUT_DIR"/input_*.txt; do
     if [[ ! -f "$exp_hex" ]]; then
         echo "${YLW}NO hex file expected!!!"
         echo "NO binary file expected!!!${RST}"
-        flag=((flag | 0x02))
+        ((flag |= 0x02))
 
     elif [[ ! -f "$exp_bin" ]]; then
         echo "${BLU}Expected Hex code at:${RST} $exp_hex"
         echo "${BLU}Output Hex code at: ${RST} $out_hex"
         echo "${YLW}NO binary file expected!!!${RST}"
-        flag=((flag | 0x01))
+        ((flag |= 0x01))
     
     else
         echo "${BLU}Expected Hex code at:${RST} $exp_hex"
@@ -158,23 +169,61 @@ for input_file in "$INPUT_DIR"/input_*.txt; do
     fi
     
     # Executing the program
-    $ASSEMBLER -i "$input_file" -o "$out_hex" -b "$out_bin" -f "$out_fmt"
+    $ASSEMBLER -i "$input_file" -o "$out_hex" -b "$out_bin" -f "$out_fmt" > /dev/null
     signal=$?
     echo "${BLU}The Assembler returned exit code:${RST} $signal"
     echo -e "${BLU}Kindly refer to the README file for knowledge on what each code means${RST}\n"
+    
+    if [[ $signal -ne 8 && $signal -ne 0 ]]; then
+        echo "❌ ${RED} Test 🧪🧪 case failed!!!"
+        echo "Something internally wrong happened with the Assembler!!!"
+        echo "Check the returned error code printed above"
+        echo "Aborting...${RST}"
+        exit 4
 
-    if  ((flag & 0x01)) && [[ -f "$out_bin" ]]; then
-        echo "❌ ${RED} Test case failed!!!"
+    elif  ((flag & 0x01)) && [[ -f "$out_bin" ]]; then
+        echo "❌ ${RED} Test 🧪🧪 case failed!!!"
         echo "No binary file was expected, yet was generated!!!${RST}"
-        flag=((flag | 0x90))
+        ((flag |= 0xd0))
 
-    elif ((flag & 0x02)) && [[ -f "$out_hex" && -f "$out_bin"]]; then
-        echo "❌ ${RED} Test case failed!!!"
+    elif ((flag & 0x02)) && [[ -f "$out_hex" && -f "$out_bin" ]]; then
+        echo "❌ ${RED} Test 🧪🧪 case failed!!!"
         echo "No binary or hex file were expected, yet were generated!!!${RST}"
-        flag=((flag | 0x90))
+        ((flag |= 0xd0))
+    
+    elif ! diff -q "$exp_fmt" "$out_fmt" > /dev/null; then
+        echo "❌ ${RED} Test 🧪🧪 case failed!!!"
+        echo "Format files don't match!!!${RST}"
+        diff "$exp_fmt" "$out_fmt"
+        ((flag |= 0xc0))
+
+    elif ! ((flag & 0x03)) && ! diff -q "$exp_hex" "$out_hex" > /dev/null; then
+        echo "❌ ${RED} Test 🧪🧪 case failed!!!"
+        echo "Hex files do not match!!!${RST}"
+        diff "$exp_hex" "$out_hex"
+        ((flag |= 0xc0))
+
+    elif ! ((flag & 0x03)) && ! diff -q "$exp_bin" "$out_bin" > /dev/null; then
+        echo "❌ ${RED} Test 🧪🧪 case failed!!!"
+        echo "Binary files do not match!!!${RST}"
+        diff "$exp_bin" "$out_bin"
+        ((flag |= 0xc0))
+    else
+        echo "✅ ${GRN} Test 🧪🧪 case passed successfully!!!${RST}"
     fi
-
-
-
+    
+    echo -e "\n\n"
+    ((case_num++))
+    ((flag &= 0x80))
+    
+    sleep 1
 
 done
+
+if ((flag & 0x80)); then
+    echo "❌❌❌❌ ${RED}Some cases Failed${RST} 🫠🫠🫠"
+    exit 5
+else
+    echo "✅✅✅✅ ${GRN}All cases passed${RST} 🥳🥳🥳"
+fi
+exit 0
