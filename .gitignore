@@ -4,6 +4,7 @@ obj
 *.exe
 test.*
 *.txt
+!test.sh
 !version.txt
 tests/outputs
 !tests/inputs/*

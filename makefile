@@ -15,9 +15,7 @@ BIN_DIR := bin
 INPUT_DIR := ./tests/inputs
 EXPECTED_DIR := ./tests/expected
 OUTPUT_DIR := ./tests/outputs
-
-# Defining Testcases
-TEST_CASES := 1 2 3 4 5
+test_file := test.sh
 
 # Source and Object Files
 SOURCE_CPP_FILES := $(wildcard $(SRC_DIR)/*.cpp)
@@ -64,81 +62,8 @@ windows: $(OBJECTS) | $(BIN_DIR)
 	@echo "To run the Windows build, use the command: ./$(target)_x64"
 
 
-# Pre-processing rule to convert line endings from CRLF to LF
-# This is useful for Windows users to ensure consistent line endings
-preprocess:
-	@echo "Preprocessing test files (dos2unix)..."
-	@find $(INPUT_DIR) $(EXPECTED_DIR) -type f -name '*.txt' -exec dos2unix {} + 2>/dev/null || true
-	@echo "✅ Preprocessing complete."
-
 # Rule to run tests
-test: $(target) $(OUTPUT_DIR) preprocess
-	@echo "==============================="
-	@echo "        Running Tests"
-	@echo "==============================="
-
-	@FAILED=false; \
-	for input_file in $(INPUT_DIR)/input_*.txt; do \
-	    case=$$(basename "$$input_file" .txt | sed 's/input_//'); \
-	    echo ""; \
-	    echo "🧪 Running test case: $$case"; \
-	    \
-	    input="$(INPUT_DIR)/input_$$case.txt"; \
-	    out_hex="$(OUTPUT_DIR)/hex/$$case.txt"; \
-	    out_bin="$(OUTPUT_DIR)/bin/$$case.txt"; \
-	    exp_hex="$(EXPECTED_DIR)/hex/$$case.txt"; \
-	    exp_bin="$(EXPECTED_DIR)/bin_f/$$case.txt"; \
-	    \
-	    : "Normalize Windows line endings"; \
-	    dos2unix $$input $$exp_hex $$exp_bin 2>/dev/null || true; \
-	    \
-	    : "Run assembler"; \
-	    if ! ./$(target) -i $$input -o $$out_hex -b $$out_bin; then \
-	        status=$$?; \
-	        if [ $$status -eq 8 ] && [ ! -f $$exp_bin ]; then \
-	            echo "   ✔ Status OK: Binary output intentionally skipped (code 8)"; \
-	        else \
-	            echo "   ❌ Assembler returned error code $$status"; \
-	            FAILED=true; \
-	            continue; \
-	        fi; \
-	    fi; \
-	    \
-	    echo "   🔍 Comparing hex output..."; \
-	    if cmp -s $$out_hex $$exp_hex; then \
-	        echo "   ✔ Hex OK"; \
-	    else \
-	        echo "   ❌ Hex mismatch!"; \
-	        git diff --no-index --color $$out_hex $$exp_hex; \
-	        FAILED=true; \
-	    fi; \
-	    \
-	    echo "   🔍 Comparing binary output..."; \
-	    if [ -f $$exp_bin ]; then \
-	        if cmp -s $$out_bin $$exp_bin; then \
-	            echo "   ✔ Bin OK"; \
-	        else \
-	            echo "   ❌ Bin mismatch!"; \
-	            git diff --no-index --color $$out_bin $$exp_bin; \
-	            FAILED=true; \
-	        fi; \
-	    else \
-	        echo "   ↪ No expected binary output — skipping."; \
-	    fi; \
-	    \
-	    echo "   ✓ Completed test $$case"; \
-	done; \
-	echo ""; \
-	echo "==============================="; \
-	echo "        Test Summary"; \
-	echo "==============================="; \
-	if [ "$$FAILED" = "true" ]; then \
-	    echo "❌ Some tests FAILED"; \
-	    exit 1; \
-	else \
-	    echo "✅ All tests passed successfully!"; \
-	fi
-
+test: $(target) $(OUTPUT_DIR) $(test_file)
 
 
 clean:
