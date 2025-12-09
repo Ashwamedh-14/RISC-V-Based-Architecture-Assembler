@@ -16,11 +16,11 @@ EXPECTED_DIR="./tests/expected"
 OUTPUT_DIR="./tests/output"
 
 # Validating any command line args
-if [[ $# -eq 1 ]]; then
+if [[ $# -eq 0 ]]; then
     echo "${BLU}No arguements passed!"
     echo "Using default values${RST}"
 
-elif [[ $# -gt 5 ]]; then
+elif [[ $# -gt 4 ]]; then
     echo "❌ ${RED}Too many arguements passed"
     echo "Expected arguements in the following format${RST}"
     echo "./test.sh <ASSEMBLER> <INPUT_DIR> <OUTPUT_DIR> <EXPECTED_DIR>"
@@ -28,7 +28,7 @@ elif [[ $# -gt 5 ]]; then
     exit 1
 
 else
-    for ((i = 1; i < $#; i++)); do
+    for ((i = 1; i <= $#; i++)); do
         arg=${!i}
         if [[ i -eq 1 ]]; then
             echo "${BLU}Passed Assembler:${RST} $arg"
@@ -169,7 +169,7 @@ for input_file in "$INPUT_DIR"/input_*.txt; do
     fi
     
     # Executing the program
-    $ASSEMBLER -i "$input_file" -o "$out_hex" -b "$out_bin" -f "$out_fmt" > /dev/null
+    "$ASSEMBLER" -i "$input_file" -o "$out_hex" -b "$out_bin" -f "$out_fmt" > /dev/null
     signal=$?
     echo "${BLU}The Assembler returned exit code:${RST} $signal"
     echo -e "${BLU}Kindly refer to the README file for knowledge on what each code means${RST}\n"
