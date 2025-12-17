@@ -30,11 +30,6 @@ using namespace std;
 // Error variable
 bool ERR = 0;
 
-// regular expression checks
-static const regex REG_DAT("^[0-9A-F]{1,2}$");              // Whether valid Data for Dataline
-static const regex REG_REG("^R[0-9]{1,2}$");                // Whether valid Register Reference
-static const regex REG_LABEL("^[A-Za-z_][A-Za-z0-9_]*$");   // Whether valid Label
-
 static const char HEX_CHARS[] = {
     '0', '1', '2', '3', '4', '5', '6', '7',
     '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'
@@ -89,6 +84,26 @@ static const size_t INPUT_PORT_NUMBERS = sizeof(INPUT_PORTS) / sizeof(INPUT_PORT
 static const size_t OUTPUT_PORT_NUMBERS = sizeof(OUTPUT_PORTS) / sizeof(OUTPUT_PORTS[0]);
 
 // Helper functions
+static bool validDAT(const string &s){
+    if (s.empty() || s.size() > 2) return false;
+    for (char c: s) if ((c < 'A' || c > 'F') && (c < '0' || c > '9')) return false;
+    return true;
+}
+
+static bool validReg(const string &s){
+    if (s.size() < 2 || s.size() > 3) return false;
+    else if (s[0] != 'R') return false;
+    for (char c: s.substr(1)) if (c < '0' || c > '9') return false;
+    return true;
+}
+
+static bool validLabelName(const string &s){
+    if (s.size() < 1) return false;
+    else if ((s[0] < 'A' || s[0] > 'Z') && s[0] != '_') return false;
+    for (char c: s.substr(1)) if ((c < '0' || c >'9') && (c < 'A' || c > 'Z') && c != '_') return false;
+    return true;
+}
+
 const Opcode* findOpcode(const string &name){
     for (size_t i = 0; i < OP_TABLE_SIZE; i++){
         if (OP_TABLE[i].opcode == name) return &OP_TABLE[i];
@@ -153,7 +168,7 @@ uint8_t isValidLabel(const string &s){
     
     // return false if it is a valid OPCODE
     if (findOpcode(label)) return 4;
-    else if (!regex_match(label, REG_LABEL)) return 5;
+    else if (!validLabelName(label))return 5;
 
     return 0;
 
@@ -209,7 +224,7 @@ uint8_t instr_chk(Instruction &instr, const map<string, size_t> &labels){
             instr.registers[i] = "0";
             continue;
         }
-        else if (!regex_match(instr.registers[i], REG_REG)){
+        else if (!validReg(instr.registers[i])){
             if (i == 0) return REG_W_INVALID_REFERENCE;
             else if (i == 1) return REG_RX_INVALID_REFERENCE;
             else return REG_RY_INVALID_REFERENCE;
@@ -227,8 +242,8 @@ uint8_t instr_chk(Instruction &instr, const map<string, size_t> &labels){
     if (instr.dataline.empty()) return 0;
     else if (!isValidLabel(instr.dataline + ":")) {
         // It's syntactically a label; now check if it's defined
-        if (!isLabelRecorded(instr.dataline, labels) && !regex_match(instr.dataline, REG_DAT)) return INVALID_LABEL_REF;
-        else if (regex_match(instr.dataline, REG_DAT)){
+        if (!isLabelRecorded(instr.dataline, labels) && !validDAT(instr.dataline)) return INVALID_LABEL_REF;
+        else if (validDAT(instr.dataline)){
             if (instr.dataline.size() == 1) instr.dataline = "0" + instr.dataline;
             return 0;
         }
@@ -249,7 +264,7 @@ uint8_t instr_chk(Instruction &instr, const map<string, size_t> &labels){
             temp /= 16;
         }
     }
-    else if (!regex_match(instr.dataline, REG_DAT)) return INVALID_DATALINE;
+    else if (validDAT(instr.dataline)) return INVALID_DATALINE;
 
     if (instr.dataline.size() == 1) instr.dataline = "0" + instr.dataline;
     return 0;   
