@@ -2,7 +2,6 @@
 #include <iostream>
 #include <cstddef> // For size_t
 #include <cstdint>
-#include <regex>
 #include <map>
 #include <sstream>
 
