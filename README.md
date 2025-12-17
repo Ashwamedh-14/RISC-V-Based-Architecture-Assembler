@@ -32,7 +32,7 @@ Following are the list of abbreviations that have / will be used:-
 
 > **Note**  
 > It is preferable to use the `GNU C/C++` compiler.  
-> Ensure you have `C++11` or greater (`C++17` is recommended).  
+> Ensure you have `C++11` or greater (`C++20` is recommended).  
 > `Logisim` requires `Java 5` or later to run.
 
 ## Setting Up

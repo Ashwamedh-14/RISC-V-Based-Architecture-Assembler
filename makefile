@@ -2,8 +2,8 @@
 CC := gcc
 CXX := g++
 
-CFLAGS := -std=c17 -Wall -Wextra -Iinclude
-CXXFLAGS := -std=c++17 -Wall -Wextra -Iinclude
+CFLAGS := -std=c20 -Wall -Wextra -Iinclude
+CXXFLAGS := -std=c++20 -Wall -Wextra -Iinclude
 
 # Directories
 SRC_DIR := src
