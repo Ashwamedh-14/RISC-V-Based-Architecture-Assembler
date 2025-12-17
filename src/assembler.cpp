@@ -263,7 +263,7 @@ uint8_t instr_chk(Instruction &instr, const map<string, size_t> &labels){
             temp /= 16;
         }
     }
-    else if (validDAT(instr.dataline)) return INVALID_DATALINE;
+    else if (!validDAT(instr.dataline)) return INVALID_DATALINE;
 
     if (instr.dataline.size() == 1) instr.dataline = "0" + instr.dataline;
     return 0;   
