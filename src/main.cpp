@@ -45,6 +45,10 @@ extern "C" {                            // This ensure this particular code is c
 #include <filesystem>
 #include <algorithm>
 
+#ifndef ASSEMBLER_VERSION
+#define ASSEMBLER_VERSION "dev"
+#endif
+
 #define INVALID_INPUT_FILE 1
 #define INVALID_OUTPUT_FILE 2
 #define INVALID_BINARY_FILE 3
@@ -79,7 +83,7 @@ int main(int argc, char **argv){
     */
     unsigned char flag = 0x01;
     // Using getopt to parse the command line arguments
-    while((c = getopt(argc, argv, ":i:o:b:f:cnh")) != -1) {
+    while((c = getopt(argc, argv, ":i:o:b:f:cnhv")) != -1) {
         switch (c) {
             case 'i':
                 input = optarg;
@@ -124,6 +128,10 @@ int main(int argc, char **argv){
 
             case 'h':
                 usage();
+                return 0;
+
+            case 'v':
+                cout << "Assembler Version: " << ASSEMBLER_VERSION << endl;
                 return 0;
 
             case ':':

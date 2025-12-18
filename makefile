@@ -1,9 +1,14 @@
+# Versioning
+VERSION ?= dev
+
 # Compiler and Flags
 CC := gcc
 CXX := g++
 
-CFLAGS := -std=c17 -Wall -Wextra -Iinclude -flto
-CXXFLAGS := -std=c++20 -Wall -Wextra -Iinclude -flto
+CFLAGS := -std=c17 -Wall -Wextra -flto
+CXXFLAGS := -std=c++20 -Wall -Wextra -flto
+CPPFLAGS := -DASSEMBLER_VERSION=\"$(VERSION)\" -Iinclude
+
 
 # Directories
 SRC_DIR := src
@@ -44,11 +49,11 @@ $(OUTPUT_DIR):
 
 # Rule to compile each .cpp file into .o file
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp | $(OBJ_DIR)
-	$(CXX) $(CXXFLAGS) -c $< -o $@
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
 
 # Rule to compile each .c file into .o file
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c | $(OBJ_DIR)
-	$(CC) $(CFLAGS) -c $< -o $@
+	$(CC) $(CPPFLAGS) $(CFLAGS) -c $< -o $@
 
 # Rule to link obj files into final binary : linux
 $(target): $(OBJECTS) | $(BIN_DIR)
@@ -61,6 +66,9 @@ windows: $(OBJECTS) | $(BIN_DIR)
 	@echo "Windows build complete. Executable: $(target)_x64"
 	@echo "To run the Windows build, use the command: ./$(target)_x64"
 
+macos: $(OBJECTS) | $(BIN_DIR)
+	$(CXX) $(CXXFLAGS) $(OBJECTS) -o $(target)_macos
+	@echo "macOS build complete. Executable: $(target)_macos"
 
 # Rule to run tests
 test: $(target) $(INPUT_DIR) $(OUTPUT_DIR) $(EXPECTED_DIR) $(test_file)

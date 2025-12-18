@@ -17,16 +17,16 @@ jobs:
         run: sudo apt-get update -y
 
       - name: Read Version Number
-        run: echo "CURRENT_VERSION=$(cat version.txt)" >> $GITHUB_ENV
+        run: echo "VERSION=${GITHUB_REF_NAME#v}" >> $GITHUB_ENV
 
       - name: Create bin Directory
         run: mkdir -p bin/
 
       - name: Install dependencies
-        run: sudo apt install build-essential make
+        run: sudo apt install build-essential make -y
 
       - name: Compile with make
-        run: make
+        run: make VERSION=${{ env.VERSION }}
 
       - name: Ensure Executable Works
         run: chmod +x bin/Assembler
@@ -43,6 +43,10 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
+      
+      - name: Read Version Number
+        shell: bash
+        run: echo "VERSION=${GITHUB_REF_NAME#v}" >> $GITHUB_ENV
 
       - name: Use cache MinGW
         id: cache-mingw
@@ -69,7 +73,7 @@ jobs:
           }
 
       - name: Compile with make
-        run: make windows
+        run: make windows VERSION=${{ env.VERSION }}
 
       - name: Ensure Executable Works
         run: |
@@ -109,6 +113,7 @@ jobs:
           cd artifacts
           zip Assembler-linux.zip Assembler
           zip Assembler-windows.zip Assembler_x64.exe
+          tar -czf Assembler-linux.tar.gz Assembler
 
       - name: Get tag message
         id: tag_message
@@ -129,5 +134,6 @@ jobs:
             artifacts/Assembler
             artifacts/Assembler_x64.exe
             artifacts/Assembler-linux.zip
+            artifacts/Assembler-linux.tar.gz
             artifacts/Assembler-windows.zip
 

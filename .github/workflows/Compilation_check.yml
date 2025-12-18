@@ -67,20 +67,11 @@ jobs:
       steps:
         - name: Checkout Code
           uses: actions/checkout@v3
-      
-        - name: Install GNU GCC, G++ and Make
-          run: |
-            brew install gcc make
-            gpp_version=$(g++-13 -dumpversion | cut -d. -f1)
-            if [ "$gpp_version" -lt 7 ]; then
-              echo "g++ version must be 7 or higher for C++17 support"
-              exit 1
-            fi
-      
+        
         - name: Build using Make
           run: |
             mkdir -p bin
-            make CC=gcc-13 CXX=g++-13
+            make macos
       
         - name: Ensure Executable Works
-          run: chmod +x bin/Assembler
+          run: chmod +x bin/Assembler_macos
