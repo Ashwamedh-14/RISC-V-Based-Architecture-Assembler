@@ -66,11 +66,15 @@ Clone the repo and build the executable using the below given commands.
 git clone https://github.com/Ashwamedh-14/RISC-V-Based-Architecture-Assembler.git
 cd RISC-V-Based-Architecture-Assembler
 
+# For windows user
+make windows VERSION=$( cat version.txt )
+
 # For MacOS
 make macos VERSION=$( cat version.txt )
 
 # For Linux users
 make VERSION=$( cat version.txt )
+
 ```
 
 The compiled binary will be located at bin/Assembler
