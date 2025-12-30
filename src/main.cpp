@@ -289,7 +289,7 @@ int main(int argc, char **argv){
         // Convert assembly code to hex
         // and write to hexfile
         
-        if (!isValidLabel(line)){
+        if (!isValidLabel(line)){                        // If the line is a valid label, the function returns a 0
             label = line.substr(0, line.size() - 1);
             hexfile << "0000000\n";
             continue;
@@ -391,3 +391,4 @@ void usage(void) {
     cout << "  7. Flags followed by <value> means that providing a value upon invoking those flags is necessary.\n";
     cout << "  8. -n ovverides the -b flag, if provided." << endl;
 }
+
