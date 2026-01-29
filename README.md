@@ -297,6 +297,7 @@ However, if for some reason you still want to give raw hexadecimal values to `jm
   - `R10` is correct
   - `R01` is correct and also equivalent to `R1`
   - `RA` is incorrect
+- **All** valid `regs` are `keywords`  
 - **All** `DAT`, `PORT Address`, `MEM Address` values are passed, parsed and taken as `8-bit hexadecimals`.
 - `jmp` statements can have both labels and direct hexadecimal values, though the use of labels is encouraged.
 

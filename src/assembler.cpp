@@ -91,7 +91,7 @@ static bool validDAT(const string &s){
 }
 
 static bool validReg(const string &s){
-    if (s.size() < 2 || s.size() > 3) return false;
+    if (s.size() < 2) return false;
     else if (s[0] != 'R') return false;
     for (char c: s.substr(1)) if (c < '0' || c > '9') return false;
     return true;
@@ -308,7 +308,7 @@ uint8_t parse(size_t line_num, const string &line, const string block_label, con
             return INVALID_LINE;
         }
 
-        else if (word[0] == 'R' && word.size() > 3) instr.dataline = word;
+        else if (word[0] == 'R' && !isValidLabel(word.substr(1))) instr.dataline = word;
         
         else if (word[0] == 'R' && instr.reg_num >= 3){
             if (!block_label.empty()) out_file << "In block: " << block_label << ".\n";
