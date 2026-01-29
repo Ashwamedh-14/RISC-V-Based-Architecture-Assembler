@@ -38,6 +38,7 @@ target := $(BIN_DIR)/Assembler
 all: $(target)
 
 # Create obj and bin folders if they don't exist
+
 $(OBJ_DIR):
 	@mkdir -p $(OBJ_DIR)
 
@@ -60,12 +61,14 @@ $(target): $(OBJECTS) | $(BIN_DIR)
 	$(CXX) $(CXXFLAGS) $(OBJECTS) -o $(target)
 	@echo "Build complete. Executable: $(target)"
 	@echo "To run the build, use the command: ./$(target)"
+
 # Rule to link obj files into final binary : windows
 windows: $(OBJECTS) | $(BIN_DIR)
 	$(CXX) $(CXXFLAGS) $(OBJECTS) -o $(target)_x64
 	@echo "Windows build complete. Executable: $(target)_x64"
 	@echo "To run the Windows build, use the command: ./$(target)_x64"
 
+# Rule to link obj files into final binary : macos
 macos: $(OBJECTS) | $(BIN_DIR)
 	$(CXX) $(CXXFLAGS) $(OBJECTS) -o $(target)_macos
 	@echo "macOS build complete. Executable: $(target)_macos"

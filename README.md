@@ -58,7 +58,7 @@ If the executable does not run on your Linux system, follow the build instructio
 
 ### Building from Source
 
-> **Note:** Ensure you have `g++` and `make` installed. Use your system's package manager (e.g., sudo apt install build-essential on Debian based distros).
+> **Note:** Ensure you have `g++` and `make` (or `clang` in the case of macOS) installed. Use your system's package manager (e.g., sudo apt install build-essential on Debian based distros).
 
 Clone the repo and build the executable using the below given commands.
 
@@ -69,8 +69,11 @@ cd RISC-V-Based-Architecture-Assembler
 # For windows user
 make windows VERSION=$( cat version.txt )
 
-# For MacOS
+# For MacOS (g++ users)
 make macos VERSION=$( cat version.txt )
+
+# For MacOS (clang users)
+make macos CC=clang CXX=clang++ VERSION=$( cat version.txt )
 
 # For Linux users
 make VERSION=$( cat version.txt )
