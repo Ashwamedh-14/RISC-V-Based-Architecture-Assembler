@@ -308,7 +308,7 @@ uint8_t parse(size_t line_num, const string &line, const string block_label, con
             return INVALID_LINE;
         }
 
-        else if (word[0] == 'R' && !isValidLabel(word.substr(1))) instr.dataline = word;
+        else if (word[0] == 'R' && !validReg(word)) instr.dataline = word;
         
         else if (word[0] == 'R' && instr.reg_num >= 3){
             if (!block_label.empty()) out_file << "In block: " << block_label << ".\n";
