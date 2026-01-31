@@ -6,7 +6,7 @@ CC := gcc
 CXX := g++
 
 CFLAGS := -std=c17 -Wall -Wextra -flto
-CXXFLAGS := -std=c++20 -Wall -Wextra -flto
+CXXFLAGS := -std=c++20 -static -static-libgcc -static-libstdc++ -Wall -Wextra -flto
 CPPFLAGS := -DASSEMBLER_VERSION=\"$(VERSION)\" -Iinclude
 
 
