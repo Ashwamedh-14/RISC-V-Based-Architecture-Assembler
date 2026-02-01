@@ -6,7 +6,7 @@ CC := gcc
 CXX := g++
 
 CFLAGS := -std=c17 -Wall -Wextra -flto
-CXXFLAGS := -std=c++20 -static -static-libgcc -static-libstdc++ -Wall -Wextra -flto
+CXXFLAGS := -std=c++20 -Wall -Wextra -flto
 CPPFLAGS := -DASSEMBLER_VERSION=\"$(VERSION)\" -Iinclude
 
 
@@ -50,7 +50,7 @@ $(OUTPUT_DIR):
 
 # Rule to compile each .cpp file into .o file
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp | $(OBJ_DIR)
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
+	$(CXX) $(CPPFLAGS) -static -static-libgcc -static-libstdc++ $(CXXFLAGS) -c $< -o $@
 
 # Rule to compile each .c file into .o file
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c | $(OBJ_DIR)
@@ -64,7 +64,7 @@ $(target): $(OBJECTS) | $(BIN_DIR)
 
 # Rule to link obj files into final binary : windows
 windows: $(OBJECTS) | $(BIN_DIR)
-	$(CXX) $(CXXFLAGS) $(OBJECTS) -o $(target)_x64
+	$(CXX) $(CXXFLAGS) -static -static-libgcc -static-libstdc++ $(OBJECTS) -o $(target)_x64
 	@echo "Windows build complete. Executable: $(target)_x64"
 	@echo "To run the Windows build, use the command: ./$(target)_x64"
 
