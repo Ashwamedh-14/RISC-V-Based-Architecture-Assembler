@@ -230,7 +230,8 @@ int main(int argc, char **argv){
                     ERR = true;
             }
         }
-        else {
+        else if (line.find(';') == string::npos) format_file << strip(line) << '\n';
+        else{
             line = strip(line.substr(0, line.find_first_of(';')));
             if (!line.size()) continue;                           // Skip the line with only a semi-colon present;
             format_file << line << ";\n";
