@@ -186,7 +186,10 @@ int main(int argc, char **argv){
         else if (line.find(':') != string::npos){
             c = isValidLabel(line);         // Reusing 'c' here since the return type is uint8_t which is typically an unsigned char
             
-            if (c) format_file << "Error: Invalid Label at line " << ++line_num << ".\n";
+            if (c) {
+                format_file << "Error: Invalid Label at line " << ++line_num << ".\n";
+                ERR = true;
+            }
 
             switch (c){
                 case 0:
@@ -200,34 +203,29 @@ int main(int argc, char **argv){
                     labels[line] = line_num;
                     format_file << line << ":\n";
                     break;
+                
                 case 1:
                     format_file << "Empty labels are invalid\n";
-                    ERR = true;
                     continue;
 
                 case 2:
                     format_file << "Label ended with a semi-colon\n";
-                    ERR = true;
                     continue;
 
                 case 3:
                     format_file << "Label does not end with a colon\n";
-                    ERR = true;
                     continue;
 
                 case 4:
                     format_file << "Label: " << strip(line.substr(0, line.size() - 1)) << " is a valid OPCode, which is a reserved name\n";
-                    ERR = true;
                     continue;
 
                 case 5:
                     format_file << "Label: " << strip(line.substr(0, line.size() - 1)) << " is not a valid label name\n";
-                    ERR = true;
                     continue;
 
                 default:
                     format_file << "Unknown Label Error\n";
-                    ERR = true;
             }
         }
         else if (line.find(';') == string::npos) format_file << strip(line) << '\n';
