@@ -208,6 +208,8 @@ uint8_t instr_chk(Instruction &instr, const map<string, size_t> &labels){
     // Checking opcode
     if (!instr.opcode) return INVALID_OPCODE;
     
+
+    // These are allowed in the function since they just re-arrage the regs to their correct position according to the Opcode
     if (instr.opcode->opcode == "STORE" || instr.opcode->opcode == "PUSH" || instr.opcode->opcode == "OUT"){ 
         instr.registers[1] = instr.registers[0];
         instr.registers[0] = "";
@@ -240,7 +242,12 @@ uint8_t instr_chk(Instruction &instr, const map<string, size_t> &labels){
         
     // Checking valid dataline
     if (instr.dataline.empty()) return 0;
-    else if (validLabelName(instr.dataline) && !isLabelRecorded(instr.dataline)
+    else if (!validLabelName(instr.dataline) && !validHexDAT(instr.dataline)) return INVALID_DATALINE;
+    else if (validLabelName(instr.dataline) && !isLabelRecorded(instr.dataline, labels) && !validHexDAT(instr.dataline)) return INVALID_LABEL_REF;
+    else if (validLabelName(instr.dataline) && isLabelRecorded(instr.dataline, labels)){
+        // Now we know that the dataline is having a label and it is recorded, we convert the address of the label to the dataline in hex
+        temp = labels[instr.dataline]
+    }
     
 
     if (instr.dataline.size() == 1) instr.dataline = "0" + instr.dataline;
