@@ -246,7 +246,16 @@ uint8_t instr_chk(Instruction &instr, const map<string, size_t> &labels){
     else if (validLabelName(instr.dataline) && !isLabelRecorded(instr.dataline, labels) && !validHexDAT(instr.dataline)) return INVALID_LABEL_REF;
     else if (validLabelName(instr.dataline) && isLabelRecorded(instr.dataline, labels)){
         // Now we know that the dataline is having a label and it is recorded, we convert the address of the label to the dataline in hex
-        temp = labels[instr.dataline]
+        temp = labels.at(instr.dataline);
+        if (!temp) instr.dataline = "00";
+        else if (temp > 255 || temp < 0) return JUMP_OUT_OF_RANGE;
+        else{
+            instr.dataline = "";
+            while (temp > 0){
+                instr.dataline += HEX_CHARS[temp % 16];
+                temp /= 16;
+            }
+        }
     }
     
 
