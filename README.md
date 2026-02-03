@@ -288,6 +288,8 @@ label3:
 
 However, if for some reason you still want to give raw hexadecimal values to `jmp` statements, kindly then generate a formatted version of your assembly code to check errors against, if any.
 
+> **NOTE**
+> Labels cannot be used with `JMPPCRZ` and `JMPPCRNZ` Opcodes, as they require jumping relative to the current `PC` and not an arbitrary point in the code.
 
 ### Points to remember
 
@@ -299,7 +301,8 @@ However, if for some reason you still want to give raw hexadecimal values to `jm
   - `RA` is incorrect
 - **All** valid `regs` are `keywords`  
 - **All** `DAT`, `PORT Address`, `MEM Address` values are passed, parsed and taken as `8-bit hexadecimals`.
-- `jmp` statements can have both labels and direct hexadecimal values, though the use of labels is encouraged.
+- `JMP` statements can have both labels and direct hexadecimal values, though the use of labels is encouraged.
+- `JMPPCRZ` and `JMPPCRNZ` **only** work with hexadecimal values.
 
 ## Error Codes
 

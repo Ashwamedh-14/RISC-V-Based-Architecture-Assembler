@@ -19,7 +19,7 @@ BIN_DIR := bin
 # Directories for Tests
 INPUT_DIR := ./tests/inputs
 EXPECTED_DIR := ./tests/expected
-OUTPUT_DIR := ./tests/outputs
+OUTPUT_DIR := ./tests/output
 test_file := ./test.sh
 
 # Source and Object Files
