@@ -84,7 +84,7 @@ static const size_t INPUT_PORT_NUMBERS = sizeof(INPUT_PORTS) / sizeof(INPUT_PORT
 static const size_t OUTPUT_PORT_NUMBERS = sizeof(OUTPUT_PORTS) / sizeof(OUTPUT_PORTS[0]);
 
 // Helper functions
-static bool validDAT(const string &s){
+static bool validHexDAT(const string &s){
     if (s.empty() || s.size() > 2) return false;
     for (char c: s) if ((c < 'A' || c > 'F') && (c < '0' || c > '9')) return false;
     return true;
@@ -240,31 +240,8 @@ uint8_t instr_chk(Instruction &instr, const map<string, size_t> &labels){
         
     // Checking valid dataline
     if (instr.dataline.empty()) return 0;
-    else if (!isValidLabel(instr.dataline + ":")) {
-        // It's syntactically a label; now check if it's defined
-        if (!isLabelRecorded(instr.dataline, labels) && !validDAT(instr.dataline)) return INVALID_LABEL_REF;
-        else if (validDAT(instr.dataline)){
-            if (instr.dataline.size() == 1) instr.dataline = "0" + instr.dataline;
-            return 0;
-        }
-
-        // Now that we know it really is a label and is defined in the source code, we check whether the opcode provided is the correct one.
-        if (instr.opcode->opcode.substr(0,3) != "JMP") return INVALID_LABEL_USE;
-        temp = labels.at(instr.dataline);
-        if (temp > 255) return JUMP_OUT_OF_RANGE;
-        else if (temp == 0){
-            instr.dataline = "00";
-            return 0;
-        }
-
-        // Convert label address to hex string
-        instr.dataline = "";
-        while (temp > 0) {
-            instr.dataline = HEX_CHARS[temp % 16] + instr.dataline;
-            temp /= 16;
-        }
-    }
-    else if (!validDAT(instr.dataline)) return INVALID_DATALINE;
+    else if (validLabelName(instr.dataline) && !isLabelRecorded(instr.dataline)
+    
 
     if (instr.dataline.size() == 1) instr.dataline = "0" + instr.dataline;
     return 0;   
