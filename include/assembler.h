@@ -12,6 +12,7 @@ struct Opcode{
     * The 2 LSB bit indicate total number of parameters needed for given opcode
     * The next 2 indicate number of registers needed in parameters
     * The next bit indicates whether a Dataline value is required
+    * The next bit indicates whether the Dataline can have a label in it.
     */
     unsigned char instr_num;
     std::string opcode;

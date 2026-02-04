@@ -46,8 +46,6 @@ static const string INPUT_PORTS[] = {"F1", "F2", "F3", "F4"};
 
 static const string OUTPUT_PORTS[] = {"F8", "F9", "FA", "FB"};
 
-static const string VALID_LABEL_OPCODES[] = {"0D", "0E", "0F", "10", "11"};
-
 static const Opcode OP_TABLE[] = {
     {0x00, "NOP", "00"},
     {0x0f, "AND", "01"},
@@ -62,11 +60,11 @@ static const Opcode OP_TABLE[] = {
     {0x16, "MOVI", "0A"},
     {0x16, "LOAD", "0B"},
     {0x16, "STORE", "0C"},
-    {0x11, "JMP", "0D"},
-    {0x11, "JMPZ", "0E"},
-    {0x11, "JMPNZ", "0F"},
-    {0x11, "JMPC", "10"},
-    {0x11, "JMPNC", "11"},
+    {0x31, "JMP", "0D"},
+    {0x31, "JMPZ", "0E"},
+    {0x31, "JMPNZ", "0F"},
+    {0x31, "JMPC", "10"},
+    {0x31, "JMPNC", "11"},
     {0x05, "PUSH", "12"},
     {0x05, "POP", "13"},
     {0x16, "IN", "14"},
@@ -83,7 +81,6 @@ static const Opcode OP_TABLE[] = {
 static const size_t OP_TABLE_SIZE = sizeof(OP_TABLE) / sizeof(OP_TABLE[0]); // Should be 29 for now
 static const size_t INPUT_PORT_NUMBERS = sizeof(INPUT_PORTS) / sizeof(INPUT_PORTS[0]);
 static const size_t OUTPUT_PORT_NUMBERS = sizeof(OUTPUT_PORTS) / sizeof(OUTPUT_PORTS[0]);
-static const size_t VALID_LABLE_OPCODES_NUMBERS = sizeof(VALID_LABEL_OPCODES) / sizeof(VALID_LABEL_OPCODES[0]);
 
 // Helper functions
 static bool validHexDAT(const string &s){
@@ -201,6 +198,8 @@ Meaning of returned values
 107: Register Rx Out of Range
 108: Register Ry Out of Range
 109: JUMP_OUT_OF_RANGE
+113: Label referenced is invalid or not defined
+114: Label used in wrong OPcode
 */
 
 
@@ -246,7 +245,11 @@ uint8_t instructionCheck(Instruction &instr, const map<string, size_t> &labels){
     if (instr.dataline.empty()) return 0;
     else if (!validLabelName(instr.dataline) && !validHexDAT(instr.dataline)) return INVALID_DATALINE;
     else if (validLabelName(instr.dataline) && !isLabelRecorded(instr.dataline, labels) && !validHexDAT(instr.dataline)) return INVALID_LABEL_REF;
-    else if (validLabelName(instr.dataline) && isLabelRecorded(instr.dataline, labels)){
+    else if (isLabelRecorded(instr.dataline, labels)){
+        
+        // Checking to see if the label is valid for given opcode
+        if (!(instr.opcode->instr_num & 0x20)) return INVALID_LABEL_USE;
+
         // Now we know that the dataline is having a label and it is recorded, we convert the address of the label to the dataline in hex
         temp = labels.at(instr.dataline);
         if (!temp){
@@ -319,7 +322,9 @@ uint8_t parse(size_t line_num, const string &line, const string block_label, con
     error_num = instructionCheck(instr, labels);
     
     // checking to see if there is any error, to get a default message for all switch cases with error;
-    if (error_num && !block_label.empty()) out_file << "In block: " << block_label << ".\n";
+    if (error_num && !block_label.empty()){ 
+        out_file << "In block: " << block_label << ".\n";
+    }
 
     switch (error_num){
         case 0:
@@ -385,7 +390,11 @@ uint8_t parse(size_t line_num, const string &line, const string block_label, con
             out_file << "The error could either be due to invalid label name, or no label of same name was found.\n";
             ERR = true;
             break;
-
+        case INVALID_LABEL_USE:
+            out_file << "Error (Code 114): Invalid use of label with opcode " << instr.opcode->opcode << ", at line " << line_num  << ".\n";
+            out_file << "The error is because labels are explicitly only to be used with `jmp`, or similar statements.\n";
+            ERR = true;
+            break;
         default:
             out_file << "Error (Code 100): Bad line at line number " << line_num << ".\n";
             ERR = true;
@@ -416,12 +425,6 @@ uint8_t parse(size_t line_num, const string &line, const string block_label, con
         out_file << "But non was passed.\n";
         ERR = true;
         return INVALID_DAT_REF;
-    }
-    else if (isLabelRecorded(instr.dataline, labels) && isPresent(instr.dataline, VALID_LABEL_OPCODES, VALID_LABLE_OPCODES_NUMBERS)){
-        out_file << "Error (Code 114): Invalid use of label with opcode " << instr.opcode->opcode << ", at line " << line_num  << ".\n";
-        out_file << "The error is because labels are explicitly only to be used with `jmp`, or similar statements.\n";
-        ERR = true;
-        return INVALID_LABEL_USE;
     }
     else if (instr.opcode->opcode == "IN" && isPresent(instr.dataline, INPUT_PORTS, INPUT_PORT_NUMBERS) == -1){
         if (!block_label.empty()) out_file << "In block: " << block_label << ".\n";
