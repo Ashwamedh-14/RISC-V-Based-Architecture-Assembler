@@ -1,0 +1,18 @@
+// Starting of the program
+init:
+    MOVI, R2, 0;
+    MOVI, R1, 0;
+    MOVI, R0, 0;
+
+start:
+    IN, R2, F1;
+    SUB, R15, R2, R1;
+    JMPPCRZ, 83;
+    JMP, storing;
+
+storing:
+    STOREI, R2, R0;
+    ADDI, R0, R0, 1;
+    MOV, R1, R2;
+    JMP, start;
+
