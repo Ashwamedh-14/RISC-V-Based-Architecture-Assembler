@@ -19,7 +19,7 @@ OUTPUT_DIR="./tests/output"
 if [[ $# -eq 0 ]]; then
     echo "${BLU}No arguements passed!"
     echo "Using default values${RST}"
-
+    echo "Hello"
 elif [[ $# -gt 4 ]]; then
     echo "❌ ${RED}Too many arguements passed"
     echo "Expected arguements in the following format${RST}"
