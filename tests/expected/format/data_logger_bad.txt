@@ -1,0 +1,17 @@
+INIT:
+MOVI, R2, 0;
+MOVI, R1, 0;
+MOVI, R0, 0;
+START:
+IN, R2, F1;
+SUB, R15, R2, R1;
+JMPPCRZ, START;
+JMPPCRZ, 84;
+Error: Invalid Label at line 10.
+Label: JMP, STORE is not a valid label name
+Error: Invalid Label at line 11.
+Label: STORE is a valid OPCode, which is a reserved name
+STOREI, R2, R0;
+ADDI, R0, R0, 1;
+MOV, R1, R2;
+JMP, START;

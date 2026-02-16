@@ -186,7 +186,10 @@ int main(int argc, char **argv){
         else if (line.find(':') != string::npos){
             c = isValidLabel(line);         // Reusing 'c' here since the return type is uint8_t which is typically an unsigned char
             
-            if (c) format_file << "Error: Invalid Label at line " << ++line_num << ".\n";
+            if (c) {
+                format_file << "Error: Invalid Label at line " << ++line_num << ".\n";
+                ERR = true;
+            }
 
             switch (c){
                 case 0:
@@ -200,37 +203,33 @@ int main(int argc, char **argv){
                     labels[line] = line_num;
                     format_file << line << ":\n";
                     break;
+                
                 case 1:
                     format_file << "Empty labels are invalid\n";
-                    ERR = true;
                     continue;
 
                 case 2:
                     format_file << "Label ended with a semi-colon\n";
-                    ERR = true;
                     continue;
 
                 case 3:
                     format_file << "Label does not end with a colon\n";
-                    ERR = true;
                     continue;
 
                 case 4:
                     format_file << "Label: " << strip(line.substr(0, line.size() - 1)) << " is a valid OPCode, which is a reserved name\n";
-                    ERR = true;
                     continue;
 
                 case 5:
                     format_file << "Label: " << strip(line.substr(0, line.size() - 1)) << " is not a valid label name\n";
-                    ERR = true;
                     continue;
 
                 default:
                     format_file << "Unknown Label Error\n";
-                    ERR = true;
             }
         }
-        else {
+        else if (line.find(';') == string::npos) format_file << strip(line) << '\n';
+        else{
             line = strip(line.substr(0, line.find_first_of(';')));
             if (!line.size()) continue;                           // Skip the line with only a semi-colon present;
             format_file << line << ";\n";
@@ -289,7 +288,7 @@ int main(int argc, char **argv){
         // Convert assembly code to hex
         // and write to hexfile
         
-        if (!isValidLabel(line)){
+        if (!isValidLabel(line)){                        // If the line is a valid label, the function returns a 0
             label = line.substr(0, line.size() - 1);
             hexfile << "0000000\n";
             continue;
@@ -391,3 +390,4 @@ void usage(void) {
     cout << "  7. Flags followed by <value> means that providing a value upon invoking those flags is necessary.\n";
     cout << "  8. -n ovverides the -b flag, if provided." << endl;
 }
+

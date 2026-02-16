@@ -12,6 +12,7 @@ struct Opcode{
     * The 2 LSB bit indicate total number of parameters needed for given opcode
     * The next 2 indicate number of registers needed in parameters
     * The next bit indicates whether a Dataline value is required
+    * The next bit indicates whether the Dataline can have a label in it.
     */
     unsigned char instr_num;
     std::string opcode;
@@ -36,7 +37,6 @@ uint8_t isValidLabel(const std::string &s);
 bool isLabelRecorded(const std::string &s, const std::map<std::string, size_t> &labels);
 
 // Main Functions
-uint8_t instr_chk(Instruction &instr, const std::map<std::string, size_t> &labels); // Function to check whether the values in Instruction are correct
 uint8_t parse(size_t line_num, const std::string &line, const std::string block_label, const std::map<std::string, size_t> &labels, std::ofstream &out_file); // Function to parse the instruction and check for errors
 
 extern bool ERR;

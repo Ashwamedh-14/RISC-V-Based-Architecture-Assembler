@@ -109,7 +109,7 @@ echo "2. ALL THE DIRECTORIES CORRECTLY STRUCTURED"
 echo "3. ASSMEBLER CORRECTLY IN PLACE AND EXECUTABLE"
 echo -e "4. ALL THE EXPECTED FORMAT, HEX, and BIN files are in their place${RST}\n\n"
 
-sleep 10
+sleep 1
 
 # Test cases
 echo -e "${BLU}Starting Test Cases:${RST}\n"

@@ -46,7 +46,6 @@ static const string INPUT_PORTS[] = {"F1", "F2", "F3", "F4"};
 
 static const string OUTPUT_PORTS[] = {"F8", "F9", "FA", "FB"};
 
-
 static const Opcode OP_TABLE[] = {
     {0x00, "NOP", "00"},
     {0x0f, "AND", "01"},
@@ -61,11 +60,11 @@ static const Opcode OP_TABLE[] = {
     {0x16, "MOVI", "0A"},
     {0x16, "LOAD", "0B"},
     {0x16, "STORE", "0C"},
-    {0x11, "JMP", "0D"},
-    {0x11, "JMPZ", "0E"},
-    {0x11, "JMPNZ", "0F"},
-    {0x11, "JMPC", "10"},
-    {0x11, "JMPNC", "11"},
+    {0x31, "JMP", "0D"},
+    {0x31, "JMPZ", "0E"},
+    {0x31, "JMPNZ", "0F"},
+    {0x31, "JMPC", "10"},
+    {0x31, "JMPNC", "11"},
     {0x05, "PUSH", "12"},
     {0x05, "POP", "13"},
     {0x16, "IN", "14"},
@@ -84,14 +83,14 @@ static const size_t INPUT_PORT_NUMBERS = sizeof(INPUT_PORTS) / sizeof(INPUT_PORT
 static const size_t OUTPUT_PORT_NUMBERS = sizeof(OUTPUT_PORTS) / sizeof(OUTPUT_PORTS[0]);
 
 // Helper functions
-static bool validDAT(const string &s){
+static bool validHexDAT(const string &s){
     if (s.empty() || s.size() > 2) return false;
     for (char c: s) if ((c < 'A' || c > 'F') && (c < '0' || c > '9')) return false;
     return true;
 }
 
 static bool validReg(const string &s){
-    if (s.size() < 2 || s.size() > 3) return false;
+    if (s.size() < 2) return false;
     else if (s[0] != 'R') return false;
     for (char c: s.substr(1)) if (c < '0' || c > '9') return false;
     return true;
@@ -199,15 +198,19 @@ Meaning of returned values
 107: Register Rx Out of Range
 108: Register Ry Out of Range
 109: JUMP_OUT_OF_RANGE
+113: Label referenced is invalid or not defined
+114: Label used in wrong OPcode
 */
 
 
-uint8_t instr_chk(Instruction &instr, const map<string, size_t> &labels){
+uint8_t instructionCheck(Instruction &instr, const map<string, size_t> &labels){
     int temp;
 
     // Checking opcode
     if (!instr.opcode) return INVALID_OPCODE;
     
+
+    // These are allowed in the function since they just re-arrage the regs to their correct position according to the Opcode
     if (instr.opcode->opcode == "STORE" || instr.opcode->opcode == "PUSH" || instr.opcode->opcode == "OUT"){ 
         instr.registers[1] = instr.registers[0];
         instr.registers[0] = "";
@@ -240,32 +243,28 @@ uint8_t instr_chk(Instruction &instr, const map<string, size_t> &labels){
         
     // Checking valid dataline
     if (instr.dataline.empty()) return 0;
-    else if (!isValidLabel(instr.dataline + ":")) {
-        // It's syntactically a label; now check if it's defined
-        if (!isLabelRecorded(instr.dataline, labels) && !validDAT(instr.dataline)) return INVALID_LABEL_REF;
-        else if (validDAT(instr.dataline)){
-            if (instr.dataline.size() == 1) instr.dataline = "0" + instr.dataline;
-            return 0;
-        }
+    else if (!validLabelName(instr.dataline) && !validHexDAT(instr.dataline)) return INVALID_DATALINE;
+    else if (validLabelName(instr.dataline) && !isLabelRecorded(instr.dataline, labels) && !validHexDAT(instr.dataline)) return INVALID_LABEL_REF;
+    else if (isLabelRecorded(instr.dataline, labels)){
+        
+        // Checking to see if the label is valid for given opcode
+        if (!(instr.opcode->instr_num & 0x20)) return INVALID_LABEL_USE;
 
-        // Now that we know it really is a label and is defined in the source code, we check whether the opcode provided is the correct one.
-        if (instr.opcode->opcode.substr(0,3) != "JMP") return INVALID_LABEL_USE;
+        // Now we know that the dataline is having a label and it is recorded, we convert the address of the label to the dataline in hex
         temp = labels.at(instr.dataline);
-        if (temp > 255) return JUMP_OUT_OF_RANGE;
-        else if (temp == 0){
+        if (!temp){
             instr.dataline = "00";
             return 0;
         }
-
-        // Convert label address to hex string
+        else if (temp > 255 || temp < 0) return JUMP_OUT_OF_RANGE;
         instr.dataline = "";
-        while (temp > 0) {
+        while (temp > 0){
             instr.dataline = HEX_CHARS[temp % 16] + instr.dataline;
             temp /= 16;
         }
     }
-    else if (!validDAT(instr.dataline)) return INVALID_DATALINE;
 
+    // If we reach this position, we know the dataline has a valid hex data and hence can safely parse the coming statements
     if (instr.dataline.size() == 1) instr.dataline = "0" + instr.dataline;
     return 0;   
 }
@@ -307,25 +306,25 @@ uint8_t parse(size_t line_num, const string &line, const string block_label, con
             ERR = true;
             return INVALID_LINE;
         }
-
-        else if (word[0] == 'R' && word.size() > 3) instr.dataline = word;
-        
-        else if (word[0] == 'R' && instr.reg_num >= 3){
+ 
+        else if (validReg(word) && instr.reg_num >= 3){
             if (!block_label.empty()) out_file << "In block: " << block_label << ".\n";
             out_file << "Error (Code 111): Too many register references at line number " << line_num << ".\n";
             out_file << "Maximum Register References allowed: 3.\n";
             ERR = true;
             return INVALID_REG_NUM;
         }
-        else if (word[0] == 'R') instr.registers[instr.reg_num++] = word;
+        else if (validReg(word)) instr.registers[instr.reg_num++] = word;
         else instr.dataline = word;
         param_num++;
     }
 
-    error_num = instr_chk(instr, labels);
+    error_num = instructionCheck(instr, labels);
     
     // checking to see if there is any error, to get a default message for all switch cases with error;
-    if (error_num && !block_label.empty()) out_file << "In block: " << block_label << ".\n";
+    if (error_num && !block_label.empty()){ 
+        out_file << "In block: " << block_label << ".\n";
+    }
 
     switch (error_num){
         case 0:
@@ -391,13 +390,11 @@ uint8_t parse(size_t line_num, const string &line, const string block_label, con
             out_file << "The error could either be due to invalid label name, or no label of same name was found.\n";
             ERR = true;
             break;
-
         case INVALID_LABEL_USE:
-            out_file << "Error (Code 114): Inavlid use of label with opcode " << instr.opcode->opcode << ", at line " << line_num  << ".\n";
+            out_file << "Error (Code 114): Invalid use of label with opcode " << instr.opcode->opcode << ", at line " << line_num  << ".\n";
             out_file << "The error is because labels are explicitly only to be used with `jmp`, or similar statements.\n";
             ERR = true;
             break;
-
         default:
             out_file << "Error (Code 100): Bad line at line number " << line_num << ".\n";
             ERR = true;
@@ -444,7 +441,7 @@ uint8_t parse(size_t line_num, const string &line, const string block_label, con
         return INVALID_OUTPUT_PORT;
     }
 
-    // If after all these checkes, dataline is still empty, it means the dataline is not used, so we write "00" to it
+    // If dataline is empty, that means dataline was not used, and hence default value to be given is 00
     else if (instr.dataline.empty()) instr.dataline = "00";
 
     out_file << instr.opcode->hex << instr.registers[0] << instr.registers[1] << instr.registers[2] << instr.dataline << "\n";

@@ -58,7 +58,7 @@ If the executable does not run on your Linux system, follow the build instructio
 
 ### Building from Source
 
-> **Note:** Ensure you have `g++` and `make` installed. Use your system's package manager (e.g., sudo apt install build-essential on Debian based distros).
+> **Note:** Ensure you have `g++` and `make` (or `clang` in the case of macOS) installed. Use your system's package manager (e.g., sudo apt install build-essential on Debian based distros).
 
 Clone the repo and build the executable using the below given commands.
 
@@ -69,8 +69,11 @@ cd RISC-V-Based-Architecture-Assembler
 # For windows user
 make windows VERSION=$( cat version.txt )
 
-# For MacOS
+# For MacOS (g++ users)
 make macos VERSION=$( cat version.txt )
+
+# For MacOS (clang users)
+make macos CC=clang CXX=clang++ VERSION=$( cat version.txt )
 
 # For Linux users
 make VERSION=$( cat version.txt )
@@ -285,6 +288,8 @@ label3:
 
 However, if for some reason you still want to give raw hexadecimal values to `jmp` statements, kindly then generate a formatted version of your assembly code to check errors against, if any.
 
+> **NOTE**
+> Labels cannot be used with `JMPPCRZ` and `JMPPCRNZ` Opcodes, as they require jumping relative to the current `PC` and not an arbitrary point in the code.
 
 ### Points to remember
 
@@ -294,8 +299,10 @@ However, if for some reason you still want to give raw hexadecimal values to `jm
   - `R10` is correct
   - `R01` is correct and also equivalent to `R1`
   - `RA` is incorrect
+- **All** valid `regs` are `keywords`  
 - **All** `DAT`, `PORT Address`, `MEM Address` values are passed, parsed and taken as `8-bit hexadecimals`.
-- `jmp` statements can have both labels and direct hexadecimal values, though the use of labels is encouraged.
+- `JMP` statements can have both labels and direct hexadecimal values, though the use of labels is encouraged.
+- `JMPPCRZ` and `JMPPCRNZ` **only** work with hexadecimal values.
 
 ## Error Codes
 
